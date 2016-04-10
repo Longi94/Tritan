@@ -43,7 +43,7 @@ public class HexleGameScreen implements Screen {
         }
 
         //Sets the clear screen color to white
-        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
 
         //Clears the screen
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);

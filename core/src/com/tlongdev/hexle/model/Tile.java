@@ -10,7 +10,7 @@ public class Tile {
 
     private int posY;
 
-    private Color color;
+    private TileColor tileColor;
 
     public int getPosX() {
         return posX;
@@ -28,12 +28,12 @@ public class Tile {
         this.posY = posY;
     }
 
-    public Color getColor() {
-        return color;
+    public TileColor getTileColor() {
+        return tileColor;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
+    public void setTileColor(TileColor tileColor) {
+        this.tileColor = tileColor;
     }
 
     public TileOrientation getOrientation() {

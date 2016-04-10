@@ -54,7 +54,7 @@ public class Field {
                 tile.setPosX(j);
                 tile.setPosY(i);
 
-                tile.setColor(Color.values()[generator.nextInt(6)]);
+                tile.setTileColor(TileColor.values()[generator.nextInt(6)]);
 
                 tiles[i][j] = tile;
 
