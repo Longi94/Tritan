@@ -4,12 +4,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
+import com.tlongdev.hexle.view.BaseView;
 
 /**
  * @author longi
  * @since 2016.04.10.
  */
-public class Triangle implements BasicShape {
+public class Triangle implements BaseView {
 
     private Color color;
 

@@ -3,12 +3,13 @@ package com.tlongdev.hexle.shape;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.tlongdev.hexle.view.BaseView;
 
 /**
  * @author longi
  * @since 2016.04.10.
  */
-public class EquilateralTriangle implements BasicShape {
+public class EquilateralTriangle implements BaseView {
 
     private Triangle triangle;
 
