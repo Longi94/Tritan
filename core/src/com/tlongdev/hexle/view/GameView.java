@@ -16,15 +16,17 @@ public class GameView implements BaseView {
 
     @Override
     public void render() {
-        float side = (float) (screenWidth / Math.ceil(GameController.TILE_COLUMNS / 2.0));
+        float width = (float) (screenWidth / Math.ceil(GameController.TILE_COLUMNS / 2.0));
+        float height = width * (float) Math.sqrt(3) / 2.0f;
+        float offsetY = (screenHeight - (GameController.TILE_ROWS - 1) * height) / 2.0f;
 
         for (int i = 0; i < GameController.TILE_ROWS; i++) {
             for (int j = 0; j < GameController.TILE_COLUMNS; j++) {
                 TileView view = tileViews[i][j];
-                view.setSide(side);
+                view.setSide(width * 0.9f);
                 view.setCenter(new Vector2(
-                        (j + 1) * side / 2.0f,
-                        i * 200
+                        (j + 1) * width / 2.0f,
+                        offsetY + i * height
                 ));
                 view.render();
             }
