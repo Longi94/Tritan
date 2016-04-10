@@ -8,7 +8,13 @@ public class GameController {
 
     private static final String TAG = GameController.class.getName();
 
-    public GameController() {
+    private final int width;
+    private final int height;
+
+    public GameController(int width, int height) {
+        this.width = width;
+        this.height = height;
+        init();
     }
 
     private void init() {
