@@ -1,4 +1,4 @@
-package com.tlongdev.hexle.simple;
+package com.tlongdev.hexle.shape;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -21,6 +21,9 @@ public class Triangle implements BasicShape {
 
     public Triangle() {
         shapeRenderer = new ShapeRenderer();
+        a = new Vector2();
+        b = new Vector2();
+        c = new Vector2();
     }
 
     public void setColor(Color color) {

@@ -1,4 +1,4 @@
-package com.tlongdev.hexle.simple;
+package com.tlongdev.hexle.shape;
 
 import com.badlogic.gdx.utils.Disposable;
 

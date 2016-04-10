@@ -2,10 +2,11 @@ package com.tlongdev.hexle.renderer;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.tlongdev.hexle.controller.GameController;
-import com.tlongdev.hexle.simple.Triangle;
+import com.tlongdev.hexle.shape.EquilateralTriangle;
 
 /**
  * @author longi
@@ -35,13 +36,17 @@ public class GameRenderer implements Disposable{
     public void render() {
         batch.begin();
 
-        Triangle triangle = new Triangle();
-        triangle.setColor(Color.GREEN);
-        triangle.setA(new Vector2(100, 100));
-        triangle.setB(new Vector2(100, 200));
-        triangle.setC(new Vector2(200, 100));
-        triangle.render();
+        EquilateralTriangle triangle = new EquilateralTriangle();
+        triangle.setCenter(new Vector2(
+                width / 2.0f,
+                height /2.0f
+        ));
 
+        triangle.setSide(400);
+        triangle.setColor(Color.GREEN);
+        triangle.setRotation(MathUtils.PI / 2.0f);
+        triangle.render();
+        triangle.dispose();
         batch.end();
     }
 
