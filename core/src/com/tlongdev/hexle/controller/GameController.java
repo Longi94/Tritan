@@ -1,7 +1,9 @@
 package com.tlongdev.hexle.controller;
 
+import com.badlogic.gdx.utils.Logger;
 import com.tlongdev.hexle.input.HexleInputProcessor;
 import com.tlongdev.hexle.model.Field;
+import com.tlongdev.hexle.model.SlideDirection;
 import com.tlongdev.hexle.view.GameView;
 import com.tlongdev.hexle.view.TileView;
 
@@ -20,11 +22,15 @@ public class GameController implements HexleInputProcessor.HexleInputListener {
 
     private Field field;
 
+    private Logger logger;
+
     public GameController() {
         init();
     }
 
     private void init() {
+        logger = new Logger(TAG, Logger.DEBUG);
+
         field = new Field(TILE_COLUMNS, TILE_ROWS);
         field.randomize();
 
@@ -59,5 +65,10 @@ public class GameController implements HexleInputProcessor.HexleInputListener {
     @Override
     public void touchUp(int x, int y) {
         gameView.touchUp(x, y);
+    }
+
+    @Override
+    public void touchDragged(SlideDirection direction, float dst) {
+        logger.info(direction.toString() + ":" + dst);
     }
 }
