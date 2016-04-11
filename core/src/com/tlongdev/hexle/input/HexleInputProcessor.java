@@ -72,11 +72,14 @@ public class HexleInputProcessor implements InputProcessor {
         Vector2 dirVector = dragged.cpy().sub(start);
         float angle = dirVector.angleRad();
 
-        float opposite = angle + MathUtils.PI;
+        float opposite = angle - MathUtils.PI;
+        if (opposite <= -MathUtils.PI) {
+            opposite += MathUtils.PI2;
+        }
         if (direction == null) {
             if (dst > MIN_DRAG_DISTANCE) {
                 if (angle >= -MathUtils.PI / 6.0f && angle < MathUtils.PI / 6.0f ||
-                        opposite >= -MathUtils.PI / 6.0f && opposite < MathUtils.PI / 6.0f) {
+                        angle >= 5.0f * MathUtils.PI / 6.0f || angle < - 5.0f * MathUtils.PI / 6.0f) {
                     direction = SlideDirection.EAST;
                 } else if (angle >= MathUtils.PI / 6.0f && angle < MathUtils.PI / 2.0f ||
                         opposite >= MathUtils.PI / 6.0f && opposite < MathUtils.PI / 2.0f) {

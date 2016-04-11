@@ -3,6 +3,7 @@ package com.tlongdev.hexle.view;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.tlongdev.hexle.model.SlideDirection;
 import com.tlongdev.hexle.model.Tile;
 import com.tlongdev.hexle.shape.EquilateralTriangle;
 
@@ -89,5 +90,43 @@ public class TileView implements BaseView {
 
     public Vector2 getCenter() {
         return center;
+    }
+
+    public boolean isAffectedBySlide(TileView selectedTile, SlideDirection slideDirection) {
+        int aX = tile.getPosX();
+        int aY = tile.getPosY();
+        int bX = selectedTile.getTile().getPosX();
+        int bY = selectedTile.getTile().getPosY();
+        switch (slideDirection) {
+            case EAST:
+                return aY == bY;
+            case NORTH_EAST:
+                if (bX - aX == bY - aY) {
+                    return true;
+                }
+                switch (tile.getOrientation()){
+                    case UP:
+                        return bX - aX - 1 == bY - aY;
+                    case DOWN:
+                        return bX - aX == bY - aY - 1;
+                }
+                break;
+            case NORTH_WEST:
+                if (bX - aX ==  - (bY - aY)) {
+                    return true;
+                }
+                switch (tile.getOrientation()){
+                    case UP:
+                        return bX - aX == - (bY - aY) - 1;
+                    case DOWN:
+                        return bX - aX - 1 == - (bY - aY);
+                }
+                break;
+        }
+        return false;
+    }
+
+    public Tile getTile() {
+        return tile;
     }
 }

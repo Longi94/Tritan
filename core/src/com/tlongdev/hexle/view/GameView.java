@@ -37,29 +37,29 @@ public class GameView implements BaseView {
 
                 if (selectedTile == view) {
                     view.setSide(width);
-
-                    if (slideDirection != null) {
-                        Vector2 slideVector = new Vector2(slideDistance, 0);
-                        switch (slideDirection){
-                            case EAST:
-                                slideVector.setAngleRad(0);
-                                break;
-                            case NORTH_EAST:
-                                slideVector.setAngleRad(MathUtils.PI / 3.0f);
-                                break;
-                            case NORTH_WEST:
-                                slideVector.setAngleRad(2.0f * MathUtils.PI / 3.0f);
-                                break;
-                        }
-                        if (slideDistance < 0) {
-                            slideVector.rotateRad(MathUtils.PI);
-                        }
-                        view.getCenter().add(slideVector);
-                    }
-
                 } else {
                     view.setSide(width * 0.9f);
                 }
+
+                if (slideDirection != null && view.isAffectedBySlide(selectedTile, slideDirection)) {
+                    Vector2 slideVector = new Vector2(slideDistance, 0);
+                    switch (slideDirection){
+                        case EAST:
+                            slideVector.setAngleRad(0);
+                            break;
+                        case NORTH_EAST:
+                            slideVector.setAngleRad(MathUtils.PI / 3.0f);
+                            break;
+                        case NORTH_WEST:
+                            slideVector.setAngleRad(2.0f * MathUtils.PI / 3.0f);
+                            break;
+                    }
+                    if (slideDistance < 0) {
+                        slideVector.rotateRad(MathUtils.PI);
+                    }
+                    view.getCenter().add(slideVector);
+                }
+
                 view.render();
             }
         }
