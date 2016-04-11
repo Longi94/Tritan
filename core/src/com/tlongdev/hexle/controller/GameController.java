@@ -52,12 +52,12 @@ public class GameController implements HexleInputProcessor.HexleInputListener {
     }
 
     @Override
-    public void touchDown(int screenX, int screenY) {
-        gameView.touchDown(screenX, screenY);
+    public void touchDown(int x, int y) {
+        gameView.touchDown(x, y);
     }
 
     @Override
-    public void touchUp(int screenX, int screenY) {
-        gameView.touchUp(screenX, screenY);
+    public void touchUp(int x, int y) {
+        gameView.touchUp(x, y);
     }
 }

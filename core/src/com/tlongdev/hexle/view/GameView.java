@@ -14,7 +14,7 @@ public class GameView implements BaseView {
 
     private TileView[][] tileViews;
 
-    private Vector2 touchDown;
+    private TileView selectedTile;
 
     @Override
     public void render() {
@@ -30,7 +30,7 @@ public class GameView implements BaseView {
                         offsetY + i * height
                 ));
 
-                if (touchDown != null && touchDown.dst(view.getTriangleCenter()) < width) {
+                if (selectedTile == view) {
                     view.setSide(width);
                 } else {
                     view.setSide(width * 0.9f);
@@ -47,7 +47,6 @@ public class GameView implements BaseView {
                 tileViews[i][j].dispose();
             }
         }
-
     }
 
     public void setDimensions(int width, int height) {
@@ -63,11 +62,22 @@ public class GameView implements BaseView {
         this.tileViews = tileViews;
     }
 
-    public void touchDown(int screenX, int screenY) {
-        touchDown = new Vector2(screenX, screenY);
+    public void touchDown(int x, int y) {
+        Vector2 touchDown = new Vector2(x, y);
+        float minDist = screenHeight;
+
+        for (int i = 0; i < GameController.TILE_ROWS; i++) {
+            for (int j = 0; j < GameController.TILE_COLUMNS; j++) {
+                float dist = touchDown.dst(tileViews[i][j].getTriangleCenter());
+                if (minDist > dist) {
+                    minDist = dist;
+                    selectedTile = tileViews[i][j];
+                }
+            }
+        }
     }
 
     public void touchUp(int screenX, int screenY) {
-        touchDown = null;
+        selectedTile = null;
     }
 }

@@ -74,7 +74,7 @@ public class HexleInputProcessor implements InputProcessor {
     }
 
     public interface HexleInputListener {
-        void touchDown(int screenX, int screenY);
-        void touchUp(int screenX, int screenY);
+        void touchDown(int x, int y);
+        void touchUp(int x, int y);
     }
 }
