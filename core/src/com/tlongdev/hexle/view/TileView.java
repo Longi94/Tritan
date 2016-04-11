@@ -93,6 +93,9 @@ public class TileView implements BaseView {
     }
 
     public boolean isAffectedBySlide(TileView selectedTile, SlideDirection slideDirection) {
+        if (selectedTile == null || slideDirection == null) {
+            return false;
+        }
         int aX = tile.getPosX();
         int aY = tile.getPosY();
         int bX = selectedTile.getTile().getPosX();
