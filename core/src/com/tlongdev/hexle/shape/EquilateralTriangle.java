@@ -1,6 +1,7 @@
 package com.tlongdev.hexle.shape;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.tlongdev.hexle.view.BaseView;
@@ -23,8 +24,8 @@ public class EquilateralTriangle implements BaseView {
 
     private Color color;
 
-    public EquilateralTriangle() {
-        triangle = new Triangle();
+    public EquilateralTriangle(ShapeRenderer shapeRenderer) {
+        triangle = new Triangle(shapeRenderer);
     }
 
     public Vector2 getCenter() {
@@ -86,8 +87,6 @@ public class EquilateralTriangle implements BaseView {
         triangle.render();
     }
 
-    @Override
-    public void dispose() {
-        triangle.dispose();
+    public void setShapeRenderer(ShapeRenderer shapeRenderer) {
     }
 }

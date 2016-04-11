@@ -1,6 +1,7 @@
 package com.tlongdev.hexle.view;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.tlongdev.hexle.model.SlideDirection;
@@ -19,8 +20,8 @@ public class TileView implements BaseView {
 
     private Vector2 center;
 
-    public TileView() {
-        triangle = new EquilateralTriangle();
+    public TileView(ShapeRenderer shapeRenderer) {
+        triangle = new EquilateralTriangle(shapeRenderer);
     }
 
     @Override
@@ -73,12 +74,6 @@ public class TileView implements BaseView {
         }
 
         triangle.render();
-    }
-
-    @Override
-    public void dispose() {
-        triangle.dispose();
-        tile = null;
     }
 
     public void setTile(Tile tile) {

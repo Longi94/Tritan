@@ -1,5 +1,6 @@
 package com.tlongdev.hexle.renderer;
 
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import com.tlongdev.hexle.controller.GameController;
 import com.tlongdev.hexle.view.GameView;
@@ -9,6 +10,8 @@ import com.tlongdev.hexle.view.GameView;
  * @since 2016.04.10.
  */
 public class GameRenderer implements Disposable{
+
+    private ShapeRenderer shapeRenderer;
 
     private GameController controller;
 
@@ -24,22 +27,24 @@ public class GameRenderer implements Disposable{
     }
 
     private void init() {
+        shapeRenderer = controller.getShapeRenderer();
     }
 
     public void render() {
         //Render the game
         GameView view = controller.getGameView();
-        view.setDimensions(width, height);
         view.render();
     }
 
     public void resize(int width, int height) {
         this.width = width;
         this.height = height;
+        GameView view = controller.getGameView();
+        view.setDimensions(width, height);
     }
 
     @Override
     public void dispose() {
-        controller.getGameView().dispose();
+        shapeRenderer.dispose();
     }
 }

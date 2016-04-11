@@ -1,5 +1,6 @@
 package com.tlongdev.hexle.view;
 
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.tlongdev.hexle.controller.GameController;
@@ -11,13 +12,14 @@ import com.tlongdev.hexle.model.SlideDirection;
  */
 public class GameView implements BaseView {
 
+    private ShapeRenderer shapeRenderer;
+
     private int screenWidth;
     private int screenHeight;
 
     private TileView[][] tileViews;
 
     private TileView selectedTile;
-
     private SlideDirection slideDirection;
     private float slideDistance;
 
@@ -73,15 +75,6 @@ public class GameView implements BaseView {
                 }
 
                 view.render();
-            }
-        }
-    }
-
-    @Override
-    public void dispose() {
-        for (int i = 0; i < GameController.TILE_ROWS; i++) {
-            for (int j = 0; j < GameController.TILE_COLUMNS; j++) {
-                tileViews[i][j].dispose();
             }
         }
     }
@@ -161,5 +154,9 @@ public class GameView implements BaseView {
     public void setSlide(SlideDirection direction, float dst) {
         this.slideDirection = direction;
         this.slideDistance = dst;
+    }
+
+    public void setShapeRenderer(ShapeRenderer shapeRenderer) {
+        this.shapeRenderer = shapeRenderer;
     }
 }

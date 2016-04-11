@@ -29,7 +29,6 @@ public class Tile {
 
     public void setPosX(int posX) {
         this.posX = posX;
-        updateIndices();
     }
 
     public int getPosY() {
@@ -38,7 +37,6 @@ public class Tile {
 
     public void setPosY(int posY) {
         this.posY = posY;
-        updateIndices();
     }
 
     public TileColor getTileColor() {

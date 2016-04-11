@@ -1,5 +1,6 @@
 package com.tlongdev.hexle.controller;
 
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Logger;
 import com.tlongdev.hexle.input.HexleInputProcessor;
 import com.tlongdev.hexle.model.Field;
@@ -18,17 +19,19 @@ public class GameController implements HexleInputProcessor.HexleInputListener {
     public static final int TILE_COLUMNS = 9;
     public static final int TILE_ROWS = 8;
 
+    private ShapeRenderer shapeRenderer;
+
     private GameView gameView;
 
     private Field field;
 
     private Logger logger;
 
-    public GameController() {
-        init();
+    public GameController(ShapeRenderer shapeRenderer) {
+        init(shapeRenderer);
     }
 
-    private void init() {
+    private void init(ShapeRenderer shapeRenderer) {
         logger = new Logger(TAG, Logger.DEBUG);
 
         field = new Field(TILE_COLUMNS, TILE_ROWS);
@@ -40,7 +43,7 @@ public class GameController implements HexleInputProcessor.HexleInputListener {
 
         for (int i = 0; i < TILE_ROWS; i++) {
             for (int j = 0; j < TILE_COLUMNS; j++) {
-                TileView view = new TileView();
+                TileView view = new TileView(shapeRenderer);
                 view.setTile(field.getTiles()[i][j]);
                 tileViews[i][j] = view;
             }
@@ -70,5 +73,9 @@ public class GameController implements HexleInputProcessor.HexleInputListener {
     @Override
     public void touchDragged(SlideDirection direction, float dst) {
         gameView.setSlide(direction, dst);
+    }
+
+    public ShapeRenderer getShapeRenderer() {
+        return shapeRenderer;
     }
 }

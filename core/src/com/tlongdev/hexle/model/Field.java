@@ -54,6 +54,7 @@ public class Field {
 
                 tile.setPosX(j);
                 tile.setPosY(i);
+                tile.updateIndices();
 
                 if ((tile.getPosX() + tile.getPosY()) % 2 == 0) {
                     tile.setOrientation(Tile.TileOrientation.DOWN);

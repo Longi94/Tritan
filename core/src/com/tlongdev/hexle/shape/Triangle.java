@@ -22,8 +22,8 @@ public class Triangle implements BaseView {
 
     private ShapeRenderer shapeRenderer;
 
-    public Triangle() {
-        shapeRenderer = new ShapeRenderer();
+    public Triangle(ShapeRenderer shapeRenderer) {
+        this.shapeRenderer = shapeRenderer;
         a = new Vector2();
         b = new Vector2();
         c = new Vector2();
@@ -63,10 +63,5 @@ public class Triangle implements BaseView {
         shapeRenderer.setColor(color);
         shapeRenderer.triangle(a.x, a.y, b.x, b.y, c.x, c.y);
         shapeRenderer.end();
-    }
-
-    @Override
-    public void dispose() {
-        shapeRenderer.dispose();
     }
 }
