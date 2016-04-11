@@ -46,16 +46,11 @@ public class GameView implements BaseView {
                         offsetY + i * height
                 ));
 
-                if (selectedTile == view) {
-                    //The tile is selected, so it's slightly bigger
-                    view.setSide(width);
-                } else {
-                    view.setSide(width * 0.9f);
-                }
+                view.setSide(width * 0.9f);
 
                 //If slideDirection is not null the a slide is currently happening
                 if (slideDirection != null && view.isAffectedBySlide(selectedTile, slideDirection)) {
-                    switch (slideDirection){
+                    switch (slideDirection) {
                         case EAST:
                             slideVector.setAngleRad(0);
                             break;
@@ -73,6 +68,8 @@ public class GameView implements BaseView {
                         slideVector.rotateRad(MathUtils.PI);
                     }
                     view.getCenter().add(slideVector);
+
+                    renderDuplicates(view, slideDirection, width);
                 }
 
                 view.render();
@@ -87,6 +84,44 @@ public class GameView implements BaseView {
                 tileViews[i][j].dispose();
             }
         }
+    }
+
+    /**
+     * This will render duplicates of triangles which are currently sliding creating an illusion of
+     * a looped shift register.
+     *
+     * @param original the original tile view
+     * @param direction the direction the sliding is going on
+     * @param side the (full) size of the triangles side
+     */
+    private void renderDuplicates(TileView original, SlideDirection direction, float side) {
+        Vector2 slideVector = new Vector2(slideDistance, 0);
+        Vector2 originalVector = original.getCenter();
+        float distance;
+        switch (direction) {
+            case EAST:
+                distance = side * 5.0f;
+                slideVector.setAngleRad(0);
+                break;
+            case NORTH_EAST:
+                int rightIndex = original.getTile().getRightDiagonalIndex();
+                distance = (1 + Math.min(rightIndex, 7 - rightIndex)) * 2.0f * side;
+                slideVector.setAngleRad(MathUtils.PI / 3.0f);
+                break;
+            default:
+                int leftIndex = original.getTile().getLeftDiagonalIndex();
+                distance = (1 + Math.min(leftIndex, 7 - leftIndex)) * 2.0f * side;
+                slideVector.setAngleRad(2.0f * MathUtils.PI / 3.0f);
+                break;
+        }
+        slideVector.setLength(distance);
+        original.setCenter(originalVector.cpy().add(slideVector));
+        original.render();
+
+        slideVector.rotateRad(MathUtils.PI);
+        original.setCenter(originalVector.cpy().add(slideVector));
+        original.render();
+        original.setCenter(originalVector);
     }
 
     public void setDimensions(int width, int height) {
