@@ -12,6 +12,13 @@ public class Tile {
 
     private int posY;
 
+    /**
+     * These variables determine index of the 3 possible rows the tile is in
+     */
+    private int horizontalRowIndex;
+    private int leftDiagonalIndex;
+    private int rightDiagonalIndex;
+
     private TileColor tileColor;
 
     private TileOrientation orientation;
@@ -22,6 +29,7 @@ public class Tile {
 
     public void setPosX(int posX) {
         this.posX = posX;
+        updateIndices();
     }
 
     public int getPosY() {
@@ -30,6 +38,7 @@ public class Tile {
 
     public void setPosY(int posY) {
         this.posY = posY;
+        updateIndices();
     }
 
     public TileColor getTileColor() {
@@ -48,44 +57,41 @@ public class Tile {
         this.orientation = orientation;
     }
 
+    public int getHorizontalRowIndex() {
+        return horizontalRowIndex;
+    }
+
+    public int getLeftDiagonalIndex() {
+        return leftDiagonalIndex;
+    }
+
+    public int getRightDiagonalIndex() {
+        return rightDiagonalIndex;
+    }
+
     public boolean isAffectedBySlide(Tile selectedTile, SlideDirection slideDirection) {
         if (selectedTile == null || slideDirection == null) {
             return false;
         }
-        int aX = posX;
-        int aY = posY;
-        int bX = selectedTile.getPosX();
-        int bY = selectedTile.getPosY();
         switch (slideDirection) {
             case EAST:
                 //Sliding sideways, tile is affected if the Y coordinate is the same
-                return aY == bY;
+                return horizontalRowIndex == selectedTile.getHorizontalRowIndex();
             case NORTH_EAST:
-                //Magic to determine whether the tile is in the same left diagonal
-                if (bX - aX == bY - aY) {
-                    return true;
-                }
-                switch (getOrientation()) {
-                    case UP:
-                        return bX - aX - 1 == bY - aY;
-                    case DOWN:
-                        return bX - aX == bY - aY - 1;
-                }
-                break;
-            case NORTH_WEST:
                 //Magic to determine whether the tile is in the same right diagonal
-                if (bX - aX == -(bY - aY)) {
-                    return true;
-                }
-                switch (getOrientation()) {
-                    case UP:
-                        return bX - aX == -(bY - aY) - 1;
-                    case DOWN:
-                        return bX - aX - 1 == -(bY - aY);
-                }
-                break;
+                return rightDiagonalIndex == selectedTile.getRightDiagonalIndex();
+            case NORTH_WEST:
+                //Magic to determine whether the tile is in the same left diagonal
+                return leftDiagonalIndex == selectedTile.getLeftDiagonalIndex();
         }
         return false;
+    }
+
+    public void updateIndices() {
+        //Black magic (not really) to determine which rows the tile is in
+        horizontalRowIndex = posY;
+        rightDiagonalIndex = (posX - posY + 7) / 2;
+        leftDiagonalIndex = (posX + posY) / 2;
     }
 
     public enum TileOrientation {
