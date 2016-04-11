@@ -1,6 +1,8 @@
 package com.tlongdev.hexle.model;
 
 /**
+ * A single tile.
+ *
  * @author longi
  * @since 2016.04.09.
  */
@@ -37,11 +39,52 @@ public class Tile {
     }
 
     public TileOrientation getOrientation() {
+        // TODO: 2016.04.11. this should not be dynamic as tiles can't change orientation
         if ((posX + posY) % 2 == 0) {
             return TileOrientation.DOWN;
         } else {
             return TileOrientation.UP;
         }
+    }
+
+    public boolean isAffectedBySlide(Tile selectedTile, SlideDirection slideDirection) {
+        if (selectedTile == null || slideDirection == null) {
+            return false;
+        }
+        int aX = posX;
+        int aY = posY;
+        int bX = selectedTile.getPosX();
+        int bY = selectedTile.getPosY();
+        switch (slideDirection) {
+            case EAST:
+                //Sliding sideways, tile is affected if the Y coordinate is the same
+                return aY == bY;
+            case NORTH_EAST:
+                //Magic to determine whether the tile is in the same left diagonal
+                if (bX - aX == bY - aY) {
+                    return true;
+                }
+                switch (getOrientation()) {
+                    case UP:
+                        return bX - aX - 1 == bY - aY;
+                    case DOWN:
+                        return bX - aX == bY - aY - 1;
+                }
+                break;
+            case NORTH_WEST:
+                //Magic to determine whether the tile is in the same right diagonal
+                if (bX - aX == -(bY - aY)) {
+                    return true;
+                }
+                switch (getOrientation()) {
+                    case UP:
+                        return bX - aX == -(bY - aY) - 1;
+                    case DOWN:
+                        return bX - aX - 1 == -(bY - aY);
+                }
+                break;
+        }
+        return false;
     }
 
     public enum TileOrientation {

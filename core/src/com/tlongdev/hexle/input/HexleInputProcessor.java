@@ -8,6 +8,8 @@ import com.badlogic.gdx.utils.Logger;
 import com.tlongdev.hexle.model.SlideDirection;
 
 /**
+ * Input processor for the standard game.
+ *
  * @author Long
  * @since 2016. 04. 11.
  */
@@ -15,15 +17,24 @@ public class HexleInputProcessor implements InputProcessor {
 
     private static final String TAG = HexleInputProcessor.class.getSimpleName();
 
-    public static final float MIN_DRAG_DISTANCE = 50.0f;
-
     private Logger logger;
+
+    /**
+     * The minimum distance in pixels needed for the drag to trigger.
+     */
+    public static final float MIN_DRAG_DISTANCE = 50.0f;
 
     private HexleInputListener listener;
 
+    /**
+     * Start position of the drag
+     */
     private int startX;
     private int startY;
 
+    /**
+     * Direction of the drag
+     */
     private SlideDirection direction = null;
 
     public HexleInputProcessor() {
@@ -32,25 +43,31 @@ public class HexleInputProcessor implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
+        // unused
         return true;
     }
 
     @Override
     public boolean keyUp(int keycode) {
+        // unused
         return true;
     }
 
     @Override
     public boolean keyTyped(char character) {
+        // unused
         return true;
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (listener != null) {
+            //Flip the Y
             listener.touchDown(screenX, Gdx.graphics.getHeight() - screenY);
         }
         startX = screenX;
+
+        //Flip the Y
         startY = Gdx.graphics.getHeight() - screenY;
         return true;
     }
@@ -58,6 +75,7 @@ public class HexleInputProcessor implements InputProcessor {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         if (listener != null) {
+            //Flip the Y
             listener.touchUp(screenX, Gdx.graphics.getHeight() - screenY);
         }
         direction = null;
@@ -66,30 +84,50 @@ public class HexleInputProcessor implements InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+
+        //The current position of the drag
         Vector2 dragged = new Vector2(screenX, Gdx.graphics.getHeight() - screenY);
+
+        //The start position of the drag
         Vector2 start = new Vector2(startX, startY);
-        float dst = start.dst(dragged);
+
+        //Vector pointing in the diraction of the drag
         Vector2 dirVector = dragged.cpy().sub(start);
+        //Angle of above vector
         float angle = dirVector.angleRad();
 
+        //Calculate the opposite vector
         float opposite = angle - MathUtils.PI;
         if (opposite <= -MathUtils.PI) {
             opposite += MathUtils.PI2;
         }
+
+        //If direction is null a slide hasn't been initiated yet
         if (direction == null) {
+
+            //Distance between the two points
+            float dst = start.dst(dragged);
+
+            //Check if the distance if long enough
             if (dst > MIN_DRAG_DISTANCE) {
+
+                //Magic angles
                 if (angle >= -MathUtils.PI / 6.0f && angle < MathUtils.PI / 6.0f ||
-                        angle >= 5.0f * MathUtils.PI / 6.0f || angle < - 5.0f * MathUtils.PI / 6.0f) {
+                        angle >= 5.0f * MathUtils.PI / 6.0f || angle < -5.0f * MathUtils.PI / 6.0f) {
+                    //User dragged left/right
                     direction = SlideDirection.EAST;
                 } else if (angle >= MathUtils.PI / 6.0f && angle < MathUtils.PI / 2.0f ||
                         opposite >= MathUtils.PI / 6.0f && opposite < MathUtils.PI / 2.0f) {
+                    //User dragged NE or SW
                     direction = SlideDirection.NORTH_EAST;
                 } else {
+                    //User dragged NW or SE
                     direction = SlideDirection.NORTH_WEST;
                 }
                 logger.info(direction.toString() + ":" + dst);
             }
         } else {
+            //Vector parallel to the slide direction
             Vector2 projectionBase = new Vector2(1, 0);
             switch (direction) {
                 case EAST:
@@ -103,7 +141,10 @@ public class HexleInputProcessor implements InputProcessor {
                     break;
             }
 
+            //Project the direction vector to the base slide direction vector
             float slideDistance = dirVector.dot(projectionBase) / projectionBase.len();
+
+            //Tell the listener drag is going on
             if (listener != null) {
                 listener.touchDragged(direction, slideDistance);
             }
@@ -113,11 +154,13 @@ public class HexleInputProcessor implements InputProcessor {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
+        // unused
         return true;
     }
 
     @Override
     public boolean scrolled(int amount) {
+        // unused
         return true;
     }
 

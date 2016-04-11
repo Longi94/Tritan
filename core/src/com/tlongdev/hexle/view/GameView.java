@@ -23,26 +23,38 @@ public class GameView implements BaseView {
 
     @Override
     public void render() {
+        //Get the maximum width the tile can fit in the screen
         float width = (float) (screenWidth / Math.ceil(GameController.TILE_COLUMNS / 2.0));
+
+        //Calculate the height from the width (equilateral triangle height from side)
         float height = width * (float) Math.sqrt(3) / 2.0f;
+
+        //Calculate the vertical offset, so the triangles are in the middle of the screen
         float offsetY = (screenHeight - (GameController.TILE_ROWS - 1) * height) / 2.0f;
 
+        //The vector that will translate all the affected tiles
+        Vector2 slideVector = new Vector2(slideDistance, 0);
+
+        //Iterate through the tiles
         for (int i = 0; i < GameController.TILE_ROWS; i++) {
             for (int j = 0; j < GameController.TILE_COLUMNS; j++) {
                 TileView view = tileViews[i][j];
+
+                //Set the center
                 view.setCenter(new Vector2(
                         (j + 1) * width / 2.0f,
                         offsetY + i * height
                 ));
 
                 if (selectedTile == view) {
+                    //The tile is selected, so it's slightly bigger
                     view.setSide(width);
                 } else {
                     view.setSide(width * 0.9f);
                 }
 
+                //If slideDirection is not null the a slide is currently happening
                 if (slideDirection != null && view.isAffectedBySlide(selectedTile, slideDirection)) {
-                    Vector2 slideVector = new Vector2(slideDistance, 0);
                     switch (slideDirection){
                         case EAST:
                             slideVector.setAngleRad(0);
@@ -54,6 +66,9 @@ public class GameView implements BaseView {
                             slideVector.setAngleRad(2.0f * MathUtils.PI / 3.0f);
                             break;
                     }
+
+                    //Because setting the length of the vector will always make if face in the
+                    //positive direction no matter the distance being negative. Dumb.
                     if (slideDistance < 0) {
                         slideVector.rotateRad(MathUtils.PI);
                     }
@@ -91,6 +106,7 @@ public class GameView implements BaseView {
         Vector2 touchDown = new Vector2(x, y);
         float minDist = screenHeight;
 
+        //Find the closest tile and mark it as selected
         for (int i = 0; i < GameController.TILE_ROWS; i++) {
             for (int j = 0; j < GameController.TILE_COLUMNS; j++) {
                 float dist = touchDown.dst(tileViews[i][j].getTriangleCenter());

@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.tlongdev.hexle.view.BaseView;
 
 /**
+ * And equilateral triangle.
+ *
  * @author longi
  * @since 2016.04.10.
  */
@@ -61,6 +63,9 @@ public class EquilateralTriangle implements BaseView {
     public void render() {
 
         float h = side / ((float) Math.sqrt(3));
+
+        //Calculate the 3 points of the triangle based on the center point, the length of the
+        //triangle sides and the rotation.
 
         triangle.setA(new Vector2(
                 center.x + MathUtils.cos(rotation) * h,

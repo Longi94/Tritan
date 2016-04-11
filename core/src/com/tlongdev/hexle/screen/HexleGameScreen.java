@@ -17,12 +17,12 @@ public class HexleGameScreen implements Screen {
 
     private static final String TAG = HexleGameScreen.class.getSimpleName();
 
+    private Logger logger;
+
     private GameController controller;
     private GameRenderer renderer;
 
     private boolean paused;
-
-    private Logger logger;
 
     public HexleGameScreen() {
         logger = new Logger(TAG, Logger.DEBUG);

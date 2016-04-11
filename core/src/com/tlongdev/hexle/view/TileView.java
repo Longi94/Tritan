@@ -27,14 +27,22 @@ public class TileView implements BaseView {
     public void render() {
         switch (tile.getOrientation()) {
             case UP:
+                //Triangle faces up /\
                 triangle.setRotation(MathUtils.PI / 2);
+
+                //Offset the triangle so the rows properly align, remove this and you'll know what
+                //I mean
                 triangle.setCenter(new Vector2(
                         center.x,
                         center.y - ((float) Math.sqrt(3) * triangle.getSide() / 12.0f)
                 ));
                 break;
             case DOWN:
+                //Triangle faces down \/
                 triangle.setRotation(-MathUtils.PI / 2);
+
+                //Offset the triangle so the rows properly align, remove this and you'll know what
+                //I mean
                 triangle.setCenter(new Vector2(
                         center.x,
                         center.y + ((float) Math.sqrt(3) * triangle.getSide() / 12.0f)
@@ -42,6 +50,7 @@ public class TileView implements BaseView {
                 break;
         }
 
+        //Set the color
         switch (tile.getTileColor()) {
             case RED:
                 triangle.setColor(Color.RED);
@@ -93,40 +102,7 @@ public class TileView implements BaseView {
     }
 
     public boolean isAffectedBySlide(TileView selectedTile, SlideDirection slideDirection) {
-        if (selectedTile == null || slideDirection == null) {
-            return false;
-        }
-        int aX = tile.getPosX();
-        int aY = tile.getPosY();
-        int bX = selectedTile.getTile().getPosX();
-        int bY = selectedTile.getTile().getPosY();
-        switch (slideDirection) {
-            case EAST:
-                return aY == bY;
-            case NORTH_EAST:
-                if (bX - aX == bY - aY) {
-                    return true;
-                }
-                switch (tile.getOrientation()){
-                    case UP:
-                        return bX - aX - 1 == bY - aY;
-                    case DOWN:
-                        return bX - aX == bY - aY - 1;
-                }
-                break;
-            case NORTH_WEST:
-                if (bX - aX ==  - (bY - aY)) {
-                    return true;
-                }
-                switch (tile.getOrientation()){
-                    case UP:
-                        return bX - aX == - (bY - aY) - 1;
-                    case DOWN:
-                        return bX - aX - 1 == - (bY - aY);
-                }
-                break;
-        }
-        return false;
+        return tile.isAffectedBySlide(selectedTile.getTile(), slideDirection);
     }
 
     public Tile getTile() {

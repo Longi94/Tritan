@@ -27,6 +27,7 @@ public class GameRenderer implements Disposable{
     }
 
     public void render() {
+        //Render the game
         GameView view = controller.getGameView();
         view.setDimensions(width, height);
         view.render();

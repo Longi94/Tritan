@@ -47,6 +47,7 @@ public class Field {
     }
 
     public void randomize() {
+        //Fill up the field with random colored tiles
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 Tile tile = new Tile();

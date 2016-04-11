@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.tlongdev.hexle.view.BaseView;
 
 /**
+ * Simple triangle shape.
+ *
  * @author longi
  * @since 2016.04.10.
  */
