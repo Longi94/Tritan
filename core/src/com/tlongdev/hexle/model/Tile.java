@@ -14,6 +14,8 @@ public class Tile {
 
     private TileColor tileColor;
 
+    private TileOrientation orientation;
+
     public int getPosX() {
         return posX;
     }
@@ -39,12 +41,11 @@ public class Tile {
     }
 
     public TileOrientation getOrientation() {
-        // TODO: 2016.04.11. this should not be dynamic as tiles can't change orientation
-        if ((posX + posY) % 2 == 0) {
-            return TileOrientation.DOWN;
-        } else {
-            return TileOrientation.UP;
-        }
+        return orientation;
+    }
+
+    public void setOrientation(TileOrientation orientation) {
+        this.orientation = orientation;
     }
 
     public boolean isAffectedBySlide(Tile selectedTile, SlideDirection slideDirection) {

@@ -55,6 +55,12 @@ public class Field {
                 tile.setPosX(j);
                 tile.setPosY(i);
 
+                if ((tile.getPosX() + tile.getPosY()) % 2 == 0) {
+                    tile.setOrientation(Tile.TileOrientation.DOWN);
+                } else {
+                    tile.setOrientation(Tile.TileOrientation.UP);
+                }
+
                 tile.setTileColor(TileColor.values()[generator.nextInt(6)]);
 
                 tiles[i][j] = tile;

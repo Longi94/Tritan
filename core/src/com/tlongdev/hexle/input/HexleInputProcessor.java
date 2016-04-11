@@ -22,7 +22,7 @@ public class HexleInputProcessor implements InputProcessor {
     /**
      * The minimum distance in pixels needed for the drag to trigger.
      */
-    public static final float MIN_DRAG_DISTANCE = 50.0f;
+    public static final float MIN_DRAG_DISTANCE = 10.0f;
 
     private HexleInputListener listener;
 
