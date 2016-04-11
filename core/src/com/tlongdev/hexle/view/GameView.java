@@ -1,7 +1,9 @@
 package com.tlongdev.hexle.view;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.tlongdev.hexle.controller.GameController;
+import com.tlongdev.hexle.model.SlideDirection;
 
 /**
  * @author longi
@@ -15,6 +17,9 @@ public class GameView implements BaseView {
     private TileView[][] tileViews;
 
     private TileView selectedTile;
+
+    private SlideDirection slideDirection;
+    private float slideDistance;
 
     @Override
     public void render() {
@@ -32,6 +37,26 @@ public class GameView implements BaseView {
 
                 if (selectedTile == view) {
                     view.setSide(width);
+
+                    if (slideDirection != null) {
+                        Vector2 slideVector = new Vector2(slideDistance, 0);
+                        switch (slideDirection){
+                            case EAST:
+                                slideVector.setAngleRad(0);
+                                break;
+                            case NORTH_EAST:
+                                slideVector.setAngleRad(MathUtils.PI / 3.0f);
+                                break;
+                            case NORTH_WEST:
+                                slideVector.setAngleRad(2.0f * MathUtils.PI / 3.0f);
+                                break;
+                        }
+                        if (slideDistance < 0) {
+                            slideVector.rotateRad(MathUtils.PI);
+                        }
+                        view.getCenter().add(slideVector);
+                    }
+
                 } else {
                     view.setSide(width * 0.9f);
                 }
@@ -79,5 +104,11 @@ public class GameView implements BaseView {
 
     public void touchUp(int screenX, int screenY) {
         selectedTile = null;
+        slideDirection = null;
+    }
+
+    public void setSlide(SlideDirection direction, float dst) {
+        this.slideDirection = direction;
+        this.slideDistance = dst;
     }
 }

@@ -69,7 +69,8 @@ public class HexleInputProcessor implements InputProcessor {
         Vector2 dragged = new Vector2(screenX, Gdx.graphics.getHeight() - screenY);
         Vector2 start = new Vector2(startX, startY);
         float dst = start.dst(dragged);
-        float angle = (start.sub(dragged)).angleRad();
+        Vector2 dirVector = dragged.cpy().sub(start);
+        float angle = dirVector.angleRad();
 
         float opposite = angle + MathUtils.PI;
         if (direction == null) {
@@ -80,14 +81,28 @@ public class HexleInputProcessor implements InputProcessor {
                 } else if (angle >= MathUtils.PI / 6.0f && angle < MathUtils.PI / 2.0f ||
                         opposite >= MathUtils.PI / 6.0f && opposite < MathUtils.PI / 2.0f) {
                     direction = SlideDirection.NORTH_EAST;
-                } else if (angle >= MathUtils.PI / 2.0f && angle < 5.0f * MathUtils.PI / 6.0f ||
-                        opposite >= MathUtils.PI / 2.0f && opposite < 5.0f * MathUtils.PI / 6.0f) {
+                } else {
                     direction = SlideDirection.NORTH_WEST;
                 }
+                logger.info(direction.toString() + ":" + dst);
             }
         } else {
+            Vector2 projectionBase = new Vector2(1, 0);
+            switch (direction) {
+                case EAST:
+                    projectionBase.setAngleRad(0);
+                    break;
+                case NORTH_EAST:
+                    projectionBase.setAngleRad(MathUtils.PI / 3.0f);
+                    break;
+                case NORTH_WEST:
+                    projectionBase.setAngleRad(2.0f * MathUtils.PI / 3.0f);
+                    break;
+            }
+
+            float slideDistance = dirVector.dot(projectionBase) / projectionBase.len();
             if (listener != null) {
-                listener.touchDragged(direction, 0);
+                listener.touchDragged(direction, slideDistance);
             }
         }
         return true;

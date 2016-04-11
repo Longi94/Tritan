@@ -6,9 +6,6 @@ package com.tlongdev.hexle.model;
  */
 public enum SlideDirection {
     EAST,
-    WEST,
     NORTH_EAST,
-    NORTH_WEST,
-    SOUTH_EAST,
-    SOUTH_WEST,
+    NORTH_WEST
 }
