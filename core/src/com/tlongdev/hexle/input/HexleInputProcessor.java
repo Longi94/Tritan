@@ -37,6 +37,8 @@ public class HexleInputProcessor implements InputProcessor {
      */
     private SlideDirection direction = null;
 
+    private int fingerCount = 0;
+
     public HexleInputProcessor() {
         logger = new Logger(TAG, Logger.DEBUG);
     }
@@ -61,6 +63,10 @@ public class HexleInputProcessor implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        fingerCount++;
+        if (fingerCount > 1) {
+            return true;
+        }
         if (listener != null) {
             //Flip the Y
             listener.touchDown(screenX, Gdx.graphics.getHeight() - screenY);
@@ -74,6 +80,10 @@ public class HexleInputProcessor implements InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        fingerCount--;
+        if (fingerCount >= 1) {
+            return true;
+        }
         if (listener != null) {
             //Flip the Y
             listener.touchUp(screenX, Gdx.graphics.getHeight() - screenY);
