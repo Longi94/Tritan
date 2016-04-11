@@ -82,4 +82,8 @@ public class TileView implements BaseView {
     public void setCenter(Vector2 center) {
         this.center = center;
     }
+
+    public Vector2 getTriangleCenter() {
+        return triangle.getCenter();
+    }
 }

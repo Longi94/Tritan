@@ -1,5 +1,6 @@
 package com.tlongdev.hexle.controller;
 
+import com.tlongdev.hexle.input.HexleInputProcessor;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.view.GameView;
 import com.tlongdev.hexle.view.TileView;
@@ -8,23 +9,18 @@ import com.tlongdev.hexle.view.TileView;
  * @author longi
  * @since 2016.04.10.
  */
-public class GameController {
+public class GameController implements HexleInputProcessor.HexleInputListener {
 
     private static final String TAG = GameController.class.getName();
 
     public static final int TILE_COLUMNS = 9;
     public static final int TILE_ROWS = 8;
 
-    private int width;
-    private int height;
-
     private GameView gameView;
 
     private Field field;
 
-    public GameController(int width, int height) {
-        this.width = width;
-        this.height = height;
+    public GameController() {
         init();
     }
 
@@ -53,5 +49,15 @@ public class GameController {
 
     public GameView getGameView() {
         return gameView;
+    }
+
+    @Override
+    public void touchDown(int screenX, int screenY) {
+        gameView.touchDown(screenX, screenY);
+    }
+
+    @Override
+    public void touchUp(int screenX, int screenY) {
+        gameView.touchUp(screenX, screenY);
     }
 }

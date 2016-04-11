@@ -4,7 +4,9 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.utils.Logger;
 import com.tlongdev.hexle.controller.GameController;
+import com.tlongdev.hexle.input.HexleInputProcessor;
 import com.tlongdev.hexle.renderer.GameRenderer;
 
 /**
@@ -13,10 +15,18 @@ import com.tlongdev.hexle.renderer.GameRenderer;
  */
 public class HexleGameScreen implements Screen {
 
+    private static final String TAG = HexleGameScreen.class.getSimpleName();
+
     private GameController controller;
     private GameRenderer renderer;
 
     private boolean paused;
+
+    private Logger logger;
+
+    public HexleGameScreen() {
+        logger = new Logger(TAG, Logger.DEBUG);
+    }
 
     @Override
     public void show() {
@@ -26,8 +36,13 @@ public class HexleGameScreen implements Screen {
         int width = Gdx.graphics.getWidth();
         int height = Gdx.graphics.getHeight();
 
+        HexleInputProcessor inputProcessor = new HexleInputProcessor();
+        Gdx.input.setInputProcessor(inputProcessor);
+
         //Initialize controller and renderer
-        controller = new GameController(width, height);
+        controller = new GameController();
+        inputProcessor.setListener(controller);
+
         renderer = new GameRenderer(controller, width, height);
 
         //Active on start
@@ -36,6 +51,7 @@ public class HexleGameScreen implements Screen {
 
     @Override
     public void render(float delta) {
+
         //Do not update is paused
         if (paused) {
             //Update game world by the time that has passed since last rendered frame.
