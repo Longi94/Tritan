@@ -34,6 +34,7 @@ public class EquilateralTriangle implements BaseView {
 
     public void setCenter(Vector2 center) {
         this.center = center;
+        //updatePoints();
     }
 
     public float getSide() {
@@ -42,6 +43,7 @@ public class EquilateralTriangle implements BaseView {
 
     public void setSide(float side) {
         this.side = side;
+        //updatePoints();
     }
 
     public float getRotation() {
@@ -50,6 +52,7 @@ public class EquilateralTriangle implements BaseView {
 
     public void setRotation(float rotation) {
         this.rotation = rotation;
+        //updatePoints();
     }
 
     public Color getColor() {
@@ -62,7 +65,14 @@ public class EquilateralTriangle implements BaseView {
 
     @Override
     public void render(ShapeRenderer shapeRenderer) {
+        // TODO: 2016.04.12. this shouldn't be in the render method
+        // TODO: 2016.04.12. optimize so setters are not called for every render
+        updatePoints();
+        triangle.setColor(color);
+        triangle.render(shapeRenderer);
+    }
 
+    private void updatePoints() {
         float h = side / ((float) Math.sqrt(3));
 
         //Calculate the 3 points of the triangle based on the center point, the length of the
@@ -82,8 +92,5 @@ public class EquilateralTriangle implements BaseView {
                 center.x + MathUtils.cos(rotation + 2 * MathUtils.PI2 / 3.0f) * h,
                 center.y + MathUtils.sin(rotation + 2 * MathUtils.PI2 / 3.0f) * h
         ));
-
-        triangle.setColor(color);
-        triangle.render(shapeRenderer);
     }
 }

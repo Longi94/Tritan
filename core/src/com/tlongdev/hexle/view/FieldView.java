@@ -1,17 +1,25 @@
 package com.tlongdev.hexle.view;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Logger;
 import com.tlongdev.hexle.controller.GameController;
 import com.tlongdev.hexle.model.SlideDirection;
 import com.tlongdev.hexle.model.Tile;
+import com.tlongdev.hexle.shape.Rectangle;
+import com.tlongdev.hexle.shape.Triangle;
 
 /**
  * @author longi
  * @since 2016.04.10.
  */
 public class FieldView implements BaseView {
+
+    private static final String TAG = FieldView.class.getName();
+
+    private Logger logger;
 
     private ShapeRenderer shapeRenderer;
 
@@ -24,6 +32,10 @@ public class FieldView implements BaseView {
     private TileView selectedTile;
     private SlideDirection slideDirection;
     private float slideDistance;
+
+    public FieldView() {
+        logger = new Logger(TAG, Logger.DEBUG);
+    }
 
     @Override
     public void render(ShapeRenderer shapeRenderer) {
@@ -98,6 +110,7 @@ public class FieldView implements BaseView {
 
         //Render fillers
         renderFillers(tileWidth, tileHeight);
+        renderBorders();
     }
 
     /**
@@ -301,7 +314,48 @@ public class FieldView implements BaseView {
         original.setCenter(originalVector);
     }
 
+    /**
+     * Render the borders that will hide the duplicate tiles.
+     */
+    private void renderBorders() {
+        //Get the maximum width the tile can fit in the screen
+        float tileWidth = (float) (screenWidth / Math.ceil(GameController.TILE_COLUMNS / 2.0));
+
+        //Calculate the height from the width (equilateral triangle height from side)
+        float tileHeight = tileWidth * (float) Math.sqrt(3) / 2.0f;
+
+        float rectangleHeight = (screenHeight - 8 * tileHeight) / 2;
+
+        //The rectangle for the top and bottom of the screen
+        Rectangle rectangle = new Rectangle();
+        rectangle.setWidth(screenWidth);
+        rectangle.setHeight(rectangleHeight);
+        rectangle.setColor(Color.BLACK);
+        rectangle.setX(0);
+        rectangle.setY(0);
+        rectangle.render(shapeRenderer);
+
+        rectangle.setY(screenHeight - rectangleHeight);
+        rectangle.render(shapeRenderer);
+
+        //The triangles on the sides of the screen
+        Triangle triangle = new Triangle();
+        triangle.setColor(Color.BLACK);
+        for (int i = 0; i < 5; i++) {
+            triangle.setA(new Vector2(tileWidth / 2.0f, rectangleHeight + 2.0f * i * tileHeight));
+            triangle.setB(new Vector2(0, rectangleHeight + 2.0f * i * tileHeight + tileHeight));
+            triangle.setC(new Vector2(0, rectangleHeight + 2.0f * i * tileHeight - tileHeight));
+            triangle.render(shapeRenderer);
+
+            triangle.setA(new Vector2(screenWidth - tileWidth / 2.0f, rectangleHeight + 2.0f * i * tileHeight));
+            triangle.setB(new Vector2(screenWidth, rectangleHeight + 2.0f * i * tileHeight + tileHeight));
+            triangle.setC(new Vector2(screenWidth, rectangleHeight + 2.0f * i * tileHeight - tileHeight));
+            triangle.render(shapeRenderer);
+        }
+    }
+
     public void setDimensions(int width, int height) {
+        logger.info("screensize changed: " + width + "x" + height);
         this.screenWidth = width;
         this.screenHeight = height;
     }
