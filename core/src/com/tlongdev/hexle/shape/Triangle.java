@@ -20,10 +20,7 @@ public class Triangle implements BaseView {
     private Vector2 b;
     private Vector2 c;
 
-    private ShapeRenderer shapeRenderer;
-
-    public Triangle(ShapeRenderer shapeRenderer) {
-        this.shapeRenderer = shapeRenderer;
+    public Triangle() {
         a = new Vector2();
         b = new Vector2();
         c = new Vector2();
@@ -58,7 +55,7 @@ public class Triangle implements BaseView {
     }
 
     @Override
-    public void render() {
+    public void render(ShapeRenderer shapeRenderer) {
         shapeRenderer.begin(ShapeType.Filled);
         shapeRenderer.setColor(color);
         shapeRenderer.triangle(a.x, a.y, b.x, b.y, c.x, c.y);

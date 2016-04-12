@@ -3,7 +3,7 @@ package com.tlongdev.hexle.renderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import com.tlongdev.hexle.controller.GameController;
-import com.tlongdev.hexle.view.GameView;
+import com.tlongdev.hexle.view.FieldView;
 
 /**
  * @author longi
@@ -27,19 +27,19 @@ public class GameRenderer implements Disposable{
     }
 
     private void init() {
-        shapeRenderer = controller.getShapeRenderer();
+        shapeRenderer = new ShapeRenderer();
     }
 
     public void render() {
         //Render the game
-        GameView view = controller.getGameView();
-        view.render();
+        FieldView view = controller.getFieldView();
+        view.render(shapeRenderer);
     }
 
     public void resize(int width, int height) {
         this.width = width;
         this.height = height;
-        GameView view = controller.getGameView();
+        FieldView view = controller.getFieldView();
         view.setDimensions(width, height);
     }
 

@@ -1,11 +1,10 @@
 package com.tlongdev.hexle.controller;
 
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Logger;
 import com.tlongdev.hexle.input.HexleInputProcessor;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.SlideDirection;
-import com.tlongdev.hexle.view.GameView;
+import com.tlongdev.hexle.view.FieldView;
 import com.tlongdev.hexle.view.TileView;
 
 /**
@@ -19,63 +18,57 @@ public class GameController implements HexleInputProcessor.HexleInputListener {
     public static final int TILE_COLUMNS = 9;
     public static final int TILE_ROWS = 8;
 
-    private ShapeRenderer shapeRenderer;
-
-    private GameView gameView;
+    private FieldView fieldView;
 
     private Field field;
 
     private Logger logger;
 
-    public GameController(ShapeRenderer shapeRenderer) {
-        init(shapeRenderer);
+    public GameController() {
+        init();
     }
 
-    private void init(ShapeRenderer shapeRenderer) {
+    private void init() {
         logger = new Logger(TAG, Logger.DEBUG);
 
         field = new Field(TILE_COLUMNS, TILE_ROWS);
         field.randomize();
 
-        gameView = new GameView();
+        fieldView = new FieldView();
 
         TileView[][] tileViews = new TileView[TILE_ROWS][TILE_COLUMNS];
 
         for (int i = 0; i < TILE_ROWS; i++) {
             for (int j = 0; j < TILE_COLUMNS; j++) {
-                TileView view = new TileView(shapeRenderer);
+                TileView view = new TileView();
                 view.setTile(field.getTiles()[i][j]);
                 tileViews[i][j] = view;
             }
         }
 
-        gameView.setTileViews(tileViews);
+        fieldView.setTileViews(tileViews);
     }
 
     public void update(float dt) {
 
     }
 
-    public GameView getGameView() {
-        return gameView;
+    public FieldView getFieldView() {
+        return fieldView;
     }
 
     @Override
     public void touchDown(int x, int y) {
-        gameView.touchDown(x, y);
+        fieldView.touchDown(x, y);
     }
 
     @Override
     public void touchUp(int x, int y) {
-        gameView.touchUp(x, y);
+        fieldView.touchUp(x, y);
     }
 
     @Override
     public void touchDragged(SlideDirection direction, float dst) {
-        gameView.setSlide(direction, dst);
-    }
-
-    public ShapeRenderer getShapeRenderer() {
-        return shapeRenderer;
+        fieldView.setSlide(direction, dst);
     }
 }

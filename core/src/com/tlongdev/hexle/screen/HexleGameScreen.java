@@ -4,7 +4,6 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Logger;
 import com.tlongdev.hexle.controller.GameController;
 import com.tlongdev.hexle.input.HexleInputProcessor;
@@ -41,7 +40,7 @@ public class HexleGameScreen implements Screen {
         Gdx.input.setInputProcessor(inputProcessor);
 
         //Initialize controller and renderer
-        controller = new GameController(new ShapeRenderer());
+        controller = new GameController();
         inputProcessor.setListener(controller);
 
         renderer = new GameRenderer(controller, width, height);

@@ -20,12 +20,12 @@ public class TileView implements BaseView {
 
     private Vector2 center;
 
-    public TileView(ShapeRenderer shapeRenderer) {
-        triangle = new EquilateralTriangle(shapeRenderer);
+    public TileView() {
+        triangle = new EquilateralTriangle();
     }
 
     @Override
-    public void render() {
+    public void render(ShapeRenderer shapeRenderer) {
         switch (tile.getOrientation()) {
             case UP:
                 //Triangle faces up /\
@@ -73,7 +73,7 @@ public class TileView implements BaseView {
                 break;
         }
 
-        triangle.render();
+        triangle.render(shapeRenderer);
     }
 
     public void setTile(Tile tile) {

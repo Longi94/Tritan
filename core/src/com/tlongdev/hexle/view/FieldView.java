@@ -10,7 +10,7 @@ import com.tlongdev.hexle.model.SlideDirection;
  * @author longi
  * @since 2016.04.10.
  */
-public class GameView implements BaseView {
+public class FieldView implements BaseView {
 
     private ShapeRenderer shapeRenderer;
 
@@ -24,7 +24,9 @@ public class GameView implements BaseView {
     private float slideDistance;
 
     @Override
-    public void render() {
+    public void render(ShapeRenderer shapeRenderer) {
+        this.shapeRenderer = shapeRenderer;
+
         //Get the maximum width the tile can fit in the screen
         float width = (float) (screenWidth / Math.ceil(GameController.TILE_COLUMNS / 2.0));
 
@@ -74,7 +76,7 @@ public class GameView implements BaseView {
                     renderDuplicates(view, slideDirection, width);
                 }
 
-                view.render();
+                view.render(shapeRenderer);
             }
         }
     }
@@ -109,11 +111,11 @@ public class GameView implements BaseView {
         }
         slideVector.setLength(distance);
         original.setCenter(originalVector.cpy().add(slideVector));
-        original.render();
+        original.render(shapeRenderer);
 
         slideVector.rotateRad(MathUtils.PI);
         original.setCenter(originalVector.cpy().add(slideVector));
-        original.render();
+        original.render(shapeRenderer);
         original.setCenter(originalVector);
     }
 
@@ -154,9 +156,5 @@ public class GameView implements BaseView {
     public void setSlide(SlideDirection direction, float dst) {
         this.slideDirection = direction;
         this.slideDistance = dst;
-    }
-
-    public void setShapeRenderer(ShapeRenderer shapeRenderer) {
-        this.shapeRenderer = shapeRenderer;
     }
 }

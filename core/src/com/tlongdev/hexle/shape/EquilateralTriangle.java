@@ -24,8 +24,8 @@ public class EquilateralTriangle implements BaseView {
 
     private Color color;
 
-    public EquilateralTriangle(ShapeRenderer shapeRenderer) {
-        triangle = new Triangle(shapeRenderer);
+    public EquilateralTriangle() {
+        triangle = new Triangle();
     }
 
     public Vector2 getCenter() {
@@ -61,7 +61,7 @@ public class EquilateralTriangle implements BaseView {
     }
 
     @Override
-    public void render() {
+    public void render(ShapeRenderer shapeRenderer) {
 
         float h = side / ((float) Math.sqrt(3));
 
@@ -84,9 +84,6 @@ public class EquilateralTriangle implements BaseView {
         ));
 
         triangle.setColor(color);
-        triangle.render();
-    }
-
-    public void setShapeRenderer(ShapeRenderer shapeRenderer) {
+        triangle.render(shapeRenderer);
     }
 }
