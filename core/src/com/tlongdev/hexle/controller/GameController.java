@@ -33,7 +33,6 @@ public class GameController implements HexleInputProcessor.HexleInputListener {
 
         field = new Field(TILE_COLUMNS, TILE_ROWS);
         field.randomize();
-        field.checkField();
 
         fieldView = new FieldView();
 

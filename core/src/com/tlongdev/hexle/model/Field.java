@@ -2,6 +2,9 @@ package com.tlongdev.hexle.model;
 
 import com.tlongdev.hexle.model.Tile.TileOrientation;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -52,6 +55,7 @@ public class Field {
     }
 
     public void randomize() {
+        List<TileColor> colors = new LinkedList<TileColor>();
         //Fill up the field with random colored tiles
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
@@ -67,10 +71,17 @@ public class Field {
                     tile.setOrientation(TileOrientation.UP);
                 }
 
-                tile.setTileColor(TileColor.values()[generator.nextInt(6)]);
+                colors.clear();
+                Collections.addAll(colors, TileColor.values());
+
+                //Prevent any 3+ groups
+                do {
+                    int randomColor = generator.nextInt(colors.size());
+                    tile.setTileColor(colors.get(randomColor));
+                    colors.remove(randomColor);
+                } while (checkTile(null, tile, 0, true));
 
                 tiles[i][j] = tile;
-
             }
 
             //Randomize filler tiles
@@ -94,7 +105,7 @@ public class Field {
     public void checkField() {
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                checkTile(null, tiles[i][j], 0);
+                checkTile(null, tiles[i][j], 0, false);
             }
         }
     }
@@ -105,12 +116,21 @@ public class Field {
      * @param source
      * @param current
      * @param depth
+     * @param init
      * @return
      */
-    private boolean checkTile(Tile source, Tile current, int depth) {
+    private boolean checkTile(Tile source, Tile current, int depth, boolean init) {
         //Don't even bother, they are not the same color
         if (source != null && source.getTileColor() != current.getTileColor()) {
             return false;
+        }
+
+        //If we reached a depth of  return true;
+        boolean result = depth >= 2;
+
+        //init: check when randomizing the field
+        if (init && result) {
+            return true;
         }
 
         //Get the neighbors of the current tile
@@ -140,29 +160,26 @@ public class Field {
             }
         }
 
-        //If we reached a depth of  return true;
-        boolean result = depth >= 2;
-
         //Recursive group discovery
         if (neighbor1 != null && (source == null || neighbor1 != source)) {
-            if (checkTile(current, neighbor1, depth + 1)) {
+            if (checkTile(current, neighbor1, depth + 1, init)) {
                 result = true;
             }
         }
 
         if (neighbor2 != null && (source == null || neighbor2 != source)) {
-            if (checkTile(current, neighbor2, depth + 1)) {
+            if (checkTile(current, neighbor2, depth + 1, init)) {
                 result = true;
             }
         }
 
         if (neighbor3 != null && (source == null || neighbor3 != source)) {
-            if (checkTile(current, neighbor3, depth + 1)) {
+            if (checkTile(current, neighbor3, depth + 1, init)) {
                 result = true;
             }
         }
 
-        if (result) {
+        if (result && !init) {
             current.setMarked(true);
         }
 
