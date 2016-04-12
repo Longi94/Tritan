@@ -33,24 +33,27 @@ public class Triangle implements BaseView {
         return a;
     }
 
-    public void setA(Vector2 a) {
-        this.a = a;
+    public void setA(float x, float y) {
+        a.x = x;
+        a.y = y;
     }
 
     public Vector2 getB() {
         return b;
     }
 
-    public void setB(Vector2 b) {
-        this.b = b;
+    public void setB(float x, float y) {
+        b.x = x;
+        b.y = y;
     }
 
     public Vector2 getC() {
         return c;
     }
 
-    public void setC(Vector2 c) {
-        this.c = c;
+    public void setC(float x, float y) {
+        c.x = x;
+        c.y = y;
     }
 
     @Override

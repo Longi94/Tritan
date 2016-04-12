@@ -333,14 +333,14 @@ public class FieldView implements BaseView {
         Triangle triangle = new Triangle();
         triangle.setColor(Color.BLACK);
         for (int i = 0; i < 5; i++) {
-            triangle.setA(new Vector2(tileWidth / 2.0f, rectangleHeight + 2.0f * i * tileHeight));
-            triangle.setB(new Vector2(0, rectangleHeight + 2.0f * i * tileHeight + tileHeight));
-            triangle.setC(new Vector2(0, rectangleHeight + 2.0f * i * tileHeight - tileHeight));
+            triangle.setA(tileWidth / 2.0f, rectangleHeight + 2.0f * i * tileHeight);
+            triangle.setB(0, rectangleHeight + 2.0f * i * tileHeight + tileHeight);
+            triangle.setC(0, rectangleHeight + 2.0f * i * tileHeight - tileHeight);
             triangle.render(shapeRenderer);
 
-            triangle.setA(new Vector2(screenWidth - tileWidth / 2.0f, rectangleHeight + 2.0f * i * tileHeight));
-            triangle.setB(new Vector2(screenWidth, rectangleHeight + 2.0f * i * tileHeight + tileHeight));
-            triangle.setC(new Vector2(screenWidth, rectangleHeight + 2.0f * i * tileHeight - tileHeight));
+            triangle.setA(screenWidth - tileWidth / 2.0f, rectangleHeight + 2.0f * i * tileHeight);
+            triangle.setB(screenWidth, rectangleHeight + 2.0f * i * tileHeight + tileHeight);
+            triangle.setC(screenWidth, rectangleHeight + 2.0f * i * tileHeight - tileHeight);
             triangle.render(shapeRenderer);
         }
     }

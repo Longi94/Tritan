@@ -26,14 +26,16 @@ public class EquilateralTriangle implements BaseView {
 
     public EquilateralTriangle() {
         triangle = new Triangle();
+        center = new Vector2();
     }
 
     public Vector2 getCenter() {
         return center;
     }
 
-    public void setCenter(Vector2 center) {
-        this.center = center;
+    public void setCenter(float x, float y) {
+        center.x = x;
+        center.y = y;
         //updatePoints();
     }
 
@@ -78,19 +80,19 @@ public class EquilateralTriangle implements BaseView {
         //Calculate the 3 points of the triangle based on the center point, the length of the
         //triangle sides and the rotation.
 
-        triangle.setA(new Vector2(
+        triangle.setA(
                 center.x + MathUtils.cos(rotation) * h,
                 center.y + MathUtils.sin(rotation) * h
-        ));
+        );
 
-        triangle.setB(new Vector2(
+        triangle.setB(
                 center.x + MathUtils.cos(rotation + MathUtils.PI2 / 3.0f) * h,
                 center.y + MathUtils.sin(rotation + MathUtils.PI2 / 3.0f) * h
-        ));
+        );
 
-        triangle.setC(new Vector2(
+        triangle.setC(
                 center.x + MathUtils.cos(rotation + 2 * MathUtils.PI2 / 3.0f) * h,
                 center.y + MathUtils.sin(rotation + 2 * MathUtils.PI2 / 3.0f) * h
-        ));
+        );
     }
 }

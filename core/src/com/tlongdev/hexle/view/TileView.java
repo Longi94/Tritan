@@ -33,10 +33,10 @@ public class TileView implements BaseView {
 
                 //Offset the triangle so the rows properly align, remove this and you'll know what
                 //I mean
-                triangle.setCenter(new Vector2(
+                triangle.setCenter(
                         center.x,
                         center.y - ((float) Math.sqrt(3) * triangle.getSide() / 12.0f)
-                ));
+                );
                 break;
             case DOWN:
                 //Triangle faces down \/
@@ -44,10 +44,10 @@ public class TileView implements BaseView {
 
                 //Offset the triangle so the rows properly align, remove this and you'll know what
                 //I mean
-                triangle.setCenter(new Vector2(
+                triangle.setCenter(
                         center.x,
                         center.y + ((float) Math.sqrt(3) * triangle.getSide() / 12.0f)
-                ));
+                );
                 break;
         }
 
