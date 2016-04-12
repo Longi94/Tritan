@@ -85,7 +85,11 @@ public class FieldView implements BaseView {
                         offsetY + i * tileHeight
                 ));
 
-                view.setSide(tileWidth * 0.9f);
+                if (selectedTile == view) {
+                    view.setSide(tileWidth);
+                } else {
+                    view.setSide(tileWidth * 0.9f);
+                }
 
                 //If slideDirection is not null the a slide is currently happening
                 if (slideDirection != null && view.isAffectedBySlide(selectedTile, slideDirection)) {
@@ -281,6 +285,9 @@ public class FieldView implements BaseView {
     private void renderDuplicates(TileView original, float rowWidth, ShapeRenderer shapeRenderer) {
         Vector2 slideVector = new Vector2(slideDistance, 0);
         Vector2 originalVector = original.getCenter();
+        float originalSize = original.getSide();
+
+        original.setSide(tileWidth * 0.9f);
         switch (slideDirection) {
             case EAST:
                 slideVector.setAngleRad(0);
@@ -299,6 +306,8 @@ public class FieldView implements BaseView {
         slideVector.rotateRad(MathUtils.PI);
         original.setCenter(originalVector.cpy().add(slideVector));
         original.render(shapeRenderer);
+
+        original.setSide(originalSize);
         original.setCenter(originalVector);
     }
 

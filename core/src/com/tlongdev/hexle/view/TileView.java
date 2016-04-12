@@ -104,4 +104,8 @@ public class TileView implements BaseView {
     public Tile getTile() {
         return tile;
     }
+
+    public float getSide() {
+        return triangle.getSide();
+    }
 }
