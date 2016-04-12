@@ -56,6 +56,7 @@ public class FieldView implements BaseView {
                         (j + 1) * tileWidth / 2.0f,
                         offsetY + i * tileHeight
                 );
+                view.setFullWidth(tileWidth);
 
                 if (selectedTile != null && selectedTile == view) {
                     view.setSide(tileWidth);
@@ -233,10 +234,12 @@ public class FieldView implements BaseView {
 
         //Draw the left filler
         filler.setCenter(leftFillerPosX, leftFillerPosY);
+        filler.setFullWidth(tileWidth);
         filler.render(shapeRenderer);
 
         //Draw the fight filler
         filler.setCenter(rightFillerPosX, rightFillerPosY);
+        filler.setFullWidth(tileWidth);
         filler.render(shapeRenderer);
     }
 

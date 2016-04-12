@@ -20,6 +20,8 @@ public class TileView implements BaseView {
 
     private Vector2 center;
 
+    private float fullWidth;
+
     public TileView() {
         triangle = new EquilateralTriangle();
         center = new Vector2();
@@ -36,7 +38,7 @@ public class TileView implements BaseView {
                 //I mean
                 triangle.setCenter(
                         center.x,
-                        center.y - ((float) Math.sqrt(3) * triangle.getSide() / 12.0f)
+                        center.y - ((float) Math.sqrt(3) * fullWidth / 12.0f)
                 );
                 break;
             case DOWN:
@@ -47,7 +49,7 @@ public class TileView implements BaseView {
                 //I mean
                 triangle.setCenter(
                         center.x,
-                        center.y + ((float) Math.sqrt(3) * triangle.getSide() / 12.0f)
+                        center.y + ((float) Math.sqrt(3) * fullWidth / 12.0f)
                 );
                 break;
         }
@@ -113,5 +115,9 @@ public class TileView implements BaseView {
 
     public float getSide() {
         return triangle.getSide();
+    }
+
+    public void setFullWidth(float fullWidth) {
+        this.fullWidth = fullWidth;
     }
 }
