@@ -1,5 +1,7 @@
 package com.tlongdev.hexle.model;
 
+import com.tlongdev.hexle.model.Tile.TileOrientation;
+
 import java.util.Random;
 
 /**
@@ -60,9 +62,9 @@ public class Field {
                 tile.updateIndices();
 
                 if ((tile.getPosX() + tile.getPosY()) % 2 == 0) {
-                    tile.setOrientation(Tile.TileOrientation.DOWN);
+                    tile.setOrientation(TileOrientation.DOWN);
                 } else {
-                    tile.setOrientation(Tile.TileOrientation.UP);
+                    tile.setOrientation(TileOrientation.UP);
                 }
 
                 tile.setTileColor(TileColor.values()[generator.nextInt(6)]);
@@ -76,9 +78,9 @@ public class Field {
             tile.setPosX(-1);
             tile.setPosY(i);
             if (tile.getPosY() % 2 == 0) {
-                tile.setOrientation(Tile.TileOrientation.UP);
+                tile.setOrientation(TileOrientation.UP);
             } else {
-                tile.setOrientation(Tile.TileOrientation.DOWN);
+                tile.setOrientation(TileOrientation.DOWN);
             }
             tile.setTileColor(TileColor.values()[generator.nextInt(6)]);
             fillerTiles[i] = tile;
