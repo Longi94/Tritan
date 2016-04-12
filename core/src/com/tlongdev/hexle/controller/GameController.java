@@ -74,6 +74,6 @@ public class GameController implements HexleInputProcessor.HexleInputListener {
 
     @Override
     public void touchDragged(SlideDirection direction, float dst) {
-        fieldView.setSlide(direction, dst);
+        fieldView.setDrag(direction, dst);
     }
 }

@@ -21,8 +21,6 @@ public class FieldView implements BaseView {
 
     private Logger logger;
 
-    private ShapeRenderer shapeRenderer;
-
     private int screenWidth;
     private int screenHeight;
 
@@ -33,23 +31,16 @@ public class FieldView implements BaseView {
     private SlideDirection slideDirection;
     private float slideDistance;
 
+    private float tileWidth;
+    private float tileHeight;
+    private float offsetY;
+
     public FieldView() {
         logger = new Logger(TAG, Logger.DEBUG);
     }
 
     @Override
     public void render(ShapeRenderer shapeRenderer) {
-        this.shapeRenderer = shapeRenderer;
-
-        //Get the maximum width the tile can fit in the screen
-        float tileWidth = (float) (screenWidth / Math.ceil(GameController.TILE_COLUMNS / 2.0));
-
-        //Calculate the height from the width (equilateral triangle height from side)
-        float tileHeight = tileWidth * (float) Math.sqrt(3) / 2.0f;
-
-        //Calculate the vertical offset, so the triangles are in the middle of the screen
-        float offsetY = (screenHeight - (GameController.TILE_ROWS - 1) * tileHeight) / 2.0f;
-
         //The vector that will translate all the affected tiles
         Vector2 slideVector = new Vector2(slideDistance, 0);
 
@@ -101,7 +92,7 @@ public class FieldView implements BaseView {
                     view.getCenter().add(slideVector);
 
                     //Render duplicates
-                    renderDuplicates(view, slideDirection, rowWidth);
+                    renderDuplicates(view, rowWidth, shapeRenderer);
                 }
 
                 view.render(shapeRenderer);
@@ -109,27 +100,25 @@ public class FieldView implements BaseView {
         }
 
         //Render fillers
-        renderFillers(tileWidth, tileHeight);
-        renderBorders();
+        renderFillers(shapeRenderer);
+        renderBorders(shapeRenderer);
     }
 
     /**
      * Draw fillers to create a seemingly infinite row.
-     *
-     * @param tileWidth
-     * @param tileHeight
      */
-    private void renderFillers(float tileWidth, float tileHeight) {
+    private void renderFillers(ShapeRenderer shapeRenderer) {
         // TODO: 2016.04.12. This function could really use some magic calculation rather than loops
         if (slideDirection == null || selectedTile == null) {
             return;
         }
 
+        Tile tile = selectedTile.getTile();
+
         //Draw the filler tiles if needed
         int fillerIndex;
         Vector2 leftFillerPos = new Vector2();
         Vector2 rightFillerPos = new Vector2();
-        Tile tile = selectedTile.getTile();
         int leftStepsX;
         int leftStepsY;
         int tilePosX;
@@ -287,13 +276,12 @@ public class FieldView implements BaseView {
      * a looped shift register.
      *
      * @param original  the original tile view
-     * @param direction the direction the sliding is going on
      * @param rowWidth  the (full) size of the row
      */
-    private void renderDuplicates(TileView original, SlideDirection direction, float rowWidth) {
+    private void renderDuplicates(TileView original, float rowWidth, ShapeRenderer shapeRenderer) {
         Vector2 slideVector = new Vector2(slideDistance, 0);
         Vector2 originalVector = original.getCenter();
-        switch (direction) {
+        switch (slideDirection) {
             case EAST:
                 slideVector.setAngleRad(0);
                 break;
@@ -317,13 +305,7 @@ public class FieldView implements BaseView {
     /**
      * Render the borders that will hide the duplicate tiles.
      */
-    private void renderBorders() {
-        //Get the maximum width the tile can fit in the screen
-        float tileWidth = (float) (screenWidth / Math.ceil(GameController.TILE_COLUMNS / 2.0));
-
-        //Calculate the height from the width (equilateral triangle height from side)
-        float tileHeight = tileWidth * (float) Math.sqrt(3) / 2.0f;
-
+    private void renderBorders(ShapeRenderer shapeRenderer) {
         float rectangleHeight = (screenHeight - 8 * tileHeight) / 2;
 
         //The rectangle for the top and bottom of the screen
@@ -358,10 +340,15 @@ public class FieldView implements BaseView {
         logger.info("screensize changed: " + width + "x" + height);
         this.screenWidth = width;
         this.screenHeight = height;
-    }
 
-    public TileView[][] getTileViews() {
-        return tileViews;
+        //Get the maximum width the tile can fit in the screen
+        tileWidth = (float) (screenWidth / Math.ceil(GameController.TILE_COLUMNS / 2.0));
+
+        //Calculate the height from the width (equilateral triangle height from side)
+        tileHeight = tileWidth * (float) Math.sqrt(3) / 2.0f;
+
+        //Calculate the vertical offset, so the triangles are in the middle of the screen
+        offsetY = (screenHeight - (GameController.TILE_ROWS - 1) * tileHeight) / 2.0f;
     }
 
     public void setTileViews(TileView[][] tileViews) {
@@ -389,7 +376,7 @@ public class FieldView implements BaseView {
         slideDirection = null;
     }
 
-    public void setSlide(SlideDirection direction, float dst) {
+    public void setDrag(SlideDirection direction, float dst) {
         this.slideDirection = direction;
         this.slideDistance = dst;
     }
