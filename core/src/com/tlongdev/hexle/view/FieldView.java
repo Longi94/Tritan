@@ -18,6 +18,7 @@ public class FieldView implements BaseView {
     private int screenHeight;
 
     private TileView[][] tileViews;
+    private TileView[] fillerTileViews;
 
     private TileView selectedTile;
     private SlideDirection slideDirection;
@@ -28,13 +29,13 @@ public class FieldView implements BaseView {
         this.shapeRenderer = shapeRenderer;
 
         //Get the maximum width the tile can fit in the screen
-        float width = (float) (screenWidth / Math.ceil(GameController.TILE_COLUMNS / 2.0));
+        float tileWidth = (float) (screenWidth / Math.ceil(GameController.TILE_COLUMNS / 2.0));
 
         //Calculate the height from the width (equilateral triangle height from side)
-        float height = width * (float) Math.sqrt(3) / 2.0f;
+        float tileHeight = tileWidth * (float) Math.sqrt(3) / 2.0f;
 
         //Calculate the vertical offset, so the triangles are in the middle of the screen
-        float offsetY = (screenHeight - (GameController.TILE_ROWS - 1) * height) / 2.0f;
+        float offsetY = (screenHeight - (GameController.TILE_ROWS - 1) * tileHeight) / 2.0f;
 
         //The vector that will translate all the affected tiles
         Vector2 slideVector = new Vector2(slideDistance, 0);
@@ -46,11 +47,11 @@ public class FieldView implements BaseView {
 
                 //Set the center
                 view.setCenter(new Vector2(
-                        (j + 1) * width / 2.0f,
-                        offsetY + i * height
+                        (j + 1) * tileWidth / 2.0f,
+                        offsetY + i * tileHeight
                 ));
 
-                view.setSide(width * 0.9f);
+                view.setSide(tileWidth * 0.9f);
 
                 //If slideDirection is not null the a slide is currently happening
                 if (slideDirection != null && view.isAffectedBySlide(selectedTile, slideDirection)) {
@@ -73,11 +74,51 @@ public class FieldView implements BaseView {
                     }
                     view.getCenter().add(slideVector);
 
-                    renderDuplicates(view, slideDirection, width);
+                    renderDuplicates(view, slideDirection, tileWidth);
                 }
 
                 view.render(shapeRenderer);
             }
+        }
+
+        renderFillers(tileWidth);
+    }
+
+    private void renderFillers(float tileWidth) {
+        //Draw the filler tiles if needed
+        if (slideDirection != null && selectedTile != null) {
+            int leftFillerIndex = -1;
+            int rightFillerIndex = -1;
+            float leftFillerX = 0;
+            float leftFillerY = 0;
+            float rightFillerX = 0;
+            float rightFillerY = 0;
+            switch (slideDirection) {
+                case EAST:
+                    leftFillerIndex = selectedTile.getTile().getHorizontalRowIndex();
+                    rightFillerIndex = selectedTile.getTile().getHorizontalRowIndex();
+                    leftFillerX = selectedTile.getCenter().x -
+                            (selectedTile.getTile().getPosX() + 1) * tileWidth / 2.0f;
+                    rightFillerX = selectedTile.getCenter().x +
+                            (9 - selectedTile.getTile().getPosX()) * tileWidth / 2.0f;
+
+                    leftFillerY = rightFillerY = selectedTile.getCenter().y;
+                    break;
+                case NORTH_EAST:
+                    break;
+                default:
+                    break;
+            }
+
+            TileView leftFiller = fillerTileViews[leftFillerIndex];
+            leftFiller.setSide(tileWidth * 0.9f);
+            leftFiller.setCenter(new Vector2(leftFillerX, leftFillerY));
+            leftFiller.render(shapeRenderer);
+
+            TileView rightFiller = fillerTileViews[rightFillerIndex];
+            rightFiller.setSide(tileWidth * 0.9f);
+            rightFiller.setCenter(new Vector2(rightFillerX, rightFillerY));
+            rightFiller.render(shapeRenderer);
         }
     }
 
@@ -85,9 +126,9 @@ public class FieldView implements BaseView {
      * This will render duplicates of triangles which are currently sliding creating an illusion of
      * a looped shift register.
      *
-     * @param original the original tile view
+     * @param original  the original tile view
      * @param direction the direction the sliding is going on
-     * @param side the (full) size of the triangles side
+     * @param side      the (full) size of the triangles side
      */
     private void renderDuplicates(TileView original, SlideDirection direction, float side) {
         Vector2 slideVector = new Vector2(slideDistance, 0);
@@ -156,5 +197,9 @@ public class FieldView implements BaseView {
     public void setSlide(SlideDirection direction, float dst) {
         this.slideDirection = direction;
         this.slideDistance = dst;
+    }
+
+    public void setFillerTileViews(TileView[] fillerTileViews) {
+        this.fillerTileViews = fillerTileViews;
     }
 }

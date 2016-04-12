@@ -18,12 +18,15 @@ public class Field {
 
     private Tile[][] tiles;
 
+    private Tile[] fillerTiles;
+
     public Field(int width, int height) {
         this.width = width;
         this.height = height;
 
         generator = new Random();
         tiles = new Tile[height][width];
+        fillerTiles = new Tile[height];
     }
 
     public int getWidth() {
@@ -67,6 +70,22 @@ public class Field {
                 tiles[i][j] = tile;
 
             }
+
+            //Randomize filler tiles
+            Tile tile = new Tile();
+            tile.setPosX(-1);
+            tile.setPosY(i);
+            if (tile.getPosY() % 2 == 0) {
+                tile.setOrientation(Tile.TileOrientation.UP);
+            } else {
+                tile.setOrientation(Tile.TileOrientation.DOWN);
+            }
+            tile.setTileColor(TileColor.values()[generator.nextInt(6)]);
+            fillerTiles[i] = tile;
         }
+    }
+
+    public Tile[] getFillerTiles() {
+        return fillerTiles;
     }
 }

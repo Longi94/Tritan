@@ -37,6 +37,7 @@ public class GameController implements HexleInputProcessor.HexleInputListener {
         fieldView = new FieldView();
 
         TileView[][] tileViews = new TileView[TILE_ROWS][TILE_COLUMNS];
+        TileView[] fillerTileViews = new TileView[TILE_ROWS];
 
         for (int i = 0; i < TILE_ROWS; i++) {
             for (int j = 0; j < TILE_COLUMNS; j++) {
@@ -44,9 +45,13 @@ public class GameController implements HexleInputProcessor.HexleInputListener {
                 view.setTile(field.getTiles()[i][j]);
                 tileViews[i][j] = view;
             }
+            TileView fillerView = new TileView();
+            fillerView.setTile(field.getFillerTiles()[i]);
+            fillerTileViews[i] = fillerView;
         }
 
         fieldView.setTileViews(tileViews);
+        fieldView.setFillerTileViews(fillerTileViews);
     }
 
     public void update(float dt) {
