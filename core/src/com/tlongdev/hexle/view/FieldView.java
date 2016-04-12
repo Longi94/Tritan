@@ -41,18 +41,29 @@ public class FieldView implements BaseView {
         //The vector that will translate all the affected tiles
         Vector2 slideVector = new Vector2(slideDistance, 0);
 
-        if (slideDirection != null) {
+        float rowWidth = 0;
+
+        if (slideDirection != null && selectedTile != null) {
             switch (slideDirection) {
                 case EAST:
                     slideVector.setAngleRad(0);
+                    rowWidth = tileWidth * 5.0f;
                     break;
                 case NORTH_EAST:
+                    int rightIndex = selectedTile.getTile().getRightDiagonalIndex();
                     slideVector.setAngleRad(MathUtils.PI / 3.0f);
+                    rowWidth = (1 + Math.min(rightIndex, 7 - rightIndex)) * 2.0f * tileWidth;
                     break;
-                case NORTH_WEST:
+                default:
+                    int leftIndex = selectedTile.getTile().getLeftDiagonalIndex();
                     slideVector.setAngleRad(2.0f * MathUtils.PI / 3.0f);
+                    rowWidth = (1 + Math.min(leftIndex, 7 - leftIndex)) * 2.0f * tileWidth;
                     break;
             }
+
+            slideVector.setLength(Math.abs(slideDistance) > Math.abs(rowWidth) ?
+                    rowWidth : slideDistance);
+
             //Because setting the length of the vector will always make if face in the
             //positive direction no matter the distance being negative. Dumb.
             if (slideDistance < 0) {
@@ -78,7 +89,7 @@ public class FieldView implements BaseView {
                     view.getCenter().add(slideVector);
 
                     //Render duplicates
-                    renderDuplicates(view, slideDirection, tileWidth);
+                    renderDuplicates(view, slideDirection, rowWidth);
                 }
 
                 view.render(shapeRenderer);
@@ -264,29 +275,23 @@ public class FieldView implements BaseView {
      *
      * @param original  the original tile view
      * @param direction the direction the sliding is going on
-     * @param side      the (full) size of the triangles side
+     * @param rowWidth  the (full) size of the row
      */
-    private void renderDuplicates(TileView original, SlideDirection direction, float side) {
+    private void renderDuplicates(TileView original, SlideDirection direction, float rowWidth) {
         Vector2 slideVector = new Vector2(slideDistance, 0);
         Vector2 originalVector = original.getCenter();
-        float distance;
         switch (direction) {
             case EAST:
-                distance = side * 5.0f;
                 slideVector.setAngleRad(0);
                 break;
             case NORTH_EAST:
-                int rightIndex = original.getTile().getRightDiagonalIndex();
-                distance = (1 + Math.min(rightIndex, 7 - rightIndex)) * 2.0f * side;
                 slideVector.setAngleRad(MathUtils.PI / 3.0f);
                 break;
             default:
-                int leftIndex = original.getTile().getLeftDiagonalIndex();
-                distance = (1 + Math.min(leftIndex, 7 - leftIndex)) * 2.0f * side;
                 slideVector.setAngleRad(2.0f * MathUtils.PI / 3.0f);
                 break;
         }
-        slideVector.setLength(distance);
+        slideVector.setLength(rowWidth);
         original.setCenter(originalVector.cpy().add(slideVector));
         original.render(shapeRenderer);
 
