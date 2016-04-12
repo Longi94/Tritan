@@ -80,10 +80,10 @@ public class FieldView implements BaseView {
                 TileView view = tileViews[i][j];
 
                 //Set the center
-                view.setCenter(new Vector2(
+                view.setCenter(
                         (j + 1) * tileWidth / 2.0f,
                         offsetY + i * tileHeight
-                ));
+                );
 
                 if (selectedTile == view) {
                     view.setSide(tileWidth);
@@ -121,8 +121,6 @@ public class FieldView implements BaseView {
 
         //Draw the filler tiles if needed
         int fillerIndex;
-        Vector2 leftFillerPos = new Vector2();
-        Vector2 rightFillerPos = new Vector2();
         int leftStepsX;
         int leftStepsY;
         int tilePosX;
@@ -130,24 +128,25 @@ public class FieldView implements BaseView {
         int rightStepsX;
         int rightStepsY;
 
+        float leftFillerPosX;
+        float leftFillerPosY;
+        float rightFillerPosX;
+        float rightFillerPosY;
+
         switch (slideDirection) {
             case EAST:
                 //The index of the filler in the array
                 fillerIndex = tile.getHorizontalRowIndex();
 
                 //Calculate the X coordinates of the fillers
-                float leftFillerX = selectedTile.getCenter().x -
+                leftFillerPosX = selectedTile.getCenter().x -
                         (tile.getPosX() + 1) * tileWidth / 2.0f;
-                float rightFillerX = selectedTile.getCenter().x +
+                rightFillerPosX = selectedTile.getCenter().x +
                         (GameController.TILE_COLUMNS - tile.getPosX()) * tileWidth / 2.0f;
 
                 //The Y coordinates since they are in the same row
-                float leftFillerY = selectedTile.getCenter().y;
-                float rightFillerY = selectedTile.getCenter().y;
-
-                //The vector positions
-                leftFillerPos.set(leftFillerX, leftFillerY);
-                rightFillerPos.set(rightFillerX, rightFillerY);
+                leftFillerPosY = selectedTile.getCenter().y;
+                rightFillerPosY = selectedTile.getCenter().y;
                 break;
 
             case NORTH_EAST:
@@ -189,15 +188,11 @@ public class FieldView implements BaseView {
                         tilePosY < GameController.TILE_ROWS);
 
                 //Offset the center relative to the selected tile
-                rightFillerPos.set(
-                        selectedTile.getCenter().x + rightStepsX * tileWidth / 2.0f,
-                        selectedTile.getCenter().y + rightStepsY * tileHeight
-                );
+                rightFillerPosX = selectedTile.getCenter().x + rightStepsX * tileWidth / 2.0f;
+                rightFillerPosY = selectedTile.getCenter().y + rightStepsY * tileHeight;
 
-                leftFillerPos.set(
-                        selectedTile.getCenter().x - leftStepsX * tileWidth / 2.0f,
-                        selectedTile.getCenter().y - leftStepsY * tileHeight
-                );
+                leftFillerPosX = selectedTile.getCenter().x - leftStepsX * tileWidth / 2.0f;
+                leftFillerPosY = selectedTile.getCenter().y - leftStepsY * tileHeight;
 
                 if (rightDiagonalIndex <= 3) {
                     fillerIndex = 6 - 2 * rightDiagonalIndex;
@@ -244,15 +239,11 @@ public class FieldView implements BaseView {
                 } while (tilePosX < GameController.TILE_COLUMNS && tilePosY >= 0);
 
                 //Offset the center relative to the selected tile
-                rightFillerPos.set(
-                        selectedTile.getCenter().x + rightStepsX * tileWidth / 2.0f,
-                        selectedTile.getCenter().y - rightStepsY * tileHeight
-                );
+                rightFillerPosX = selectedTile.getCenter().x + rightStepsX * tileWidth / 2.0f;
+                rightFillerPosY = selectedTile.getCenter().y - rightStepsY * tileHeight;
 
-                leftFillerPos.set(
-                        selectedTile.getCenter().x - leftStepsX * tileWidth / 2.0f,
-                        selectedTile.getCenter().y + leftStepsY * tileHeight
-                );
+                leftFillerPosX = selectedTile.getCenter().x - leftStepsX * tileWidth / 2.0f;
+                leftFillerPosY = selectedTile.getCenter().y + leftStepsY * tileHeight;
 
                 if (leftDiagonalIndex <= 3) {
                     fillerIndex = leftDiagonalIndex * 2 + 1;
@@ -267,11 +258,11 @@ public class FieldView implements BaseView {
         filler.setSide(tileWidth * 0.9f);
 
         //Draw the left filler
-        filler.setCenter(leftFillerPos);
+        filler.setCenter(leftFillerPosX, leftFillerPosY);
         filler.render(shapeRenderer);
 
         //Draw the fight filler
-        filler.setCenter(rightFillerPos);
+        filler.setCenter(rightFillerPosX, rightFillerPosY);
         filler.render(shapeRenderer);
     }
 
@@ -279,8 +270,8 @@ public class FieldView implements BaseView {
      * This will render duplicates of triangles which are currently sliding creating an illusion of
      * a looped shift register.
      *
-     * @param original  the original tile view
-     * @param rowWidth  the (full) size of the row
+     * @param original the original tile view
+     * @param rowWidth the (full) size of the row
      */
     private void renderDuplicates(TileView original, float rowWidth, ShapeRenderer shapeRenderer) {
         Vector2 slideVector = new Vector2(slideDistance, 0);

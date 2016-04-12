@@ -22,6 +22,7 @@ public class TileView implements BaseView {
 
     public TileView() {
         triangle = new EquilateralTriangle();
+        center = new Vector2();
     }
 
     @Override
@@ -82,6 +83,11 @@ public class TileView implements BaseView {
 
     public void setSide(float side) {
         triangle.setSide(side);
+    }
+
+    public void setCenter(float x, float y) {
+        center.x = x;
+        center.y = y;
     }
 
     public void setCenter(Vector2 center) {
