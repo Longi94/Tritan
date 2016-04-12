@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.tlongdev.hexle.controller.GameController;
 import com.tlongdev.hexle.model.SlideDirection;
+import com.tlongdev.hexle.model.Tile;
 
 /**
  * @author longi
@@ -40,6 +41,25 @@ public class FieldView implements BaseView {
         //The vector that will translate all the affected tiles
         Vector2 slideVector = new Vector2(slideDistance, 0);
 
+        if (slideDirection != null) {
+            switch (slideDirection) {
+                case EAST:
+                    slideVector.setAngleRad(0);
+                    break;
+                case NORTH_EAST:
+                    slideVector.setAngleRad(MathUtils.PI / 3.0f);
+                    break;
+                case NORTH_WEST:
+                    slideVector.setAngleRad(2.0f * MathUtils.PI / 3.0f);
+                    break;
+            }
+            //Because setting the length of the vector will always make if face in the
+            //positive direction no matter the distance being negative. Dumb.
+            if (slideDistance < 0) {
+                slideVector.rotateRad(MathUtils.PI);
+            }
+        }
+
         //Iterate through the tiles
         for (int i = 0; i < GameController.TILE_ROWS; i++) {
             for (int j = 0; j < GameController.TILE_COLUMNS; j++) {
@@ -55,25 +75,9 @@ public class FieldView implements BaseView {
 
                 //If slideDirection is not null the a slide is currently happening
                 if (slideDirection != null && view.isAffectedBySlide(selectedTile, slideDirection)) {
-                    switch (slideDirection) {
-                        case EAST:
-                            slideVector.setAngleRad(0);
-                            break;
-                        case NORTH_EAST:
-                            slideVector.setAngleRad(MathUtils.PI / 3.0f);
-                            break;
-                        case NORTH_WEST:
-                            slideVector.setAngleRad(2.0f * MathUtils.PI / 3.0f);
-                            break;
-                    }
-
-                    //Because setting the length of the vector will always make if face in the
-                    //positive direction no matter the distance being negative. Dumb.
-                    if (slideDistance < 0) {
-                        slideVector.rotateRad(MathUtils.PI);
-                    }
                     view.getCenter().add(slideVector);
 
+                    //Render duplicates
                     renderDuplicates(view, slideDirection, tileWidth);
                 }
 
@@ -81,45 +85,177 @@ public class FieldView implements BaseView {
             }
         }
 
-        renderFillers(tileWidth);
+        //Render fillers
+        renderFillers(tileWidth, tileHeight);
     }
 
-    private void renderFillers(float tileWidth) {
-        //Draw the filler tiles if needed
-        if (slideDirection != null && selectedTile != null) {
-            int leftFillerIndex = -1;
-            int rightFillerIndex = -1;
-            float leftFillerX = 0;
-            float leftFillerY = 0;
-            float rightFillerX = 0;
-            float rightFillerY = 0;
-            switch (slideDirection) {
-                case EAST:
-                    leftFillerIndex = selectedTile.getTile().getHorizontalRowIndex();
-                    rightFillerIndex = selectedTile.getTile().getHorizontalRowIndex();
-                    leftFillerX = selectedTile.getCenter().x -
-                            (selectedTile.getTile().getPosX() + 1) * tileWidth / 2.0f;
-                    rightFillerX = selectedTile.getCenter().x +
-                            (9 - selectedTile.getTile().getPosX()) * tileWidth / 2.0f;
-
-                    leftFillerY = rightFillerY = selectedTile.getCenter().y;
-                    break;
-                case NORTH_EAST:
-                    break;
-                default:
-                    break;
-            }
-
-            TileView leftFiller = fillerTileViews[leftFillerIndex];
-            leftFiller.setSide(tileWidth * 0.9f);
-            leftFiller.setCenter(new Vector2(leftFillerX, leftFillerY));
-            leftFiller.render(shapeRenderer);
-
-            TileView rightFiller = fillerTileViews[rightFillerIndex];
-            rightFiller.setSide(tileWidth * 0.9f);
-            rightFiller.setCenter(new Vector2(rightFillerX, rightFillerY));
-            rightFiller.render(shapeRenderer);
+    /**
+     * Draw fillers to create a seemingly infinite row.
+     *
+     * @param tileWidth
+     * @param tileHeight
+     */
+    private void renderFillers(float tileWidth, float tileHeight) {
+        // TODO: 2016.04.12. This function could really use some magic calculation rather than loops
+        if (slideDirection == null || selectedTile == null) {
+            return;
         }
+
+        //Draw the filler tiles if needed
+        int fillerIndex;
+        Vector2 leftFillerPos = new Vector2();
+        Vector2 rightFillerPos = new Vector2();
+        Tile tile = selectedTile.getTile();
+        int leftStepsX;
+        int leftStepsY;
+        int tilePosX;
+        int tilePosY;
+        int rightStepsX;
+        int rightStepsY;
+
+        switch (slideDirection) {
+            case EAST:
+                //The index of the filler in the array
+                fillerIndex = tile.getHorizontalRowIndex();
+
+                //Calculate the X coordinates of the fillers
+                float leftFillerX = selectedTile.getCenter().x -
+                        (tile.getPosX() + 1) * tileWidth / 2.0f;
+                float rightFillerX = selectedTile.getCenter().x +
+                        (GameController.TILE_COLUMNS - tile.getPosX()) * tileWidth / 2.0f;
+
+                //The Y coordinates since they are in the same row
+                float leftFillerY = selectedTile.getCenter().y;
+                float rightFillerY = selectedTile.getCenter().y;
+
+                //The vector positions
+                leftFillerPos.set(leftFillerX, leftFillerY);
+                rightFillerPos.set(rightFillerX, rightFillerY);
+                break;
+
+            case NORTH_EAST:
+                int rightDiagonalIndex = tile.getRightDiagonalIndex();
+
+                //Calculate the number of horizontal and vertical steps needed to reach the
+                //Position if the lower left filler
+                leftStepsX = 0;
+                leftStepsY = 0;
+                tilePosX = tile.getPosX();
+                tilePosY = tile.getPosY();
+
+                do {
+                    if ((tilePosX + tilePosY) % 2 == 1) {
+                        tilePosY--;
+                        leftStepsY++;
+                    } else {
+                        tilePosX--;
+                        leftStepsX++;
+                    }
+                } while (tilePosX >= 0 && tilePosY >= 0);
+
+                //Calculate the number of horizontal and vertical steps needed to reach the
+                //Position if the upper right filler
+                rightStepsX = 0;
+                rightStepsY = 0;
+                tilePosX = tile.getPosX();
+                tilePosY = tile.getPosY();
+
+                do {
+                    if ((tilePosX + tilePosY) % 2 == 1) {
+                        tilePosX++;
+                        rightStepsX++;
+                    } else {
+                        tilePosY++;
+                        rightStepsY++;
+                    }
+                } while (tilePosX < GameController.TILE_COLUMNS &&
+                        tilePosY < GameController.TILE_ROWS);
+
+                //Offset the center relative to the selected tile
+                rightFillerPos.set(
+                        selectedTile.getCenter().x + rightStepsX * tileWidth / 2.0f,
+                        selectedTile.getCenter().y + rightStepsY * tileHeight
+                );
+
+                leftFillerPos.set(
+                        selectedTile.getCenter().x - leftStepsX * tileWidth / 2.0f,
+                        selectedTile.getCenter().y - leftStepsY * tileHeight
+                );
+
+                if (rightDiagonalIndex <= 3) {
+                    fillerIndex = 6 - 2 * rightDiagonalIndex;
+                } else {
+                    fillerIndex = 15 - 2 * rightDiagonalIndex;
+                }
+                break;
+
+            default:
+                int leftDiagonalIndex = tile.getLeftDiagonalIndex();
+
+                //Calculate the number of horizontal and vertical steps needed to reach the
+                //Position if the upper left filler
+                leftStepsX = 0;
+                leftStepsY = 0;
+                tilePosX = tile.getPosX();
+                tilePosY = tile.getPosY();
+
+                do {
+                    if ((tilePosX + tilePosY) % 2 == 1) {
+                        tilePosX--;
+                        leftStepsX++;
+                    } else {
+                        tilePosY++;
+                        leftStepsY++;
+                    }
+                } while (tilePosX >= 0 && tilePosY < GameController.TILE_ROWS);
+
+                //Calculate the number of horizontal and vertical steps needed to reach the
+                //Position if the lower right filler
+                rightStepsX = 0;
+                rightStepsY = 0;
+                tilePosX = tile.getPosX();
+                tilePosY = tile.getPosY();
+
+                do {
+                    if ((tilePosX + tilePosY) % 2 == 1) {
+                        tilePosY--;
+                        rightStepsY++;
+                    } else {
+                        tilePosX++;
+                        rightStepsX++;
+                    }
+                } while (tilePosX < GameController.TILE_COLUMNS && tilePosY >= 0);
+
+                //Offset the center relative to the selected tile
+                rightFillerPos.set(
+                        selectedTile.getCenter().x + rightStepsX * tileWidth / 2.0f,
+                        selectedTile.getCenter().y - rightStepsY * tileHeight
+                );
+
+                leftFillerPos.set(
+                        selectedTile.getCenter().x - leftStepsX * tileWidth / 2.0f,
+                        selectedTile.getCenter().y + leftStepsY * tileHeight
+                );
+
+                if (leftDiagonalIndex <= 3) {
+                    fillerIndex = leftDiagonalIndex * 2 + 1;
+                } else {
+                    fillerIndex = leftDiagonalIndex * 2 - 8;
+                }
+
+                break;
+        }
+
+        TileView filler = fillerTileViews[fillerIndex];
+        filler.setSide(tileWidth * 0.9f);
+
+        //Draw the left filler
+        filler.setCenter(leftFillerPos);
+        filler.render(shapeRenderer);
+
+        //Draw the fight filler
+        filler.setCenter(rightFillerPos);
+        filler.render(shapeRenderer);
     }
 
     /**
