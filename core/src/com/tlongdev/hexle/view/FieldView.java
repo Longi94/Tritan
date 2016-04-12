@@ -31,9 +31,14 @@ public class FieldView implements BaseView {
     private SlideDirection slideDirection;
     private float slideDistance;
 
+    //Calculated when screen size is set
     private float tileWidth;
     private float tileHeight;
     private float offsetY;
+
+    //Calculated on drag start
+    private Vector2 slideVector;
+    private float rowWidth = 0;
 
     public FieldView() {
         logger = new Logger(TAG, Logger.DEBUG);
@@ -41,39 +46,6 @@ public class FieldView implements BaseView {
 
     @Override
     public void render(ShapeRenderer shapeRenderer) {
-        //The vector that will translate all the affected tiles
-        Vector2 slideVector = new Vector2(slideDistance, 0);
-
-        float rowWidth = 0;
-
-        if (slideDirection != null && selectedTile != null) {
-            switch (slideDirection) {
-                case EAST:
-                    slideVector.setAngleRad(0);
-                    rowWidth = tileWidth * 5.0f;
-                    break;
-                case NORTH_EAST:
-                    int rightIndex = selectedTile.getTile().getRightDiagonalIndex();
-                    slideVector.setAngleRad(MathUtils.PI / 3.0f);
-                    rowWidth = (1 + Math.min(rightIndex, 7 - rightIndex)) * 2.0f * tileWidth;
-                    break;
-                default:
-                    int leftIndex = selectedTile.getTile().getLeftDiagonalIndex();
-                    slideVector.setAngleRad(2.0f * MathUtils.PI / 3.0f);
-                    rowWidth = (1 + Math.min(leftIndex, 7 - leftIndex)) * 2.0f * tileWidth;
-                    break;
-            }
-
-            slideVector.setLength(Math.abs(slideDistance) > Math.abs(rowWidth) ?
-                    rowWidth : slideDistance);
-
-            //Because setting the length of the vector will always make if face in the
-            //positive direction no matter the distance being negative. Dumb.
-            if (slideDistance < 0) {
-                slideVector.rotateRad(MathUtils.PI);
-            }
-        }
-
         //Iterate through the tiles
         for (int i = 0; i < GameController.TILE_ROWS; i++) {
             for (int j = 0; j < GameController.TILE_COLUMNS; j++) {
@@ -96,7 +68,7 @@ public class FieldView implements BaseView {
                     view.getCenter().add(slideVector);
 
                     //Render duplicates
-                    renderDuplicates(view, rowWidth, shapeRenderer);
+                    renderDuplicates(view, shapeRenderer);
                 }
 
                 view.render(shapeRenderer);
@@ -271,9 +243,9 @@ public class FieldView implements BaseView {
      * a looped shift register.
      *
      * @param original the original tile view
-     * @param rowWidth the (full) size of the row
+     * @param shapeRenderer shape renderer
      */
-    private void renderDuplicates(TileView original, float rowWidth, ShapeRenderer shapeRenderer) {
+    private void renderDuplicates(TileView original, ShapeRenderer shapeRenderer) {
         Vector2 slideVector = new Vector2(slideDistance, 0);
         Vector2 originalVector = original.getCenter();
         float originalSize = original.getSide();
@@ -379,6 +351,35 @@ public class FieldView implements BaseView {
     public void setDrag(SlideDirection direction, float dst) {
         this.slideDirection = direction;
         this.slideDistance = dst;
+
+        //The vector that will translate all the affected tiles
+        slideVector = new Vector2(slideDistance, 0);
+
+        switch (slideDirection) {
+            case EAST:
+                slideVector.setAngleRad(0);
+                rowWidth = tileWidth * 5.0f;
+                break;
+            case NORTH_EAST:
+                int rightIndex = selectedTile.getTile().getRightDiagonalIndex();
+                slideVector.setAngleRad(MathUtils.PI / 3.0f);
+                rowWidth = (1 + Math.min(rightIndex, 7 - rightIndex)) * 2.0f * tileWidth;
+                break;
+            default:
+                int leftIndex = selectedTile.getTile().getLeftDiagonalIndex();
+                slideVector.setAngleRad(2.0f * MathUtils.PI / 3.0f);
+                rowWidth = (1 + Math.min(leftIndex, 7 - leftIndex)) * 2.0f * tileWidth;
+                break;
+        }
+
+        slideVector.setLength(Math.abs(slideDistance) > Math.abs(rowWidth) ?
+                rowWidth : slideDistance);
+
+        //Because setting the length of the vector will always make if face in the
+        //positive direction no matter the distance being negative. Dumb.
+        if (slideDistance < 0) {
+            slideVector.rotateRad(MathUtils.PI);
+        }
     }
 
     public void setFillerTileViews(TileView[] fillerTileViews) {
