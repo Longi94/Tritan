@@ -90,4 +90,82 @@ public class Field {
     public Tile[] getFillerTiles() {
         return fillerTiles;
     }
+
+    public void checkField() {
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                checkTile(null, tiles[i][j], 0);
+            }
+        }
+    }
+
+    /**
+     * Check if there are 3 or more tiles of the same color together.
+     *
+     * @param source
+     * @param current
+     * @param depth
+     * @return
+     */
+    private boolean checkTile(Tile source, Tile current, int depth) {
+        //Don't even bother, they are not the same color
+        if (source != null && source.getTileColor() != current.getTileColor()) {
+            return false;
+        }
+
+        //Get the neighbors of the current tile
+        Tile neighbor1 = null;
+        Tile neighbor2 = null;
+        Tile neighbor3 = null;
+
+        //The left neighbor
+        if (current.getPosX() != 0) {
+            neighbor1 = tiles[current.getPosY()][current.getPosX() - 1];
+        }
+
+        //The right neighbor
+        if (current.getPosX() != width - 1) {
+            neighbor2 = tiles[current.getPosY()][current.getPosX() + 1];
+        }
+
+        if (current.getOrientation() == TileOrientation.UP) {
+            //The bottom neighbor
+            if (current.getPosY() != 0) {
+                neighbor3 = tiles[current.getPosY() - 1][current.getPosX()];
+            }
+        } else {
+            //The top neighbor
+            if (current.getPosY() != height - 1) {
+                neighbor3 = tiles[current.getPosY() + 1][current.getPosX()];
+            }
+        }
+
+        //If we reached a depth of  return true;
+        boolean result = depth >= 2;
+
+        //Recursive group discovery
+        if (neighbor1 != null && (source == null || neighbor1 != source)) {
+            if (checkTile(current, neighbor1, depth + 1)) {
+                result = true;
+            }
+        }
+
+        if (neighbor2 != null && (source == null || neighbor2 != source)) {
+            if (checkTile(current, neighbor2, depth + 1)) {
+                result = true;
+            }
+        }
+
+        if (neighbor3 != null && (source == null || neighbor3 != source)) {
+            if (checkTile(current, neighbor3, depth + 1)) {
+                result = true;
+            }
+        }
+
+        if (result) {
+            current.setMarked(true);
+        }
+
+        return result;
+    }
 }

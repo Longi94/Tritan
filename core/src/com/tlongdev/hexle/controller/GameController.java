@@ -33,6 +33,7 @@ public class GameController implements HexleInputProcessor.HexleInputListener {
 
         field = new Field(TILE_COLUMNS, TILE_ROWS);
         field.randomize();
+        field.checkField();
 
         fieldView = new FieldView();
 
@@ -54,14 +55,6 @@ public class GameController implements HexleInputProcessor.HexleInputListener {
         fieldView.setFillerTileViews(fillerTileViews);
     }
 
-    public void update(float dt) {
-
-    }
-
-    public FieldView getFieldView() {
-        return fieldView;
-    }
-
     @Override
     public void touchDown(int x, int y) {
         fieldView.touchDown(x, y);
@@ -75,5 +68,13 @@ public class GameController implements HexleInputProcessor.HexleInputListener {
     @Override
     public void touchDragged(SlideDirection direction, float dst) {
         fieldView.setDrag(direction, dst);
+    }
+
+    public void update(float dt) {
+
+    }
+
+    public FieldView getFieldView() {
+        return fieldView;
     }
 }

@@ -57,8 +57,10 @@ public class FieldView implements BaseView {
                         offsetY + i * tileHeight
                 );
 
-                if (selectedTile == view) {
+                if (selectedTile != null && selectedTile == view) {
                     view.setSide(tileWidth);
+                } else if (view.getTile().isMarked()) {
+                    view.setSide(tileWidth * 0.8f);
                 } else {
                     view.setSide(tileWidth * 0.9f);
                 }
@@ -242,7 +244,7 @@ public class FieldView implements BaseView {
      * This will render duplicates of triangles which are currently sliding creating an illusion of
      * a looped shift register.
      *
-     * @param original the original tile view
+     * @param original      the original tile view
      * @param shapeRenderer shape renderer
      */
     private void renderDuplicates(TileView original, ShapeRenderer shapeRenderer) {

@@ -23,6 +23,8 @@ public class Tile {
 
     private TileOrientation orientation;
 
+    private boolean marked;
+
     public int getPosX() {
         return posX;
     }
@@ -90,6 +92,14 @@ public class Tile {
         horizontalRowIndex = posY;
         rightDiagonalIndex = (posX - posY + 7) / 2;
         leftDiagonalIndex = (posX + posY) / 2;
+    }
+
+    public boolean isMarked() {
+        return marked;
+    }
+
+    public void setMarked(boolean marked) {
+        this.marked = marked;
     }
 
     public enum TileOrientation {
