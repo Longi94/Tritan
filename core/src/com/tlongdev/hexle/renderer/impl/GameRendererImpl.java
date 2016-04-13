@@ -1,4 +1,4 @@
-package com.tlongdev.hexle.renderer;
+package com.tlongdev.hexle.renderer.impl;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -8,11 +8,12 @@ import com.tlongdev.hexle.input.HexleInputProcessor;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.GameModel;
 import com.tlongdev.hexle.model.SlideDirection;
+import com.tlongdev.hexle.renderer.GameRenderer;
 import com.tlongdev.hexle.view.FieldView;
 import com.tlongdev.hexle.view.TileView;
 
-import static com.tlongdev.hexle.model.GameModelImpl.TILE_COLUMNS;
-import static com.tlongdev.hexle.model.GameModelImpl.TILE_ROWS;
+import static com.tlongdev.hexle.model.impl.GameModelImpl.TILE_COLUMNS;
+import static com.tlongdev.hexle.model.impl.GameModelImpl.TILE_ROWS;
 
 /**
  * @author longi

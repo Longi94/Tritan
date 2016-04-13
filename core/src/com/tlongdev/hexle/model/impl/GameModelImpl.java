@@ -1,5 +1,7 @@
-package com.tlongdev.hexle.model;
+package com.tlongdev.hexle.model.impl;
 
+import com.tlongdev.hexle.model.Field;
+import com.tlongdev.hexle.model.GameModel;
 import com.tlongdev.hexle.renderer.GameRenderer;
 
 /**

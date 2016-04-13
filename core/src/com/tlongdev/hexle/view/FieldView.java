@@ -10,8 +10,8 @@ import com.tlongdev.hexle.model.Tile;
 import com.tlongdev.hexle.shape.Rectangle;
 import com.tlongdev.hexle.shape.Triangle;
 
-import static com.tlongdev.hexle.model.GameModelImpl.TILE_COLUMNS;
-import static com.tlongdev.hexle.model.GameModelImpl.TILE_ROWS;
+import static com.tlongdev.hexle.model.impl.GameModelImpl.TILE_COLUMNS;
+import static com.tlongdev.hexle.model.impl.GameModelImpl.TILE_ROWS;
 
 /**
  * @author longi

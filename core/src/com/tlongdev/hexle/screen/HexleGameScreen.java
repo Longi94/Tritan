@@ -5,10 +5,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Logger;
-import com.tlongdev.hexle.controller.GameControllerImpl;
+import com.tlongdev.hexle.controller.impl.GameControllerImpl;
 import com.tlongdev.hexle.input.HexleInputProcessor;
-import com.tlongdev.hexle.model.GameModelImpl;
-import com.tlongdev.hexle.renderer.GameRendererImpl;
+import com.tlongdev.hexle.model.impl.GameModelImpl;
+import com.tlongdev.hexle.renderer.impl.GameRendererImpl;
 
 /**
  * @author longi

@@ -1,6 +1,7 @@
-package com.tlongdev.hexle.controller;
+package com.tlongdev.hexle.controller.impl;
 
 import com.badlogic.gdx.utils.Logger;
+import com.tlongdev.hexle.controller.GameController;
 import com.tlongdev.hexle.model.GameModel;
 import com.tlongdev.hexle.renderer.GameRenderer;
 
