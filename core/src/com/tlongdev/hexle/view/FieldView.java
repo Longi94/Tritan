@@ -93,7 +93,7 @@ public class FieldView implements BaseView {
                     //Render duplicates
                     renderDuplicates(view, shapeRenderer);
                 }
-                if (animating && view.isAffectedBySlide(selectedTile, slideDirection)) {
+                if (animating && manager.containsTarget(view)) {
                     //Render duplicates
                     renderDuplicates(view, shapeRenderer);
                 }
@@ -276,7 +276,7 @@ public class FieldView implements BaseView {
      */
     private void renderDuplicates(TileView original, ShapeRenderer shapeRenderer) {
         Vector2 slideVector = new Vector2(slideDistance, 0);
-        Vector2 originalVector = original.getCenter();
+        Vector2 originalVector = original.getCenter().cpy();
         float originalSize = original.getSide();
 
         original.setSide(tileWidth * 0.9f);
@@ -361,6 +361,7 @@ public class FieldView implements BaseView {
                         (j + 1) * tileWidth / 2.0f,
                         offsetY + i * tileHeight
                 );
+                view.setCenter(view.getOriginCenter());
                 view.setFullWidth(tileWidth);
                 view.setSide(tileWidth * 0.9f);
             }
@@ -369,7 +370,6 @@ public class FieldView implements BaseView {
 
     public void setTileViews(TileView[][] tileViews, TileView[] fillers) {
         selectedTile = null;
-        slideDirection = null;
 
         this.fillerTileViews = fillers;
         this.tileViews = tileViews;
@@ -389,7 +389,25 @@ public class FieldView implements BaseView {
                 );
                 view.setFullWidth(tileWidth);
                 view.setSide(tileWidth * 0.9f);
+                view.setCenter(view.getOriginCenter());
+
+                if (view.getTile().getTemporaryOffset() != null) {
+                    animating = true;
+                    animatingTileCount++;
+                    Tween.from(view, TileViewAccessor.POS_XY, 500)
+                            .target(view.getCenter().x + view.getTile().getTemporaryOffset().x,
+                                    view.getCenter().y + view.getTile().getTemporaryOffset().y)
+                            .ease(Quad.INOUT)
+                            .setCallback(tweenCallback)
+                            .start(manager);
+                    view.getTile().setTemporaryOffset(null);
+                }
             }
+        }
+
+        //Notify the listener if animation has started
+        if (animating && animationListener != null) {
+            animationListener.onAnimationStarted();
         }
     }
 
@@ -413,7 +431,8 @@ public class FieldView implements BaseView {
 
     public void touchUp() {
         touchDown = false;
-        if (slideEndListener != null) {
+        //If slide direction is null, slide has not started
+        if (slideDirection != null && slideEndListener != null) {
             slideEndListener.onSlideEnd();
         }
     }

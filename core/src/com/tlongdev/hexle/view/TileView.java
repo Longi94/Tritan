@@ -96,7 +96,7 @@ public class TileView implements BaseView {
     }
 
     public void setCenter(Vector2 center) {
-        this.center = center;
+        this.center.set(center);
     }
 
     public Vector2 getTriangleCenter() {
@@ -130,13 +130,10 @@ public class TileView implements BaseView {
 
     public void setOriginCenter(Vector2 originCenter) {
         this.originCenter = originCenter;
-        center = originCenter.cpy();
     }
 
     public void setOriginCenter(float x, float y) {
         originCenter.x = x;
         originCenter.y = y;
-        center.x = x;
-        center.y = y;
     }
 }

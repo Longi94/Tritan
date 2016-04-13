@@ -1,10 +1,14 @@
 package com.tlongdev.hexle.controller.impl;
 
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
 import com.tlongdev.hexle.controller.GameController;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.GameModel;
 import com.tlongdev.hexle.model.SlideDirection;
+import com.tlongdev.hexle.model.Tile;
+import com.tlongdev.hexle.model.impl.GameModelImpl;
 import com.tlongdev.hexle.renderer.GameRenderer;
 import com.tlongdev.hexle.view.FieldView;
 import com.tlongdev.hexle.view.TileView;
@@ -71,9 +75,32 @@ public class GameControllerImpl implements GameController {
         Field tempField = model.getField().copy();
 
         //Apply shift to field
-        tempField.shift(slideDirection, steps * 2, selected.getTile().getRowIndex(slideDirection));
+        int rowIndex = selected.getTile().getRowIndex(slideDirection);
+        tempField.shift(slideDirection, steps * 2, rowIndex);
 
         if (tempField.checkField()) {
+
+            //The is the offset vector that will make the tile animate into its new place
+            Vector2 offset = selected.getCenter().cpy().sub(selected.getOriginCenter());
+            float length = slideDistance - tileWidth * steps;
+            offset.setLength(length);
+
+            //This is some black magic, not sure what it is yet TODO: 2016.04.14.
+            if (length * slideDistance < 0) {
+                offset.rotateRad(MathUtils.PI);
+            }
+
+            //If the tile is affected, mark it with a offset vector that will make it animate
+            //into its place
+            for (int i = 0; i < GameModelImpl.TILE_ROWS; i++) {
+                for (int j = 0; j < GameModelImpl.TILE_COLUMNS; j++) {
+                    Tile tile = tempField.getTiles()[i][j];
+                    if (tile.getRowIndex(slideDirection) == rowIndex) {
+                        tile.setTemporaryOffset(offset);
+                    }
+                }
+            }
+
             //Shift successfully creates a group, apply it
             model.setField(tempField);
         } else {

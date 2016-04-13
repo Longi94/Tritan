@@ -207,6 +207,10 @@ public class Field {
     }
 
     public void shift(SlideDirection slideDirection, int steps, int rowIndex) {
+        if (Math.abs(steps) == width + 1) {
+            return;
+        }
+
         switch (slideDirection) {
             case EAST:
                 //Create a temporary row that will store all the tiles and the filler
