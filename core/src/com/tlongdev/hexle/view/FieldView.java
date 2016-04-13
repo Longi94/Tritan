@@ -31,6 +31,7 @@ public class FieldView implements BaseView {
     private Logger logger;
 
     private OnAnimationListener animationListener;
+    private OnSlideEndListener slideEndListener;
 
     private int screenWidth;
     private int screenHeight;
@@ -366,8 +367,30 @@ public class FieldView implements BaseView {
         }
     }
 
-    public void setTileViews(TileView[][] tileViews) {
+    public void setTileViews(TileView[][] tileViews, TileView[] fillers) {
+        selectedTile = null;
+        slideDirection = null;
+
+        this.fillerTileViews = fillers;
         this.tileViews = tileViews;
+
+        //Calculate the vertical offset, so the triangles are in the middle of the screen
+        float offsetY = (screenHeight - (TILE_ROWS - 1) * tileHeight) / 2.0f;
+
+        //Iterate through the tiles
+        for (int i = 0; i < TILE_ROWS; i++) {
+            for (int j = 0; j < TILE_COLUMNS; j++) {
+                TileView view = tileViews[i][j];
+
+                //Set the center
+                view.setOriginCenter(
+                        (j + 1) * tileWidth / 2.0f,
+                        offsetY + i * tileHeight
+                );
+                view.setFullWidth(tileWidth);
+                view.setSide(tileWidth * 0.9f);
+            }
+        }
     }
 
     public void touchDown(int x, int y) {
@@ -390,27 +413,8 @@ public class FieldView implements BaseView {
 
     public void touchUp() {
         touchDown = false;
-
-        for (int i = 0; i < TILE_ROWS; i++) {
-            for (int j = 0; j < TILE_COLUMNS; j++) {
-                TileView view = tileViews[i][j];
-
-                //If the tile is out of it's place animate it back
-                if (!view.getCenter().epsilonEquals(view.getOriginCenter(), 0.0f)) {
-                    animating = true;
-                    animatingTileCount++;
-                    Tween.to(view, TileViewAccessor.POS_XY, 500)
-                            .target(view.getOriginCenter().x, view.getOriginCenter().y)
-                            .ease(Quad.INOUT)
-                            .setCallback(tweenCallback)
-                            .start(manager);
-                }
-            }
-        }
-
-        //Notify the listener if animation has started
-        if (animating && animationListener != null) {
-            animationListener.onAnimationStarted();
+        if (slideEndListener != null) {
+            slideEndListener.onSlideEnd();
         }
     }
 
@@ -450,17 +454,61 @@ public class FieldView implements BaseView {
         }
     }
 
-    public void setFillerTileViews(TileView[] fillerTileViews) {
-        this.fillerTileViews = fillerTileViews;
+    public void noMatch() {
+        for (int i = 0; i < TILE_ROWS; i++) {
+            for (int j = 0; j < TILE_COLUMNS; j++) {
+                TileView view = tileViews[i][j];
+
+                //If the tile is out of it's place animate it back
+                if (!view.getCenter().epsilonEquals(view.getOriginCenter(), 0.0f)) {
+                    animating = true;
+                    animatingTileCount++;
+                    Tween.to(view, TileViewAccessor.POS_XY, 500)
+                            .target(view.getOriginCenter().x, view.getOriginCenter().y)
+                            .ease(Quad.INOUT)
+                            .setCallback(tweenCallback)
+                            .start(manager);
+                }
+            }
+        }
+
+        //Notify the listener if animation has started
+        if (animating && animationListener != null) {
+            animationListener.onAnimationStarted();
+        }
     }
 
     public void setAnimationListener(OnAnimationListener animationListener) {
         this.animationListener = animationListener;
     }
 
+    public void setSlideEndListener(OnSlideEndListener slideEndListener) {
+        this.slideEndListener = slideEndListener;
+    }
+
+    public SlideDirection getSlideDirection() {
+        return slideDirection;
+    }
+
+    public float getSlideDistance() {
+        return slideDistance;
+    }
+
+    public TileView getSelectedTile() {
+        return selectedTile;
+    }
+
+    public float getTileWidth() {
+        return tileWidth;
+    }
+
     public interface OnAnimationListener {
         void onAnimationStarted();
 
         void onAnimationFinished();
+    }
+
+    public interface OnSlideEndListener {
+        void onSlideEnd();
     }
 }

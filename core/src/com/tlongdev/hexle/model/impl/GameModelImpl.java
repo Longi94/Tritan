@@ -39,4 +39,10 @@ public class GameModelImpl implements GameModel {
     public void setRenderer(GameRenderer renderer) {
         this.renderer = renderer;
     }
+
+    @Override
+    public void setField(Field field) {
+        this.field = field;
+        renderer.notifyModelChanged();
+    }
 }

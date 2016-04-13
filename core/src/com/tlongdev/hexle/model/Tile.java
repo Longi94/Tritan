@@ -102,6 +102,32 @@ public class Tile {
         this.marked = marked;
     }
 
+    public boolean isBlank() {
+        return false;
+    }
+
+    public Tile copy() {
+        Tile tile = new Tile();
+        tile.setTileColor(tileColor);
+        tile.setOrientation(orientation);
+        tile.setPosX(posX);
+        tile.setPosY(posY);
+        tile.setMarked(marked);
+        return tile;
+    }
+
+    public int getRowIndex(SlideDirection slideDirection) {
+        switch (slideDirection) {
+            case EAST:
+                return horizontalRowIndex;
+            case NORTH_EAST:
+                return rightDiagonalIndex;
+            case NORTH_WEST:
+                return leftDiagonalIndex;
+        }
+        return 0;
+    }
+
     public enum TileOrientation {
         UP, DOWN
     }

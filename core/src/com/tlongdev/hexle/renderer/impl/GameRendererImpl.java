@@ -23,8 +23,8 @@ import static com.tlongdev.hexle.model.impl.GameModelImpl.TILE_ROWS;
  * @author longi
  * @since 2016.04.10.
  */
-public class GameRendererImpl implements GameRenderer, Disposable,
-        HexleInputProcessor.HexleInputListener, FieldView.OnAnimationListener {
+public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnAnimationListener,
+        HexleInputProcessor.HexleInputListener, FieldView.OnSlideEndListener {
 
     private GameController controller;
 
@@ -49,6 +49,10 @@ public class GameRendererImpl implements GameRenderer, Disposable,
 
         Tween.registerAccessor(TileView.class, new TileViewAccessor());
         tweenManager = new TweenManager();
+
+        fieldView = new FieldView(tweenManager);
+        fieldView.setAnimationListener(this);
+        fieldView.setSlideEndListener(this);
     }
 
     @Override
@@ -77,9 +81,6 @@ public class GameRendererImpl implements GameRenderer, Disposable,
     public void notifyModelChanged() {
         Field field = model.getField();
 
-        fieldView = new FieldView(tweenManager);
-        fieldView.setAnimationListener(this);
-
         TileView[][] tileViews = new TileView[TILE_ROWS][TILE_COLUMNS];
         TileView[] fillerTileViews = new TileView[TILE_ROWS];
 
@@ -94,13 +95,17 @@ public class GameRendererImpl implements GameRenderer, Disposable,
             fillerTileViews[i] = fillerView;
         }
 
-        fieldView.setTileViews(tileViews);
-        fieldView.setFillerTileViews(fillerTileViews);
+        fieldView.setTileViews(tileViews, fillerTileViews);
     }
 
     @Override
     public void update(float dt) {
         tweenManager.update(dt);
+    }
+
+    @Override
+    public FieldView getFieldView() {
+        return fieldView;
     }
 
     @Override
@@ -138,14 +143,6 @@ public class GameRendererImpl implements GameRenderer, Disposable,
         }
     }
 
-    public void setController(GameController controller) {
-        this.controller = controller;
-    }
-
-    public void setModel(GameModel model) {
-        this.model = model;
-    }
-
     @Override
     public void onAnimationStarted() {
         animating = true;
@@ -154,5 +151,18 @@ public class GameRendererImpl implements GameRenderer, Disposable,
     @Override
     public void onAnimationFinished() {
         animating = false;
+    }
+
+    @Override
+    public void onSlideEnd() {
+        controller.notifySlideEnd();
+    }
+
+    public void setController(GameController controller) {
+        this.controller = controller;
+    }
+
+    public void setModel(GameModel model) {
+        this.model = model;
     }
 }

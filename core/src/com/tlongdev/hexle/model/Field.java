@@ -102,12 +102,17 @@ public class Field {
         return fillerTiles;
     }
 
-    public void checkField() {
+    public boolean checkField() {
+        return true;
+        /*boolean result = false;
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                checkTile(null, tiles[i][j], 0, false);
+                if (checkTile(null, tiles[i][j], 0, false)) {
+                    result = true;
+                }
             }
         }
+        return result;*/
     }
 
     /**
@@ -184,5 +189,57 @@ public class Field {
         }
 
         return result;
+    }
+
+
+    public void setTiles(Tile[][] tiles) {
+        this.tiles = tiles;
+    }
+
+    public Field copy() {
+        Field field = new Field(width, height);
+
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                field.getTiles()[i][j] = tiles[i][j].copy();
+                field.getTiles()[i][j].updateIndices();
+            }
+            field.getFillerTiles()[i] = fillerTiles[i].copy();
+        }
+
+        return field;
+    }
+
+    public void shift(SlideDirection slideDirection, int steps, int rowIndex) {
+        switch (slideDirection) {
+            case EAST:
+                Tile[] tempRow = new Tile[width + 1];
+                for (int i = 0; i < width; i++) {
+                    int column;
+                    if (steps + i < 0) {
+                        column = steps + i + width + 1;
+                    } else if (steps + i >= width) {
+                        column = steps + i - width - 1;
+                    } else {
+                        column = steps + i;
+                    }
+
+                    tempRow[column == -1 ? width : column] = tiles[rowIndex][i];
+                }
+                tempRow[steps > 0 ? steps - 1 : width + steps] = fillerTiles[rowIndex];
+
+                for (int i = 0; i < width; i++) {
+                    tiles[rowIndex][i] = tempRow[i];
+                    tiles[rowIndex][i].setPosX(i);
+                    tiles[rowIndex][i].updateIndices();
+                }
+
+                fillerTiles[rowIndex] = tempRow[width];
+                break;
+            case NORTH_EAST:
+                break;
+            case NORTH_WEST:
+                break;
+        }
     }
 }

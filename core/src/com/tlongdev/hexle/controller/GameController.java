@@ -6,4 +6,6 @@ package com.tlongdev.hexle.controller;
  */
 public interface GameController {
     void startGame();
+
+    void notifySlideEnd();
 }

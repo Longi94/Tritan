@@ -8,4 +8,6 @@ public interface GameModel {
     Field getField();
 
     void randomizeField();
+
+    void setField(Field field);
 }
