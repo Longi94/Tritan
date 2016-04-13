@@ -106,6 +106,9 @@ public class Tile {
         return false;
     }
 
+    /**
+     * @return a copy of this object
+     */
     public Tile copy() {
         Tile tile = new Tile();
         tile.setTileColor(tileColor);

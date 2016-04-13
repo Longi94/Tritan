@@ -81,6 +81,7 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
     public void notifyModelChanged() {
         Field field = model.getField();
 
+        //Create the views for the model objects
         TileView[][] tileViews = new TileView[TILE_ROWS][TILE_COLUMNS];
         TileView[] fillerTileViews = new TileView[TILE_ROWS];
 

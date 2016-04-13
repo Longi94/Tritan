@@ -67,12 +67,17 @@ public class GameControllerImpl implements GameController {
             }
         }
 
+        //Create a temporary copy of the field
         Field tempField = model.getField().copy();
+
+        //Apply shift to field
         tempField.shift(slideDirection, steps * 2, selected.getTile().getRowIndex(slideDirection));
 
         if (tempField.checkField()) {
+            //Shift successfully creates a group, apply it
             model.setField(tempField);
         } else {
+            //No group
             fieldView.noMatch();
         }
     }

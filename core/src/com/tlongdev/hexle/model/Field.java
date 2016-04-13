@@ -191,14 +191,11 @@ public class Field {
         return result;
     }
 
-
-    public void setTiles(Tile[][] tiles) {
-        this.tiles = tiles;
-    }
-
+    /**
+     * @return a cpy of this object
+     */
     public Field copy() {
         Field field = new Field(width, height);
-
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 field.getTiles()[i][j] = tiles[i][j].copy();
@@ -206,35 +203,46 @@ public class Field {
             }
             field.getFillerTiles()[i] = fillerTiles[i].copy();
         }
-
         return field;
     }
 
     public void shift(SlideDirection slideDirection, int steps, int rowIndex) {
         switch (slideDirection) {
             case EAST:
+                //Create a temporary row that will store all the tiles and the filler
                 Tile[] tempRow = new Tile[width + 1];
+
+                //Put each tile into it's new place
                 for (int i = 0; i < width; i++) {
                     int column;
                     if (steps + i < 0) {
+                        //The tile shifted below 0
                         column = steps + i + width + 1;
                     } else if (steps + i >= width) {
+                        //The tile shifted over the max
                         column = steps + i - width - 1;
                     } else {
+                        //Just shift
                         column = steps + i;
                     }
 
+                    //If the column is -1, the tile is now a filler
                     tempRow[column == -1 ? width : column] = tiles[rowIndex][i];
                 }
+
+                //Put the filler into its new place
                 tempRow[steps > 0 ? steps - 1 : width + steps] = fillerTiles[rowIndex];
 
+                //Apply changes, update indices
                 for (int i = 0; i < width; i++) {
                     tiles[rowIndex][i] = tempRow[i];
                     tiles[rowIndex][i].setPosX(i);
                     tiles[rowIndex][i].updateIndices();
                 }
 
+                //Apply filler (it's the last in the array)
                 fillerTiles[rowIndex] = tempRow[width];
+                fillerTiles[rowIndex].setPosX(-1);
                 break;
             case NORTH_EAST:
                 break;
