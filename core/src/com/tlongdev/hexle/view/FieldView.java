@@ -5,11 +5,13 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
-import com.tlongdev.hexle.controller.GameController;
 import com.tlongdev.hexle.model.SlideDirection;
 import com.tlongdev.hexle.model.Tile;
 import com.tlongdev.hexle.shape.Rectangle;
 import com.tlongdev.hexle.shape.Triangle;
+
+import static com.tlongdev.hexle.model.GameModelImpl.TILE_COLUMNS;
+import static com.tlongdev.hexle.model.GameModelImpl.TILE_ROWS;
 
 /**
  * @author longi
@@ -47,8 +49,8 @@ public class FieldView implements BaseView {
     @Override
     public void render(ShapeRenderer shapeRenderer) {
         //Iterate through the tiles
-        for (int i = 0; i < GameController.TILE_ROWS; i++) {
-            for (int j = 0; j < GameController.TILE_COLUMNS; j++) {
+        for (int i = 0; i < TILE_ROWS; i++) {
+            for (int j = 0; j < TILE_COLUMNS; j++) {
                 TileView view = tileViews[i][j];
 
                 //Set the center
@@ -117,7 +119,7 @@ public class FieldView implements BaseView {
                 leftFillerPosX = selectedTile.getCenter().x -
                         (tile.getPosX() + 1) * tileWidth / 2.0f;
                 rightFillerPosX = selectedTile.getCenter().x +
-                        (GameController.TILE_COLUMNS - tile.getPosX()) * tileWidth / 2.0f;
+                        (TILE_COLUMNS - tile.getPosX()) * tileWidth / 2.0f;
 
                 //The Y coordinates since they are in the same row
                 leftFillerPosY = selectedTile.getCenter().y;
@@ -159,8 +161,8 @@ public class FieldView implements BaseView {
                         tilePosY++;
                         rightStepsY++;
                     }
-                } while (tilePosX < GameController.TILE_COLUMNS &&
-                        tilePosY < GameController.TILE_ROWS);
+                } while (tilePosX < TILE_COLUMNS &&
+                        tilePosY < TILE_ROWS);
 
                 //Offset the center relative to the selected tile
                 rightFillerPosX = selectedTile.getCenter().x + rightStepsX * tileWidth / 2.0f;
@@ -194,7 +196,7 @@ public class FieldView implements BaseView {
                         tilePosY++;
                         leftStepsY++;
                     }
-                } while (tilePosX >= 0 && tilePosY < GameController.TILE_ROWS);
+                } while (tilePosX >= 0 && tilePosY < TILE_ROWS);
 
                 //Calculate the number of horizontal and vertical steps needed to reach the
                 //Position if the lower right filler
@@ -211,7 +213,7 @@ public class FieldView implements BaseView {
                         tilePosX++;
                         rightStepsX++;
                     }
-                } while (tilePosX < GameController.TILE_COLUMNS && tilePosY >= 0);
+                } while (tilePosX < TILE_COLUMNS && tilePosY >= 0);
 
                 //Offset the center relative to the selected tile
                 rightFillerPosX = selectedTile.getCenter().x + rightStepsX * tileWidth / 2.0f;
@@ -319,13 +321,13 @@ public class FieldView implements BaseView {
         this.screenHeight = height;
 
         //Get the maximum width the tile can fit in the screen
-        tileWidth = (float) (screenWidth / Math.ceil(GameController.TILE_COLUMNS / 2.0));
+        tileWidth = (float) (screenWidth / Math.ceil(TILE_COLUMNS / 2.0));
 
         //Calculate the height from the width (equilateral triangle height from side)
         tileHeight = tileWidth * (float) Math.sqrt(3) / 2.0f;
 
         //Calculate the vertical offset, so the triangles are in the middle of the screen
-        offsetY = (screenHeight - (GameController.TILE_ROWS - 1) * tileHeight) / 2.0f;
+        offsetY = (screenHeight - (TILE_ROWS - 1) * tileHeight) / 2.0f;
     }
 
     public void setTileViews(TileView[][] tileViews) {
@@ -337,8 +339,8 @@ public class FieldView implements BaseView {
         float minDist = screenHeight;
 
         //Find the closest tile and mark it as selected
-        for (int i = 0; i < GameController.TILE_ROWS; i++) {
-            for (int j = 0; j < GameController.TILE_COLUMNS; j++) {
+        for (int i = 0; i < TILE_ROWS; i++) {
+            for (int j = 0; j < TILE_COLUMNS; j++) {
                 float dist = touchDown.dst(tileViews[i][j].getTriangleCenter());
                 if (minDist > dist) {
                     minDist = dist;

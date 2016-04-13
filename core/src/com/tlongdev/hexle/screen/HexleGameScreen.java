@@ -5,9 +5,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Logger;
-import com.tlongdev.hexle.controller.GameController;
+import com.tlongdev.hexle.controller.GameControllerImpl;
 import com.tlongdev.hexle.input.HexleInputProcessor;
-import com.tlongdev.hexle.renderer.GameRenderer;
+import com.tlongdev.hexle.model.GameModelImpl;
+import com.tlongdev.hexle.renderer.GameRendererImpl;
 
 /**
  * @author longi
@@ -19,8 +20,8 @@ public class HexleGameScreen implements Screen {
 
     private Logger logger;
 
-    private GameController controller;
-    private GameRenderer renderer;
+    private GameControllerImpl controller;
+    private GameRendererImpl renderer;
 
     private boolean paused;
 
@@ -32,18 +33,27 @@ public class HexleGameScreen implements Screen {
     public void show() {
         //Set Libgdx log level to DEBUG
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
-
-        int width = Gdx.graphics.getWidth();
-        int height = Gdx.graphics.getHeight();
+        logger.info("show");
 
         HexleInputProcessor inputProcessor = new HexleInputProcessor();
         Gdx.input.setInputProcessor(inputProcessor);
 
         //Initialize controller and renderer
-        controller = new GameController();
-        inputProcessor.setListener(controller);
+        controller = new GameControllerImpl();
+        renderer = new GameRendererImpl();
+        GameModelImpl model = new GameModelImpl();
 
-        renderer = new GameRenderer(controller, width, height);
+        controller.setModel(model);
+        controller.setRenderer(renderer);
+
+        renderer.setModel(model);
+        renderer.setController(controller);
+
+        model.setRenderer(renderer);
+
+        inputProcessor.setListener(renderer);
+
+        controller.startGame();
 
         //Active on start
         paused = false;
@@ -70,26 +80,30 @@ public class HexleGameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+        logger.info("resize");
         renderer.resize(width, height);
     }
 
     @Override
     public void pause() {
+        logger.info("pause");
         paused = true;
     }
 
     @Override
     public void resume() {
+        logger.info("resize");
         paused = false;
     }
 
     @Override
     public void hide() {
-
+        logger.info("hide");
     }
 
     @Override
     public void dispose() {
+        logger.info("dispose");
         renderer.dispose();
     }
 }
