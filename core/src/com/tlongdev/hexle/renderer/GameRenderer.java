@@ -6,4 +6,6 @@ package com.tlongdev.hexle.renderer;
  */
 public interface GameRenderer extends Renderer {
     void notifyModelChanged();
+
+    void update(float dt);
 }

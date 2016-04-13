@@ -20,11 +20,14 @@ public class TileView implements BaseView {
 
     private Vector2 center;
 
+    private Vector2 originCenter;
+
     private float fullWidth;
 
     public TileView() {
         triangle = new EquilateralTriangle();
         center = new Vector2();
+        originCenter = new Vector2();
     }
 
     @Override
@@ -119,5 +122,21 @@ public class TileView implements BaseView {
 
     public void setFullWidth(float fullWidth) {
         this.fullWidth = fullWidth;
+    }
+
+    public Vector2 getOriginCenter() {
+        return originCenter;
+    }
+
+    public void setOriginCenter(Vector2 originCenter) {
+        this.originCenter = originCenter;
+        center = originCenter.cpy();
+    }
+
+    public void setOriginCenter(float x, float y) {
+        originCenter.x = x;
+        originCenter.y = y;
+        center.x = x;
+        center.y = y;
     }
 }

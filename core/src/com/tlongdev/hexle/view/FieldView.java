@@ -5,10 +5,17 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
+import com.tlongdev.hexle.animation.TileViewAccessor;
 import com.tlongdev.hexle.model.SlideDirection;
 import com.tlongdev.hexle.model.Tile;
 import com.tlongdev.hexle.shape.Rectangle;
 import com.tlongdev.hexle.shape.Triangle;
+
+import aurelienribon.tweenengine.BaseTween;
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenCallback;
+import aurelienribon.tweenengine.TweenManager;
+import aurelienribon.tweenengine.equations.Quad;
 
 import static com.tlongdev.hexle.model.impl.GameModelImpl.TILE_COLUMNS;
 import static com.tlongdev.hexle.model.impl.GameModelImpl.TILE_ROWS;
@@ -23,11 +30,17 @@ public class FieldView implements BaseView {
 
     private Logger logger;
 
+    private OnAnimationListener animationListener;
+
     private int screenWidth;
     private int screenHeight;
 
     private TileView[][] tileViews;
     private TileView[] fillerTileViews;
+
+    //Booleans for animation, input disabling etc.
+    private boolean touchDown = false;
+    private boolean animating = false;
 
     private TileView selectedTile;
     private SlideDirection slideDirection;
@@ -36,13 +49,32 @@ public class FieldView implements BaseView {
     //Calculated when screen size is set
     private float tileWidth;
     private float tileHeight;
-    private float offsetY;
 
     //Calculated on drag start
     private Vector2 slideVector;
     private float rowWidth = 0;
 
-    public FieldView() {
+    //Animation stuff
+    private int animatingTileCount = 0;
+    private TweenManager manager;
+    private TweenCallback tweenCallback = new TweenCallback() {
+        @Override
+        public void onEvent(int type, BaseTween<?> source) {
+            if (--animatingTileCount == 0) {
+                animating = false;
+                selectedTile = null;
+                slideDirection = null;
+
+                //Notify the listener that the animation stopped
+                if (animationListener != null) {
+                    animationListener.onAnimationFinished();
+                }
+            }
+        }
+    };
+
+    public FieldView(TweenManager manager) {
+        this.manager = manager;
         logger = new Logger(TAG, Logger.DEBUG);
     }
 
@@ -53,25 +85,14 @@ public class FieldView implements BaseView {
             for (int j = 0; j < TILE_COLUMNS; j++) {
                 TileView view = tileViews[i][j];
 
-                //Set the center
-                view.setCenter(
-                        (j + 1) * tileWidth / 2.0f,
-                        offsetY + i * tileHeight
-                );
-                view.setFullWidth(tileWidth);
-
-                if (selectedTile != null && selectedTile == view) {
-                    view.setSide(tileWidth);
-                } else if (view.getTile().isMarked()) {
-                    view.setSide(tileWidth * 0.8f);
-                } else {
-                    view.setSide(tileWidth * 0.9f);
-                }
-
                 //If slideDirection is not null the a slide is currently happening
-                if (slideDirection != null && view.isAffectedBySlide(selectedTile, slideDirection)) {
-                    view.getCenter().add(slideVector);
+                if (touchDown && view.isAffectedBySlide(selectedTile, slideDirection)) {
+                    view.setCenter(view.getOriginCenter().cpy().add(slideVector));
 
+                    //Render duplicates
+                    renderDuplicates(view, shapeRenderer);
+                }
+                if (animating && view.isAffectedBySlide(selectedTile, slideDirection)) {
                     //Render duplicates
                     renderDuplicates(view, shapeRenderer);
                 }
@@ -327,7 +348,22 @@ public class FieldView implements BaseView {
         tileHeight = tileWidth * (float) Math.sqrt(3) / 2.0f;
 
         //Calculate the vertical offset, so the triangles are in the middle of the screen
-        offsetY = (screenHeight - (TILE_ROWS - 1) * tileHeight) / 2.0f;
+        float offsetY = (screenHeight - (TILE_ROWS - 1) * tileHeight) / 2.0f;
+
+        //Iterate through the tiles
+        for (int i = 0; i < TILE_ROWS; i++) {
+            for (int j = 0; j < TILE_COLUMNS; j++) {
+                TileView view = tileViews[i][j];
+
+                //Set the center
+                view.setOriginCenter(
+                        (j + 1) * tileWidth / 2.0f,
+                        offsetY + i * tileHeight
+                );
+                view.setFullWidth(tileWidth);
+                view.setSide(tileWidth * 0.9f);
+            }
+        }
     }
 
     public void setTileViews(TileView[][] tileViews) {
@@ -335,6 +371,8 @@ public class FieldView implements BaseView {
     }
 
     public void touchDown(int x, int y) {
+        touchDown = true;
+
         Vector2 touchDown = new Vector2(x, y);
         float minDist = screenHeight;
 
@@ -350,18 +388,41 @@ public class FieldView implements BaseView {
         }
     }
 
-    public void touchUp(int screenX, int screenY) {
-        selectedTile = null;
-        slideDirection = null;
+    public void touchUp() {
+        touchDown = false;
+
+        for (int i = 0; i < TILE_ROWS; i++) {
+            for (int j = 0; j < TILE_COLUMNS; j++) {
+                TileView view = tileViews[i][j];
+
+                //If the tile is out of it's place animate it back
+                if (!view.getCenter().epsilonEquals(view.getOriginCenter(), 0.0f)) {
+                    animating = true;
+                    animatingTileCount++;
+                    Tween.to(view, TileViewAccessor.POS_XY, 500)
+                            .target(view.getOriginCenter().x, view.getOriginCenter().y)
+                            .ease(Quad.INOUT)
+                            .setCallback(tweenCallback)
+                            .start(manager);
+                }
+            }
+        }
+
+        //Notify the listener if animation has started
+        if (animating && animationListener != null) {
+            animationListener.onAnimationStarted();
+        }
     }
 
     public void setDrag(SlideDirection direction, float dst) {
+
         this.slideDirection = direction;
         this.slideDistance = dst;
 
         //The vector that will translate all the affected tiles
         slideVector = new Vector2(slideDistance, 0);
 
+        //Calculate the direction if the slide vector and the number of tiles in the sliding row
         switch (slideDirection) {
             case EAST:
                 slideVector.setAngleRad(0);
@@ -391,5 +452,15 @@ public class FieldView implements BaseView {
 
     public void setFillerTileViews(TileView[] fillerTileViews) {
         this.fillerTileViews = fillerTileViews;
+    }
+
+    public void setAnimationListener(OnAnimationListener animationListener) {
+        this.animationListener = animationListener;
+    }
+
+    public interface OnAnimationListener {
+        void onAnimationStarted();
+
+        void onAnimationFinished();
     }
 }

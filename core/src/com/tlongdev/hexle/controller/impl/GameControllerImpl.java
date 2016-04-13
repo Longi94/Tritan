@@ -33,7 +33,7 @@ public class GameControllerImpl implements GameController {
     }
 
     public void update(float dt) {
-
+        renderer.update(dt);
     }
 
     public void setRenderer(GameRenderer renderer) {

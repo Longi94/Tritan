@@ -63,9 +63,9 @@ public class HexleGameScreen implements Screen {
     public void render(float delta) {
 
         //Do not update is paused
-        if (paused) {
+        if (!paused) {
             //Update game world by the time that has passed since last rendered frame.
-            controller.update(Gdx.graphics.getDeltaTime());
+            controller.update(Gdx.graphics.getDeltaTime() * 1000.0f);
         }
 
         //Sets the clear screen color to white
