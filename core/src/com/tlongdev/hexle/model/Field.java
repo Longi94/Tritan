@@ -241,12 +241,14 @@ public class Field {
                 for (int i = 0; i < tileCount; i++) {
                     tiles[rowIndex][i] = tempRow[i];
                     tiles[rowIndex][i].setPosX(i);
+                    tiles[rowIndex][i].setPosY(rowIndex);
                     tiles[rowIndex][i].updateIndices();
                 }
 
                 //Apply filler (it's the last in the array)
                 fillerTiles[rowIndex] = tempRow[tileCount];
                 fillerTiles[rowIndex].setPosX(-1);
+                fillerTiles[rowIndex].setPosY(rowIndex);
                 break;
             case NORTH_EAST:
                 if (rowIndex < 4) {
@@ -289,6 +291,7 @@ public class Field {
                 //Apply filler (it's the last in the array)
                 fillerTiles[fillerIndex] = tempRow[tileCount];
                 fillerTiles[fillerIndex].setPosX(-1);
+                fillerTiles[fillerIndex].setPosY(fillerIndex);
 
                 break;
             case NORTH_WEST:
@@ -332,6 +335,7 @@ public class Field {
                 //Apply filler (it's the last in the array)
                 fillerTiles[fillerIndex] = tempRow[tileCount];
                 fillerTiles[fillerIndex].setPosX(-1);
+                fillerTiles[fillerIndex].setPosY(fillerIndex);
                 break;
         }
     }
