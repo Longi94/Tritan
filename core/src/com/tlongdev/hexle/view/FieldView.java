@@ -333,7 +333,6 @@ public class FieldView implements BaseView {
     public void setDrag(SlideDirection direction, float dst) {
 
         this.slideDirection = direction;
-        this.slideDistance = dst;
 
         //The vector that will translate all the affected tiles
         slideVector.set(dst, 0);
@@ -357,7 +356,9 @@ public class FieldView implements BaseView {
                 break;
         }
 
-        slideVector.setLength(Math.abs(dst) > Math.abs(rowWidth) ? rowWidth : dst);
+        this.slideDistance = Math.abs(dst) > Math.abs(rowWidth) ? rowWidth : dst;
+
+        slideVector.setLength(slideDistance);
 
         //Because setting the length of the vector will always make if face in the
         //positive direction no matter the distance being negative. Dumb.
