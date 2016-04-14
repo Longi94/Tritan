@@ -13,7 +13,6 @@ import com.tlongdev.hexle.model.GameModel;
 import com.tlongdev.hexle.model.SlideDirection;
 import com.tlongdev.hexle.renderer.GameRenderer;
 import com.tlongdev.hexle.view.FieldView;
-import com.tlongdev.hexle.view.TileView;
 
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenManager;
@@ -80,22 +79,14 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
     public void notifyModelChanged() {
         Field field = model.getField();
 
-        //Create the views for the model objects
-        TileView[][] tileViews = new TileView[Config.FIELD_ROWS][Config.FIELD_COLUMNS];
-        TileView[] fillerTileViews = new TileView[Config.FIELD_ROWS];
-
         for (int i = 0; i < Config.FIELD_ROWS; i++) {
             for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
-                TileView view = new TileView();
-                view.setTile(field.getTiles()[i][j]);
-                tileViews[i][j] = view;
+                fieldView.getTileViews()[i][j].setTile(field.getTiles()[i][j]);
             }
-            TileView fillerView = new TileView();
-            fillerView.setTile(field.getFillerTiles()[i]);
-            fillerTileViews[i] = fillerView;
+            fieldView.getFillerTileViews()[i].setTile(field.getFillerTiles()[i]);
         }
 
-        fieldView.setTileViews(tileViews, fillerTileViews);
+        fieldView.animateSlide();
     }
 
     @Override

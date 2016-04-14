@@ -16,7 +16,7 @@ import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
-import aurelienribon.tweenengine.equations.Quad;
+import aurelienribon.tweenengine.equations.Cubic;
 
 /**
  * @author longi
@@ -73,8 +73,22 @@ public class FieldView implements BaseView {
 
     public FieldView(TweenManager manager) {
         this.manager = manager;
+        init();
+    }
+
+    private void init() {
         slideVector = new Vector2();
         logger = new Logger(TAG, Logger.DEBUG);
+
+        tileViews = new TileView[Config.FIELD_ROWS][Config.FIELD_COLUMNS];
+        fillerTileViews = new TileView[Config.FIELD_COLUMNS];
+
+        for (int i = 0; i < Config.FIELD_ROWS; i++) {
+            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
+                tileViews[i][j] = new TileView();
+            }
+            fillerTileViews[i] = new TileView();
+        }
     }
 
     @Override
@@ -266,43 +280,6 @@ public class FieldView implements BaseView {
         }
     }
 
-    public void setTileViews(TileView[][] tileViews, TileView[] fillers) {
-        selectedTile = null;
-
-        this.fillerTileViews = fillers;
-        this.tileViews = tileViews;
-
-        //Iterate through the tiles
-        for (int i = 0; i < Config.FIELD_ROWS; i++) {
-            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
-                TileView view = tileViews[i][j];
-
-                //Set the center
-                view.setOriginCenter(
-                        (j + 1) * tileWidth / 2.0f,
-                        offsetY + i * tileHeight
-                );
-                view.setFullWidth(tileWidth);
-                view.setSide(tileWidth * 0.9f);
-                view.setCenter(view.getOriginCenter());
-            }
-        }
-
-        if (slideVector.len() > 0 && !animating) {
-            animating = true;
-            Tween.to(slideVector, Vector2Accessor.POS_XY, Config.SLIDE_DURATION)
-                    .target(0, 0)
-                    .ease(Quad.INOUT)
-                    .setCallback(tweenCallback)
-                    .start(manager);
-
-            //Notify the listener if animation has started
-            if (animationListener != null) {
-                animationListener.onAnimationStarted();
-            }
-        }
-    }
-
     public void touchDown(int x, int y) {
         touchDown = true;
 
@@ -366,13 +343,13 @@ public class FieldView implements BaseView {
         }
     }
 
-    public void noMatch() {
+    public void animateSlide() {
         //If the tile is out of it's place animate it back
         if (slideVector.len() > 0) {
             animating = true;
             Tween.to(slideVector, Vector2Accessor.POS_XY, Config.SLIDE_DURATION)
                     .target(0, 0)
-                    .ease(Quad.INOUT)
+                    .ease(Cubic.OUT)
                     .setCallback(tweenCallback)
                     .start(manager);
         }
@@ -409,6 +386,14 @@ public class FieldView implements BaseView {
 
     public void setSlideVector(Vector2 slideVector) {
         this.slideVector.set(slideVector);
+    }
+
+    public TileView[][] getTileViews() {
+        return tileViews;
+    }
+
+    public TileView[] getFillerTileViews() {
+        return fillerTileViews;
     }
 
     public interface OnAnimationListener {

@@ -50,14 +50,14 @@ public class GameControllerImpl implements GameController {
 
         if (Math.abs(slideDistance) < tileWidth * (1.0f - Config.SLIDE_THRESHOLD)) {
             //Not enough distance
-            fieldView.noMatch();
+            fieldView.animateSlide();
             return;
         }
 
         if (Math.abs(slideDistance) % tileWidth > tileWidth * Config.SLIDE_THRESHOLD &&
                 Math.abs(slideDistance) % tileWidth < tileWidth * (1.0f - Config.SLIDE_THRESHOLD)) {
             //Tiles are not close enough to each other
-            fieldView.noMatch();
+            fieldView.animateSlide();
             return;
         }
 
@@ -94,7 +94,7 @@ public class GameControllerImpl implements GameController {
             model.setField(tempField);
         } else {
             //No group
-            fieldView.noMatch();
+            fieldView.animateSlide();
         }
     }
 
