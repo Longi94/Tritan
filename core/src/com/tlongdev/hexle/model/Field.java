@@ -212,35 +212,151 @@ public class Field {
             return;
         }
 
+        //Number of tiles in the row
+        int tileCount = getRowTileCount(slideDirection, rowIndex);
+
+        //Create a temporary row that will store all the tiles and the filler
+        Tile[] tempRow = new Tile[tileCount + 1];
+
+        //Position of the filler
+        int fillerIndex = getFillerIndex(slideDirection, rowIndex);
+
+        //Add the filler to the end of the new array
+        tempRow[tileCount] = fillerTiles[fillerIndex];
+
+        int startX;
+        int startY;
+        int x;
+        int y;
+
         switch (slideDirection) {
             case EAST:
-                //Create a temporary row that will store all the tiles and the filler
-                Tile[] tempRow = new Tile[width + 1];
-
                 //Create a new array
-                System.arraycopy(tiles[rowIndex], 0, tempRow, 0, tiles[rowIndex].length);
-
-                //Add the filler to the new array
-                tempRow[width] = fillerTiles[rowIndex];
+                System.arraycopy(tiles[rowIndex], 0, tempRow, 0, tileCount);
 
                 //Shift the array
                 tempRow = Util.shiftArray(tempRow, steps);
 
                 //Apply changes, update indices
-                for (int i = 0; i < width; i++) {
+                for (int i = 0; i < tileCount; i++) {
                     tiles[rowIndex][i] = tempRow[i];
                     tiles[rowIndex][i].setPosX(i);
                     tiles[rowIndex][i].updateIndices();
                 }
 
                 //Apply filler (it's the last in the array)
-                fillerTiles[rowIndex] = tempRow[width];
+                fillerTiles[rowIndex] = tempRow[tileCount];
                 fillerTiles[rowIndex].setPosX(-1);
                 break;
             case NORTH_EAST:
+                if (rowIndex < 4) {
+                    y = startY = 6 - rowIndex * 2;
+                    x = startX = 0;
+                } else {
+                    y = startY = 0;
+                    x = startX = 2 * rowIndex - 7;
+                }
+
+                //Create a new array
+                for (int i = 0; i < tileCount; i++) {
+                    tempRow[i] = tiles[y][x];
+                    if (tempRow[i].getOrientation() == TileOrientation.UP) {
+                        x++;
+                    } else {
+                        y++;
+                    }
+                }
+
+                //Shift the array
+                tempRow = Util.shiftArray(tempRow, steps);
+
+                x = startX;
+                y = startY;
+
+                //Create a new array
+                for (int i = 0; i < tileCount; i++) {
+                    tiles[y][x] = tempRow[i];
+                    tiles[y][x].setPosY(y);
+                    tiles[y][x].setPosX(x);
+                    tiles[y][x].updateIndices();
+                    if (tiles[y][x].getOrientation() == TileOrientation.UP) {
+                        x++;
+                    } else {
+                        y++;
+                    }
+                }
+
+                //Apply filler (it's the last in the array)
+                fillerTiles[fillerIndex] = tempRow[tileCount];
+                fillerTiles[fillerIndex].setPosX(-1);
+
                 break;
             case NORTH_WEST:
+                if (rowIndex < 4) {
+                    y = startY = 0;
+                    x = startX = 1 + rowIndex * 2;
+                } else {
+                    y = startY = 2 * rowIndex - 8;
+                    x = startX = width - 1;
+                }
+
+                //Create a new array
+                for (int i = 0; i < tileCount; i++) {
+                    tempRow[i] = tiles[y][x];
+                    if (tempRow[i].getOrientation() == TileOrientation.UP) {
+                        x--;
+                    } else {
+                        y++;
+                    }
+                }
+
+                //Shift the array
+                tempRow = Util.shiftArray(tempRow, steps);
+
+                x = startX;
+                y = startY;
+
+                //Create a new array
+                for (int i = 0; i < tileCount; i++) {
+                    tiles[y][x] = tempRow[i];
+                    tiles[y][x].setPosY(y);
+                    tiles[y][x].setPosX(x);
+                    tiles[y][x].updateIndices();
+                    if (tiles[y][x].getOrientation() == TileOrientation.UP) {
+                        x--;
+                    } else {
+                        y++;
+                    }
+                }
+
+                //Apply filler (it's the last in the array)
+                fillerTiles[fillerIndex] = tempRow[tileCount];
+                fillerTiles[fillerIndex].setPosX(-1);
                 break;
+        }
+    }
+
+    public static int getRowTileCount(SlideDirection slideDirection, int rowIndex) {
+        return slideDirection == SlideDirection.EAST ? 9 :
+                3 + Math.min(rowIndex, 7 - rowIndex) * 4;
+    }
+
+    public static int getFillerIndex(SlideDirection slideDirection, int rowIndex) {
+        switch (slideDirection) {
+            case EAST:
+                return rowIndex;
+            case NORTH_EAST:
+                if (rowIndex < 4) {
+                    return 6 - 2 * rowIndex;
+                } else {
+                    return 15 - 2 * rowIndex;
+                }
+            default:
+                if (rowIndex < 4) {
+                    return rowIndex * 2 + 1;
+                } else {
+                    return rowIndex * 2 - 8;
+                }
         }
     }
 }
