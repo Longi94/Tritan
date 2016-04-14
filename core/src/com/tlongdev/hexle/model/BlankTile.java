@@ -7,6 +7,6 @@ package com.tlongdev.hexle.model;
 public class BlankTile extends Tile {
     @Override
     public boolean isBlank() {
-        return false;
+        return true;
     }
 }

@@ -1,5 +1,6 @@
 package com.tlongdev.hexle.model;
 
+import com.tlongdev.hexle.factory.TileFactory;
 import com.tlongdev.hexle.model.Tile.TileOrientation;
 import com.tlongdev.hexle.util.Util;
 
@@ -17,6 +18,8 @@ public class Field {
 
     private Random generator;
 
+    private TileFactory tileFactory;
+
     private int width;
 
     private int height;
@@ -30,10 +33,14 @@ public class Field {
     public Field(int width, int height) {
         this.width = width;
         this.height = height;
+        init();
+    }
 
+    private void init() {
         generator = new Random();
         tiles = new Tile[height][width];
         fillerTiles = new Tile[height];
+        tileFactory = new TileFactory();
     }
 
     public SlideDirection getOrientation() {
@@ -53,17 +60,7 @@ public class Field {
         //Fill up the field with random colored tiles
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                Tile tile = new Tile();
-
-                tile.setPosX(j);
-                tile.setPosY(i);
-                tile.updateIndices();
-
-                if ((tile.getPosX() + tile.getPosY()) % 2 == 0) {
-                    tile.setOrientation(TileOrientation.DOWN);
-                } else {
-                    tile.setOrientation(TileOrientation.UP);
-                }
+                Tile tile = tileFactory.get(j, i);
 
                 colors.clear();
                 Collections.addAll(colors, TileColor.values());
@@ -80,14 +77,7 @@ public class Field {
             }
 
             //Randomize filler tiles
-            Tile tile = new Tile();
-            tile.setPosX(-1);
-            tile.setPosY(i);
-            if (tile.getPosY() % 2 == 0) {
-                tile.setOrientation(TileOrientation.UP);
-            } else {
-                tile.setOrientation(TileOrientation.DOWN);
-            }
+            Tile tile = tileFactory.get(-1, i);
             tile.setTileColor(TileColor.values()[generator.nextInt(6)]);
             fillerTiles[i] = tile;
         }
@@ -103,8 +93,7 @@ public class Field {
      * @return whether the field has groups
      */
     public boolean checkField() {
-        return true;
-        /*boolean result = false;
+        boolean result = false;
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (checkTile(null, tiles[i][j], 0, false)) {
@@ -112,7 +101,7 @@ public class Field {
                 }
             }
         }
-        return result;*/
+        return result;
     }
 
     /**

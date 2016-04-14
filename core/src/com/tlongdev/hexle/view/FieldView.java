@@ -98,17 +98,19 @@ public class FieldView implements BaseView {
             for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
                 TileView view = tileViews[i][j];
 
-                //If slideDirection is not null the a slide is currently happening
-                if (slideDirection != null && view.getTile().getRowIndex(slideDirection) == rowIndex
-                        && (touchDown || animating)) {
-                    view.setCenter(view.getOriginCenter().cpy().add(slideVector));
-                    //Render duplicates
-                    renderDuplicates(view, shapeRenderer);
-                } else {
-                    view.setCenter(view.getOriginCenter());
-                }
+                if (!view.getTile().isBlank()) {
+                    //If slideDirection is not null the a slide is currently happening
+                    if (slideDirection != null && view.getTile().getRowIndex(slideDirection) == rowIndex
+                            && (touchDown || animating)) {
+                        view.setCenter(view.getOriginCenter().cpy().add(slideVector));
+                        //Render duplicates
+                        renderDuplicates(view, shapeRenderer);
+                    } else {
+                        view.setCenter(view.getOriginCenter());
+                    }
 
-                view.render(shapeRenderer);
+                    view.render(shapeRenderer);
+                }
             }
         }
 
@@ -214,6 +216,7 @@ public class FieldView implements BaseView {
 
     /**
      * Render the borders that will hide the duplicate tiles.
+     *
      * @param shapeRenderer shape renderer
      */
     private void renderBorders(ShapeRenderer shapeRenderer) {

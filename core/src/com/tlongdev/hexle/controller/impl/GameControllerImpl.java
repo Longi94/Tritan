@@ -88,7 +88,7 @@ public class GameControllerImpl implements GameController {
             if (length * slideDistance < 0) {
                 offset.rotateRad(MathUtils.PI);
             }
-            renderer.setOffset(offset);
+            renderer.setSlideOffset(offset);
 
             //Shift successfully creates a group, apply it
             model.setField(tempField);

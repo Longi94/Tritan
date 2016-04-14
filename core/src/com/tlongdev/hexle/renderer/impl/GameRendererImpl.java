@@ -38,6 +38,8 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
 
     private boolean touchWhileAnim = false;
 
+    private boolean noInput = false;
+
     public GameRendererImpl() {
         init();
     }
@@ -103,12 +105,16 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
     public void touchDown(int x, int y) {
         //Only forward input if animation is not happening
         if (!animating) {
-            if (fieldView != null) {
-                fieldView.touchDown(x, y);
-            }
+            noInput = false;
         } else {
             //Touch down while still animating
             touchWhileAnim = true;
+        }
+
+        if (!noInput) {
+            if (fieldView != null) {
+                fieldView.touchDown(x, y);
+            }
         }
     }
 
@@ -117,11 +123,15 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
         //Only forward input if animation is not happening
         if (!animating) {
             //Don't forward input if dragging started while animating
-            if (!touchWhileAnim && fieldView != null) {
-                fieldView.touchUp();
+            if (!touchWhileAnim) {
+                noInput = false;
             }
             //Released touch while not animating
             touchWhileAnim = false;
+        }
+
+        if (!noInput && fieldView != null) {
+            fieldView.touchUp();
         }
     }
 
@@ -129,7 +139,11 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
     public void touchDragged(SlideDirection direction, float dst) {
         //Only forward input if animation is not happening
         //Don't forward input if dragging started while animating
-        if (!animating && !touchWhileAnim && fieldView != null) {
+        if (!animating && !touchWhileAnim) {
+            noInput = false;
+        }
+
+        if (!noInput && fieldView != null) {
             fieldView.setDrag(direction, dst);
         }
     }
@@ -137,6 +151,7 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
     @Override
     public void onAnimationStarted() {
         animating = true;
+        noInput = true;
     }
 
     @Override
@@ -150,7 +165,7 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
     }
 
     @Override
-    public void setOffset(Vector2 offset) {
+    public void setSlideOffset(Vector2 offset) {
         fieldView.setSlideVector(offset);
     }
 
