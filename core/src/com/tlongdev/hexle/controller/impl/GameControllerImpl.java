@@ -112,6 +112,8 @@ public class GameControllerImpl implements GameController {
             }
         }
 
+        model.getField().generateNewTiles();
+
         renderer.notifyNewTilesGenerated();
     }
 

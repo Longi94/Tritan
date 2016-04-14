@@ -92,6 +92,20 @@ public class Tile {
         horizontalRowIndex = posY;
         rightDiagonalIndex = (posX - posY + 7) / 2;
         leftDiagonalIndex = (posX + posY) / 2;
+
+        if (posX >= 0) {
+            if ((posX + posY) % 2 == 0) {
+                setOrientation(TileOrientation.DOWN);
+            } else {
+                setOrientation(TileOrientation.UP);
+            }
+        } else {
+            if (posY % 2 == 0) {
+                setOrientation(TileOrientation.UP);
+            } else {
+                setOrientation(TileOrientation.DOWN);
+            }
+        }
     }
 
     public boolean isMarked() {

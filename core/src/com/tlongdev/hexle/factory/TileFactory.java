@@ -14,12 +14,6 @@ public class TileFactory {
         tile.setPosX(x);
         tile.setPosY(y);
 
-        if ((x + y) % 2 == 0) {
-            tile.setOrientation(Tile.TileOrientation.DOWN);
-        } else {
-            tile.setOrientation(Tile.TileOrientation.UP);
-        }
-
         tile.setTileColor(TileColor.RED);
         tile.updateIndices();
         return tile;
@@ -29,12 +23,6 @@ public class TileFactory {
         Tile tile = new BlankTile();
         tile.setPosX(x);
         tile.setPosY(y);
-
-        if ((x + y) % 2 == 0) {
-            tile.setOrientation(Tile.TileOrientation.DOWN);
-        } else {
-            tile.setOrientation(Tile.TileOrientation.UP);
-        }
 
         tile.updateIndices();
         return tile;

@@ -24,7 +24,7 @@ public class Field {
 
     private int height;
 
-    private SlideDirection orientation;
+    private SlideDirection orientation = SlideDirection.NORTH_EAST;
 
     private Tile[][] tiles;
 
@@ -282,6 +282,7 @@ public class Field {
                 fillerTiles[rowIndex] = tempRow[tileCount];
                 fillerTiles[rowIndex].setPosX(-1);
                 fillerTiles[rowIndex].setPosY(rowIndex);
+                fillerTiles[rowIndex].updateIndices();
                 break;
             case NORTH_EAST:
                 if (rowIndex < 4) {
@@ -325,6 +326,7 @@ public class Field {
                 fillerTiles[fillerIndex] = tempRow[tileCount];
                 fillerTiles[fillerIndex].setPosX(-1);
                 fillerTiles[fillerIndex].setPosY(fillerIndex);
+                fillerTiles[fillerIndex].updateIndices();
 
                 break;
             case NORTH_WEST:
@@ -369,15 +371,30 @@ public class Field {
                 fillerTiles[fillerIndex] = tempRow[tileCount];
                 fillerTiles[fillerIndex].setPosX(-1);
                 fillerTiles[fillerIndex].setPosY(fillerIndex);
+                fillerTiles[fillerIndex].updateIndices();
                 break;
         }
     }
 
+    /**
+     * Get the number of tiles in a row (excluding the filler)
+     *
+     * @param slideDirection the direction if the slite
+     * @param rowIndex       the index of the row
+     * @return the number of tiles
+     */
     public static int getRowTileCount(SlideDirection slideDirection, int rowIndex) {
         return slideDirection == SlideDirection.EAST ? 9 :
                 3 + Math.min(rowIndex, 7 - rowIndex) * 4;
     }
 
+    /**
+     * Get the index of the filler tile in the array
+     *
+     * @param slideDirection the direction if the slite
+     * @param rowIndex       the index of the row
+     * @return the index of the filler
+     */
     public static int getFillerIndex(SlideDirection slideDirection, int rowIndex) {
         switch (slideDirection) {
             case EAST:
@@ -394,6 +411,210 @@ public class Field {
                 } else {
                     return rowIndex * 2 - 8;
                 }
+        }
+    }
+
+    public void generateNewTiles() {
+
+        for (int i = 0; i < 8; i++) {
+            slideIn(orientation, i);
+        }
+    }
+
+    private void slideIn(SlideDirection slideDirection, int rowIndex) {
+        //Number of tiles in the row
+        int tileCount = getRowTileCount(orientation, rowIndex);
+
+        //Create a temporary row that will store all the tiles and the filler
+        Tile[] tempRow = new Tile[tileCount + 1];
+
+        //Position of the filler
+        int fillerIndex = getFillerIndex(slideDirection, rowIndex);
+
+        //Add the filler to the end of the new array
+        tempRow[tileCount] = fillerTiles[fillerIndex];
+
+        int startX;
+        int startY;
+        int x;
+        int y;
+
+        switch (slideDirection) {
+            case EAST:
+                //Create a new array
+                System.arraycopy(tiles[rowIndex], 0, tempRow, 0, tileCount);
+
+                minimizeHoles(tempRow);
+                randomizeEnd(tempRow);
+
+                //Apply changes, update indices
+                for (int i = 0; i < tileCount; i++) {
+                    tiles[rowIndex][i] = tempRow[i];
+                    tiles[rowIndex][i].setPosX(i);
+                    tiles[rowIndex][i].setPosY(rowIndex);
+                    tiles[rowIndex][i].updateIndices();
+                }
+
+                //Apply filler (it's the last in the array)
+                fillerTiles[rowIndex] = tempRow[tileCount];
+                fillerTiles[rowIndex].setPosX(-1);
+                fillerTiles[rowIndex].setPosY(rowIndex);
+                fillerTiles[rowIndex].updateIndices();
+                break;
+            case NORTH_EAST:
+                if (rowIndex < 4) {
+                    y = startY = 6 - rowIndex * 2;
+                    x = startX = 0;
+                } else {
+                    y = startY = 0;
+                    x = startX = 2 * rowIndex - 7;
+                }
+
+                //Create a new array
+                for (int i = 0; i < tileCount; i++) {
+                    tempRow[i] = tiles[y][x];
+                    if (tempRow[i].getOrientation() == TileOrientation.UP) {
+                        x++;
+                    } else {
+                        y++;
+                    }
+                }
+
+                minimizeHoles(tempRow);
+                randomizeEnd(tempRow);
+
+                x = startX;
+                y = startY;
+
+                //Create a new array
+                for (int i = 0; i < tileCount; i++) {
+                    tiles[y][x] = tempRow[i];
+                    tiles[y][x].setPosY(y);
+                    tiles[y][x].setPosX(x);
+                    tiles[y][x].updateIndices();
+                    if (tiles[y][x].getOrientation() == TileOrientation.UP) {
+                        x++;
+                    } else {
+                        y++;
+                    }
+                }
+
+                //Apply filler (it's the last in the array)
+                fillerTiles[fillerIndex] = tempRow[tileCount];
+                fillerTiles[fillerIndex].setPosX(-1);
+                fillerTiles[fillerIndex].setPosY(fillerIndex);
+                fillerTiles[fillerIndex].updateIndices();
+
+                break;
+            case NORTH_WEST:
+                if (rowIndex < 4) {
+                    y = startY = 0;
+                    x = startX = 1 + rowIndex * 2;
+                } else {
+                    y = startY = 2 * rowIndex - 8;
+                    x = startX = width - 1;
+                }
+
+                //Create a new array
+                for (int i = 0; i < tileCount; i++) {
+                    tempRow[i] = tiles[y][x];
+                    if (tempRow[i].getOrientation() == TileOrientation.UP) {
+                        x--;
+                    } else {
+                        y++;
+                    }
+                }
+
+                minimizeHoles(tempRow);
+                randomizeEnd(tempRow);
+
+                x = startX;
+                y = startY;
+
+                //Create a new array
+                for (int i = 0; i < tileCount; i++) {
+                    tiles[y][x] = tempRow[i];
+                    tiles[y][x].setPosY(y);
+                    tiles[y][x].setPosX(x);
+                    tiles[y][x].updateIndices();
+                    if (tiles[y][x].getOrientation() == TileOrientation.UP) {
+                        x--;
+                    } else {
+                        y++;
+                    }
+                }
+
+                //Apply filler (it's the last in the array)
+                fillerTiles[fillerIndex] = tempRow[tileCount];
+                fillerTiles[fillerIndex].setPosX(-1);
+                fillerTiles[fillerIndex].setPosY(fillerIndex);
+                fillerTiles[fillerIndex].updateIndices();
+                break;
+        }
+    }
+
+    /**
+     * Reduces the gaps in the row to 0 of the length of the gap is even, 1 if odd
+     *
+     * @param tiles the row tho reduce
+     */
+    private void minimizeHoles(Tile[] tiles) {
+        boolean hasBlank = false;
+
+        int t = 0;
+        while (!hasBlank && t < tiles.length) {
+            if (tiles[t].isBlank()) {
+                hasBlank = true;
+            }
+            t++;
+        }
+
+        //Do nothing if the row has no gaps
+        if (!hasBlank) {
+            return;
+        }
+
+        int totalShifts = 0;
+        for (int i = 0; i < tiles.length; i++) {
+
+            //Find a gap
+            if (tiles[i].isBlank()) {
+                int blankCount = 0;
+
+                //Count the number of blanks and nulls
+                for (int j = i; j < tiles.length && tiles[j].isBlank(); j++) {
+                    blankCount++;
+                }
+
+                //Holes with a length of 1 cannot be filled
+                if (blankCount != 1) {
+
+                    //If the number of blank tiles is odd, on tile must be left blank
+                    if (blankCount % 2 == 1) {
+                        blankCount--;
+                        i++;
+                    }
+
+                    //Shift the tiles down, so there is only 1 or 0 blank tiles left in the current gap
+                    System.arraycopy(tiles, i + blankCount, tiles, i, tiles.length - (i + blankCount));
+                    totalShifts += blankCount;
+                }
+            }
+        }
+
+        //Nullify the end of the row
+        for (int i = 1; i <= totalShifts; i++) {
+            tiles[tiles.length - i] = null;
+        }
+    }
+
+    private void randomizeEnd(Tile[] tiles) {
+        //Fill up the nulls with blank tiles
+        int i = tiles.length - 1;
+        while (tiles[i] == null && i >= 0) {
+            tiles[i] = tileFactory.get(0, 0);
+            tiles[i].setTileColor(TileColor.values()[generator.nextInt(6)]);
+            i--;
         }
     }
 }
