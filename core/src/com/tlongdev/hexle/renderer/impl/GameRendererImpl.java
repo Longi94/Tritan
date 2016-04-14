@@ -2,8 +2,9 @@ package com.tlongdev.hexle.renderer.impl;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
-import com.tlongdev.hexle.animation.TileViewAccessor;
+import com.tlongdev.hexle.animation.Vector2Accessor;
 import com.tlongdev.hexle.controller.GameController;
 import com.tlongdev.hexle.input.HexleInputProcessor;
 import com.tlongdev.hexle.model.Field;
@@ -47,7 +48,7 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
     private void init() {
         shapeRenderer = new ShapeRenderer();
 
-        Tween.registerAccessor(TileView.class, new TileViewAccessor());
+        Tween.registerAccessor(Vector2.class, new Vector2Accessor());
         tweenManager = new TweenManager();
 
         fieldView = new FieldView(tweenManager);
@@ -117,7 +118,7 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
                 fieldView.touchDown(x, y);
             }
         } else {
-            //Touch down whil still animating
+            //Touch down while still animating
             touchWhileAnim = true;
         }
     }

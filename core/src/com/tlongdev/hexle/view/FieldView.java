@@ -7,7 +7,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
 import com.tlongdev.hexle.animation.TileViewAccessor;
 import com.tlongdev.hexle.model.SlideDirection;
-import com.tlongdev.hexle.model.Tile;
 import com.tlongdev.hexle.shape.Rectangle;
 import com.tlongdev.hexle.shape.Triangle;
 
@@ -46,36 +45,36 @@ public class FieldView implements BaseView {
     private TileView selectedTile;
     private SlideDirection slideDirection;
     private float slideDistance;
+    private int rowIndex;
 
     //Calculated when screen size is set
     private float tileWidth;
     private float tileHeight;
+    private float offsetY;
 
     //Calculated on drag start
     private Vector2 slideVector;
     private float rowWidth = 0;
 
     //Animation stuff
-    private int animatingTileCount = 0;
     private TweenManager manager;
     private TweenCallback tweenCallback = new TweenCallback() {
         @Override
         public void onEvent(int type, BaseTween<?> source) {
-            if (--animatingTileCount == 0) {
-                animating = false;
-                selectedTile = null;
-                slideDirection = null;
+            animating = false;
+            selectedTile = null;
+            slideDirection = null;
 
-                //Notify the listener that the animation stopped
-                if (animationListener != null) {
-                    animationListener.onAnimationFinished();
-                }
+            //Notify the listener that the animation stopped
+            if (animationListener != null) {
+                animationListener.onAnimationFinished();
             }
         }
     };
 
     public FieldView(TweenManager manager) {
         this.manager = manager;
+        slideVector = new Vector2();
         logger = new Logger(TAG, Logger.DEBUG);
     }
 
@@ -87,15 +86,14 @@ public class FieldView implements BaseView {
                 TileView view = tileViews[i][j];
 
                 //If slideDirection is not null the a slide is currently happening
-                if (touchDown && view.isAffectedBySlide(selectedTile, slideDirection)) {
-                    view.setCenter(view.getOriginCenter().cpy().add(slideVector));
+                if (touchDown && view.isAffectedBySlide(selectedTile, slideDirection) ||
+                        animating && view.getTile().getRowIndex(slideDirection) == rowIndex) {
 
+                    view.setCenter(view.getOriginCenter().cpy().add(slideVector));
                     //Render duplicates
                     renderDuplicates(view, shapeRenderer);
-                }
-                if (animating && manager.containsTarget(view)) {
-                    //Render duplicates
-                    renderDuplicates(view, shapeRenderer);
+                } else {
+                    view.setCenter(view.getOriginCenter());
                 }
 
                 view.render(shapeRenderer);
@@ -111,21 +109,12 @@ public class FieldView implements BaseView {
      * Draw fillers to create a seemingly infinite row.
      */
     private void renderFillers(ShapeRenderer shapeRenderer) {
-        // TODO: 2016.04.12. This function could really use some magic calculation rather than loops
-        if (slideDirection == null || selectedTile == null) {
+        if (slideDirection == null) {
             return;
         }
 
-        Tile tile = selectedTile.getTile();
-
         //Draw the filler tiles if needed
         int fillerIndex;
-        int leftStepsX;
-        int leftStepsY;
-        int tilePosX;
-        int tilePosY;
-        int rightStepsX;
-        int rightStepsY;
 
         float leftFillerPosX;
         float leftFillerPosY;
@@ -135,121 +124,55 @@ public class FieldView implements BaseView {
         switch (slideDirection) {
             case EAST:
                 //The index of the filler in the array
-                fillerIndex = tile.getHorizontalRowIndex();
+                fillerIndex = rowIndex;
 
                 //Calculate the X coordinates of the fillers
-                leftFillerPosX = selectedTile.getCenter().x -
-                        (tile.getPosX() + 1) * tileWidth / 2.0f;
-                rightFillerPosX = selectedTile.getCenter().x +
-                        (TILE_COLUMNS - tile.getPosX()) * tileWidth / 2.0f;
+                leftFillerPosX = 0 + slideVector.x;
+                rightFillerPosX = screenWidth + slideVector.x;
 
                 //The Y coordinates since they are in the same row
-                leftFillerPosY = selectedTile.getCenter().y;
-                rightFillerPosY = selectedTile.getCenter().y;
+                rightFillerPosY = leftFillerPosY = offsetY + fillerIndex * tileHeight;
                 break;
 
             case NORTH_EAST:
-                int rightDiagonalIndex = tile.getRightDiagonalIndex();
 
-                //Calculate the number of horizontal and vertical steps needed to reach the
-                //Position if the lower left filler
-                leftStepsX = 0;
-                leftStepsY = 0;
-                tilePosX = tile.getPosX();
-                tilePosY = tile.getPosY();
+                if (rowIndex < 4) {
+                    fillerIndex = 6 - 2 * rowIndex;
 
-                do {
-                    if ((tilePosX + tilePosY) % 2 == 1) {
-                        tilePosY--;
-                        leftStepsY++;
-                    } else {
-                        tilePosX--;
-                        leftStepsX++;
-                    }
-                } while (tilePosX >= 0 && tilePosY >= 0);
+                    leftFillerPosX = 0 + slideVector.x;
+                    rightFillerPosX = tileWidth * (rowIndex + 1) + slideVector.x;
 
-                //Calculate the number of horizontal and vertical steps needed to reach the
-                //Position if the upper right filler
-                rightStepsX = 0;
-                rightStepsY = 0;
-                tilePosX = tile.getPosX();
-                tilePosY = tile.getPosY();
-
-                do {
-                    if ((tilePosX + tilePosY) % 2 == 1) {
-                        tilePosX++;
-                        rightStepsX++;
-                    } else {
-                        tilePosY++;
-                        rightStepsY++;
-                    }
-                } while (tilePosX < TILE_COLUMNS &&
-                        tilePosY < TILE_ROWS);
-
-                //Offset the center relative to the selected tile
-                rightFillerPosX = selectedTile.getCenter().x + rightStepsX * tileWidth / 2.0f;
-                rightFillerPosY = selectedTile.getCenter().y + rightStepsY * tileHeight;
-
-                leftFillerPosX = selectedTile.getCenter().x - leftStepsX * tileWidth / 2.0f;
-                leftFillerPosY = selectedTile.getCenter().y - leftStepsY * tileHeight;
-
-                if (rightDiagonalIndex <= 3) {
-                    fillerIndex = 6 - 2 * rightDiagonalIndex;
+                    leftFillerPosY = offsetY + fillerIndex * tileHeight + slideVector.y;
+                    rightFillerPosY = offsetY + TILE_ROWS * tileHeight + slideVector.y;
                 } else {
-                    fillerIndex = 15 - 2 * rightDiagonalIndex;
+                    fillerIndex = 15 - 2 * rowIndex;
+
+                    leftFillerPosX = tileWidth * (rowIndex - 3) + slideVector.x;
+                    rightFillerPosX = screenWidth + slideVector.x;
+
+                    rightFillerPosY = offsetY + fillerIndex * tileHeight + slideVector.y;
+                    leftFillerPosY = offsetY + -1 * tileHeight + slideVector.y;
                 }
                 break;
 
             default:
-                int leftDiagonalIndex = tile.getLeftDiagonalIndex();
+                if (rowIndex < 4) {
+                    fillerIndex = rowIndex * 2 + 1;
 
-                //Calculate the number of horizontal and vertical steps needed to reach the
-                //Position if the upper left filler
-                leftStepsX = 0;
-                leftStepsY = 0;
-                tilePosX = tile.getPosX();
-                tilePosY = tile.getPosY();
+                    leftFillerPosX = 0 + slideVector.x;
+                    rightFillerPosX = tileWidth * (rowIndex + 1) + slideVector.x;
 
-                do {
-                    if ((tilePosX + tilePosY) % 2 == 1) {
-                        tilePosX--;
-                        leftStepsX++;
-                    } else {
-                        tilePosY++;
-                        leftStepsY++;
-                    }
-                } while (tilePosX >= 0 && tilePosY < TILE_ROWS);
-
-                //Calculate the number of horizontal and vertical steps needed to reach the
-                //Position if the lower right filler
-                rightStepsX = 0;
-                rightStepsY = 0;
-                tilePosX = tile.getPosX();
-                tilePosY = tile.getPosY();
-
-                do {
-                    if ((tilePosX + tilePosY) % 2 == 1) {
-                        tilePosY--;
-                        rightStepsY++;
-                    } else {
-                        tilePosX++;
-                        rightStepsX++;
-                    }
-                } while (tilePosX < TILE_COLUMNS && tilePosY >= 0);
-
-                //Offset the center relative to the selected tile
-                rightFillerPosX = selectedTile.getCenter().x + rightStepsX * tileWidth / 2.0f;
-                rightFillerPosY = selectedTile.getCenter().y - rightStepsY * tileHeight;
-
-                leftFillerPosX = selectedTile.getCenter().x - leftStepsX * tileWidth / 2.0f;
-                leftFillerPosY = selectedTile.getCenter().y + leftStepsY * tileHeight;
-
-                if (leftDiagonalIndex <= 3) {
-                    fillerIndex = leftDiagonalIndex * 2 + 1;
+                    leftFillerPosY = offsetY + fillerIndex * tileHeight + slideVector.y;
+                    rightFillerPosY = offsetY + -1 * tileHeight + slideVector.y;
                 } else {
-                    fillerIndex = leftDiagonalIndex * 2 - 8;
-                }
+                    fillerIndex = rowIndex * 2 - 8;
 
+                    leftFillerPosX = tileWidth * (rowIndex - 3) + slideVector.x;
+                    rightFillerPosX = screenWidth + slideVector.x;
+
+                    rightFillerPosY = offsetY + fillerIndex * tileHeight + slideVector.y;
+                    leftFillerPosY = offsetY + TILE_ROWS * tileHeight + slideVector.y;
+                }
                 break;
         }
 
@@ -275,31 +198,17 @@ public class FieldView implements BaseView {
      * @param shapeRenderer shape renderer
      */
     private void renderDuplicates(TileView original, ShapeRenderer shapeRenderer) {
-        Vector2 slideVector = new Vector2(slideDistance, 0);
+        Vector2 dupeVector = new Vector2(slideVector);
         Vector2 originalVector = original.getCenter().cpy();
-        float originalSize = original.getSide();
 
-        original.setSide(tileWidth * 0.9f);
-        switch (slideDirection) {
-            case EAST:
-                slideVector.setAngleRad(0);
-                break;
-            case NORTH_EAST:
-                slideVector.setAngleRad(MathUtils.PI / 3.0f);
-                break;
-            default:
-                slideVector.setAngleRad(2.0f * MathUtils.PI / 3.0f);
-                break;
-        }
-        slideVector.setLength(rowWidth);
-        original.setCenter(originalVector.cpy().add(slideVector));
+        dupeVector.setLength(rowWidth);
+        original.setCenter(originalVector.cpy().add(dupeVector));
         original.render(shapeRenderer);
 
-        slideVector.rotateRad(MathUtils.PI);
-        original.setCenter(originalVector.cpy().add(slideVector));
+        dupeVector.rotateRad(MathUtils.PI);
+        original.setCenter(originalVector.cpy().add(dupeVector));
         original.render(shapeRenderer);
 
-        original.setSide(originalSize);
         original.setCenter(originalVector);
     }
 
@@ -349,7 +258,7 @@ public class FieldView implements BaseView {
         tileHeight = tileWidth * (float) Math.sqrt(3) / 2.0f;
 
         //Calculate the vertical offset, so the triangles are in the middle of the screen
-        float offsetY = (screenHeight - (TILE_ROWS - 1) * tileHeight) / 2.0f;
+        offsetY = (screenHeight - (TILE_ROWS - 1) * tileHeight) / 2.0f;
 
         //Iterate through the tiles
         for (int i = 0; i < TILE_ROWS; i++) {
@@ -375,7 +284,7 @@ public class FieldView implements BaseView {
         this.tileViews = tileViews;
 
         //Calculate the vertical offset, so the triangles are in the middle of the screen
-        float offsetY = (screenHeight - (TILE_ROWS - 1) * tileHeight) / 2.0f;
+        offsetY = (screenHeight - (TILE_ROWS - 1) * tileHeight) / 2.0f;
 
         //Iterate through the tiles
         for (int i = 0; i < TILE_ROWS; i++) {
@@ -392,14 +301,15 @@ public class FieldView implements BaseView {
                 view.setCenter(view.getOriginCenter());
 
                 if (view.getTile().getTemporaryOffset() != null) {
-                    animating = true;
-                    animatingTileCount++;
-                    Tween.from(view, TileViewAccessor.POS_XY, 500)
-                            .target(view.getCenter().x + view.getTile().getTemporaryOffset().x,
-                                    view.getCenter().y + view.getTile().getTemporaryOffset().y)
-                            .ease(Quad.INOUT)
-                            .setCallback(tweenCallback)
-                            .start(manager);
+                    if (!animating) {
+                        animating = true;
+                        slideVector.set(view.getTile().getTemporaryOffset());
+                        Tween.to(slideVector, TileViewAccessor.POS_XY, 500)
+                                .target(0, 0)
+                                .ease(Quad.INOUT)
+                                .setCallback(tweenCallback)
+                                .start(manager);
+                    }
                     view.getTile().setTemporaryOffset(null);
                 }
             }
@@ -443,52 +353,46 @@ public class FieldView implements BaseView {
         this.slideDistance = dst;
 
         //The vector that will translate all the affected tiles
-        slideVector = new Vector2(slideDistance, 0);
+        slideVector.set(dst, 0);
 
         //Calculate the direction if the slide vector and the number of tiles in the sliding row
         switch (slideDirection) {
             case EAST:
                 slideVector.setAngleRad(0);
                 rowWidth = tileWidth * 5.0f;
+                rowIndex = selectedTile.getTile().getPosY();
                 break;
             case NORTH_EAST:
-                int rightIndex = selectedTile.getTile().getRightDiagonalIndex();
+                rowIndex = selectedTile.getTile().getRightDiagonalIndex();
                 slideVector.setAngleRad(MathUtils.PI / 3.0f);
-                rowWidth = (1 + Math.min(rightIndex, 7 - rightIndex)) * 2.0f * tileWidth;
+                rowWidth = (1 + Math.min(rowIndex, 7 - rowIndex)) * 2.0f * tileWidth;
                 break;
             default:
-                int leftIndex = selectedTile.getTile().getLeftDiagonalIndex();
+                rowIndex = selectedTile.getTile().getLeftDiagonalIndex();
                 slideVector.setAngleRad(2.0f * MathUtils.PI / 3.0f);
-                rowWidth = (1 + Math.min(leftIndex, 7 - leftIndex)) * 2.0f * tileWidth;
+                rowWidth = (1 + Math.min(rowIndex, 7 - rowIndex)) * 2.0f * tileWidth;
                 break;
         }
 
-        slideVector.setLength(Math.abs(slideDistance) > Math.abs(rowWidth) ?
-                rowWidth : slideDistance);
+        slideVector.setLength(Math.abs(dst) > Math.abs(rowWidth) ?
+                rowWidth : dst);
 
         //Because setting the length of the vector will always make if face in the
         //positive direction no matter the distance being negative. Dumb.
-        if (slideDistance < 0) {
+        if (dst < 0) {
             slideVector.rotateRad(MathUtils.PI);
         }
     }
 
     public void noMatch() {
-        for (int i = 0; i < TILE_ROWS; i++) {
-            for (int j = 0; j < TILE_COLUMNS; j++) {
-                TileView view = tileViews[i][j];
-
-                //If the tile is out of it's place animate it back
-                if (!view.getCenter().epsilonEquals(view.getOriginCenter(), 0.0f)) {
-                    animating = true;
-                    animatingTileCount++;
-                    Tween.to(view, TileViewAccessor.POS_XY, 500)
-                            .target(view.getOriginCenter().x, view.getOriginCenter().y)
-                            .ease(Quad.INOUT)
-                            .setCallback(tweenCallback)
-                            .start(manager);
-                }
-            }
+        //If the tile is out of it's place animate it back
+        if (slideVector.len() > 0) {
+            animating = true;
+            Tween.to(slideVector, TileViewAccessor.POS_XY, 500)
+                    .target(0, 0)
+                    .ease(Quad.INOUT)
+                    .setCallback(tweenCallback)
+                    .start(manager);
         }
 
         //Notify the listener if animation has started
