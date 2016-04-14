@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
 import com.tlongdev.hexle.animation.TileViewAccessor;
+import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.SlideDirection;
 import com.tlongdev.hexle.shape.Rectangle;
 import com.tlongdev.hexle.shape.Triangle;
@@ -113,8 +114,8 @@ public class FieldView implements BaseView {
             return;
         }
 
-        //Draw the filler tiles if needed
-        int fillerIndex;
+        //The index of the filler in the array
+        int fillerIndex = Field.getFillerIndex(slideDirection, rowIndex);
 
         float leftFillerPosX;
         float leftFillerPosY;
@@ -123,9 +124,6 @@ public class FieldView implements BaseView {
 
         switch (slideDirection) {
             case EAST:
-                //The index of the filler in the array
-                fillerIndex = rowIndex;
-
                 //Calculate the X coordinates of the fillers
                 leftFillerPosX = 0 + slideVector.x;
                 rightFillerPosX = screenWidth + slideVector.x;
@@ -133,20 +131,14 @@ public class FieldView implements BaseView {
                 //The Y coordinates since they are in the same row
                 rightFillerPosY = leftFillerPosY = offsetY + fillerIndex * tileHeight;
                 break;
-
             case NORTH_EAST:
-
                 if (rowIndex < 4) {
-                    fillerIndex = 6 - 2 * rowIndex;
-
                     leftFillerPosX = 0 + slideVector.x;
                     rightFillerPosX = tileWidth * (rowIndex + 1) + slideVector.x;
 
                     leftFillerPosY = offsetY + fillerIndex * tileHeight + slideVector.y;
                     rightFillerPosY = offsetY + TILE_ROWS * tileHeight + slideVector.y;
                 } else {
-                    fillerIndex = 15 - 2 * rowIndex;
-
                     leftFillerPosX = tileWidth * (rowIndex - 3) + slideVector.x;
                     rightFillerPosX = screenWidth + slideVector.x;
 
@@ -154,19 +146,14 @@ public class FieldView implements BaseView {
                     leftFillerPosY = offsetY + -1 * tileHeight + slideVector.y;
                 }
                 break;
-
             default:
                 if (rowIndex < 4) {
-                    fillerIndex = rowIndex * 2 + 1;
-
                     leftFillerPosX = 0 + slideVector.x;
                     rightFillerPosX = tileWidth * (rowIndex + 1) + slideVector.x;
 
                     leftFillerPosY = offsetY + fillerIndex * tileHeight + slideVector.y;
                     rightFillerPosY = offsetY + -1 * tileHeight + slideVector.y;
                 } else {
-                    fillerIndex = rowIndex * 2 - 8;
-
                     leftFillerPosX = tileWidth * (rowIndex - 3) + slideVector.x;
                     rightFillerPosX = screenWidth + slideVector.x;
 
@@ -374,8 +361,7 @@ public class FieldView implements BaseView {
                 break;
         }
 
-        slideVector.setLength(Math.abs(dst) > Math.abs(rowWidth) ?
-                rowWidth : dst);
+        slideVector.setLength(Math.abs(dst) > Math.abs(rowWidth) ? rowWidth : dst);
 
         //Because setting the length of the vector will always make if face in the
         //positive direction no matter the distance being negative. Dumb.

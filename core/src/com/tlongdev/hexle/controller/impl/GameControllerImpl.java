@@ -49,21 +49,21 @@ public class GameControllerImpl implements GameController {
         float tileWidth = fieldView.getTileWidth();
         TileView selected = fieldView.getSelectedTile();
 
-        if (Math.abs(slideDistance) < tileWidth * 3.0f / 4.0f) {
+        if (Math.abs(slideDistance) < tileWidth * 2.0f / 3.0f) {
             //Not enough distance
             fieldView.noMatch();
             return;
         }
 
-        if (Math.abs(slideDistance) % tileWidth > tileWidth / 4.0f &&
-                Math.abs(slideDistance) % tileWidth < tileWidth * 3.0f / 4.0f) {
+        if (Math.abs(slideDistance) % tileWidth > tileWidth / 3.0f &&
+                Math.abs(slideDistance) % tileWidth < tileWidth * 2.0f / 3.0f) {
             //Tiles are not close enough to each other
             fieldView.noMatch();
             return;
         }
 
         int steps = (int) (slideDistance / tileWidth);
-        if (Math.abs(slideDistance) % tileWidth > tileWidth * 3.0f / 4.0f) {
+        if (Math.abs(slideDistance) % tileWidth > tileWidth * 2.0f / 3.0f) {
             if (slideDistance > 0) {
                 steps++;
             } else {

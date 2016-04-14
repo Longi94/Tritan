@@ -120,13 +120,8 @@ public class Tile {
         tile.setPosX(posX);
         tile.setPosY(posY);
         tile.setMarked(marked);
-        //tile.setTemporaryOffset(temporaryOffset);
         return tile;
     }
-
-    /*private void setTemporaryOffset(Vector2 temporaryOffset) {
-        this.temporaryOffset.set(temporaryOffset);
-    }*/
 
     public int getRowIndex(SlideDirection slideDirection) {
         switch (slideDirection) {
