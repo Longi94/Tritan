@@ -1,6 +1,7 @@
 package com.tlongdev.hexle.model;
 
 import com.tlongdev.hexle.model.Tile.TileOrientation;
+import com.tlongdev.hexle.util.Util;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -216,26 +217,14 @@ public class Field {
                 //Create a temporary row that will store all the tiles and the filler
                 Tile[] tempRow = new Tile[width + 1];
 
-                //Put each tile into it's new place
-                for (int i = 0; i < width; i++) {
-                    int column;
-                    if (steps + i < 0) {
-                        //The tile shifted below 0
-                        column = steps + i + width + 1;
-                    } else if (steps + i >= width) {
-                        //The tile shifted over the max
-                        column = steps + i - width - 1;
-                    } else {
-                        //Just shift
-                        column = steps + i;
-                    }
+                //Create a new array
+                System.arraycopy(tiles[rowIndex], 0, tempRow, 0, tiles[rowIndex].length);
 
-                    //If the column is -1, the tile is now a filler
-                    tempRow[column == -1 ? width : column] = tiles[rowIndex][i];
-                }
+                //Add the filler to the new array
+                tempRow[width] = fillerTiles[rowIndex];
 
-                //Put the filler into its new place
-                tempRow[steps > 0 ? steps - 1 : width + steps] = fillerTiles[rowIndex];
+                //Shift the array
+                tempRow = Util.shiftArray(tempRow, steps);
 
                 //Apply changes, update indices
                 for (int i = 0; i < width; i++) {
