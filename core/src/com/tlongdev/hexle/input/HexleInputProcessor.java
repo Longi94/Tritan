@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
+import com.tlongdev.hexle.Config;
 import com.tlongdev.hexle.model.SlideDirection;
 
 /**
@@ -18,11 +19,6 @@ public class HexleInputProcessor implements InputProcessor {
     private static final String TAG = HexleInputProcessor.class.getSimpleName();
 
     private Logger logger;
-
-    /**
-     * The minimum distance in pixels needed for the drag to trigger.
-     */
-    public static final float MIN_DRAG_DISTANCE = 10.0f;
 
     private HexleInputListener listener;
 
@@ -119,7 +115,7 @@ public class HexleInputProcessor implements InputProcessor {
             float dst = start.dst(dragged);
 
             //Check if the distance if long enough
-            if (dst > MIN_DRAG_DISTANCE) {
+            if (dst > Config.MIN_DRAG_DISTANCE) {
 
                 //Magic angles
                 if (angle >= -MathUtils.PI / 6.0f && angle < MathUtils.PI / 6.0f ||

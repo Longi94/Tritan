@@ -1,5 +1,6 @@
 package com.tlongdev.hexle.model.impl;
 
+import com.tlongdev.hexle.Config;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.GameModel;
 import com.tlongdev.hexle.renderer.GameRenderer;
@@ -10,9 +11,6 @@ import com.tlongdev.hexle.renderer.GameRenderer;
  */
 public class GameModelImpl implements GameModel {
 
-    public static final int TILE_COLUMNS = 9;
-    public static final int TILE_ROWS = 8;
-
     private GameRenderer renderer;
 
     private Field field;
@@ -22,7 +20,7 @@ public class GameModelImpl implements GameModel {
     }
 
     private void init() {
-        field = new Field(TILE_COLUMNS, TILE_ROWS);
+        field = new Field(Config.FIELD_COLUMNS, Config.FIELD_ROWS);
     }
 
     @Override

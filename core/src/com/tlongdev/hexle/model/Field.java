@@ -119,11 +119,11 @@ public class Field {
     /**
      * Check if there are 3 or more tiles of the same color together.
      *
-     * @param source
-     * @param current
-     * @param depth
-     * @param init
-     * @return
+     * @param source  the tile the call came from
+     * @param current the current tile
+     * @param depth   recursion depth
+     * @param init    if true, it won't go deeper than 3
+     * @return if there is a group
      */
     private boolean checkTile(Tile source, Tile current, int depth, boolean init) {
         //Don't even bother, they are not the same color

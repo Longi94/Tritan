@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
+import com.tlongdev.hexle.Config;
 import com.tlongdev.hexle.animation.Vector2Accessor;
 import com.tlongdev.hexle.controller.GameController;
 import com.tlongdev.hexle.input.HexleInputProcessor;
@@ -16,9 +17,6 @@ import com.tlongdev.hexle.view.TileView;
 
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenManager;
-
-import static com.tlongdev.hexle.model.impl.GameModelImpl.TILE_COLUMNS;
-import static com.tlongdev.hexle.model.impl.GameModelImpl.TILE_ROWS;
 
 /**
  * @author longi
@@ -83,11 +81,11 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
         Field field = model.getField();
 
         //Create the views for the model objects
-        TileView[][] tileViews = new TileView[TILE_ROWS][TILE_COLUMNS];
-        TileView[] fillerTileViews = new TileView[TILE_ROWS];
+        TileView[][] tileViews = new TileView[Config.FIELD_ROWS][Config.FIELD_COLUMNS];
+        TileView[] fillerTileViews = new TileView[Config.FIELD_ROWS];
 
-        for (int i = 0; i < TILE_ROWS; i++) {
-            for (int j = 0; j < TILE_COLUMNS; j++) {
+        for (int i = 0; i < Config.FIELD_ROWS; i++) {
+            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
                 TileView view = new TileView();
                 view.setTile(field.getTiles()[i][j]);
                 tileViews[i][j] = view;

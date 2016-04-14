@@ -5,7 +5,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
-import com.tlongdev.hexle.animation.TileViewAccessor;
+import com.tlongdev.hexle.Config;
+import com.tlongdev.hexle.animation.Vector2Accessor;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.SlideDirection;
 import com.tlongdev.hexle.shape.Rectangle;
@@ -16,9 +17,6 @@ import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
 import aurelienribon.tweenengine.equations.Quad;
-
-import static com.tlongdev.hexle.model.impl.GameModelImpl.TILE_COLUMNS;
-import static com.tlongdev.hexle.model.impl.GameModelImpl.TILE_ROWS;
 
 /**
  * @author longi
@@ -82,14 +80,13 @@ public class FieldView implements BaseView {
     @Override
     public void render(ShapeRenderer shapeRenderer) {
         //Iterate through the tiles
-        for (int i = 0; i < TILE_ROWS; i++) {
-            for (int j = 0; j < TILE_COLUMNS; j++) {
+        for (int i = 0; i < Config.FIELD_ROWS; i++) {
+            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
                 TileView view = tileViews[i][j];
 
                 //If slideDirection is not null the a slide is currently happening
-                if (touchDown && view.isAffectedBySlide(selectedTile, slideDirection) ||
-                        animating && view.getTile().getRowIndex(slideDirection) == rowIndex) {
-
+                if (slideDirection != null && view.getTile().getRowIndex(slideDirection) == rowIndex
+                        && (touchDown || animating)) {
                     view.setCenter(view.getOriginCenter().cpy().add(slideVector));
                     //Render duplicates
                     renderDuplicates(view, shapeRenderer);
@@ -137,7 +134,7 @@ public class FieldView implements BaseView {
                     rightFillerPosX = tileWidth * (rowIndex + 1) + slideVector.x;
 
                     leftFillerPosY = offsetY + fillerIndex * tileHeight + slideVector.y;
-                    rightFillerPosY = offsetY + TILE_ROWS * tileHeight + slideVector.y;
+                    rightFillerPosY = offsetY + Config.FIELD_ROWS * tileHeight + slideVector.y;
                 } else {
                     leftFillerPosX = tileWidth * (rowIndex - 3) + slideVector.x;
                     rightFillerPosX = screenWidth + slideVector.x;
@@ -158,7 +155,7 @@ public class FieldView implements BaseView {
                     rightFillerPosX = screenWidth + slideVector.x;
 
                     rightFillerPosY = offsetY + fillerIndex * tileHeight + slideVector.y;
-                    leftFillerPosY = offsetY + TILE_ROWS * tileHeight + slideVector.y;
+                    leftFillerPosY = offsetY + Config.FIELD_ROWS * tileHeight + slideVector.y;
                 }
                 break;
         }
@@ -188,10 +185,12 @@ public class FieldView implements BaseView {
         Vector2 dupeVector = new Vector2(slideVector);
         Vector2 originalVector = original.getCenter().cpy();
 
+        //One duplicate
         dupeVector.setLength(rowWidth);
         original.setCenter(originalVector.cpy().add(dupeVector));
         original.render(shapeRenderer);
 
+        //The other duplicate
         dupeVector.rotateRad(MathUtils.PI);
         original.setCenter(originalVector.cpy().add(dupeVector));
         original.render(shapeRenderer);
@@ -201,6 +200,7 @@ public class FieldView implements BaseView {
 
     /**
      * Render the borders that will hide the duplicate tiles.
+     * @param shapeRenderer shape renderer
      */
     private void renderBorders(ShapeRenderer shapeRenderer) {
         float rectangleHeight = (screenHeight - 8 * tileHeight) / 2;
@@ -221,11 +221,13 @@ public class FieldView implements BaseView {
         Triangle triangle = new Triangle();
         triangle.setColor(Color.BLACK);
         for (int i = 0; i < 5; i++) {
+            //Left triangle
             triangle.setA(tileWidth / 2.0f, rectangleHeight + 2.0f * i * tileHeight);
             triangle.setB(0, rectangleHeight + 2.0f * i * tileHeight + tileHeight);
             triangle.setC(0, rectangleHeight + 2.0f * i * tileHeight - tileHeight);
             triangle.render(shapeRenderer);
 
+            //Right triangle
             triangle.setA(screenWidth - tileWidth / 2.0f, rectangleHeight + 2.0f * i * tileHeight);
             triangle.setB(screenWidth, rectangleHeight + 2.0f * i * tileHeight + tileHeight);
             triangle.setC(screenWidth, rectangleHeight + 2.0f * i * tileHeight - tileHeight);
@@ -234,22 +236,22 @@ public class FieldView implements BaseView {
     }
 
     public void setDimensions(int width, int height) {
-        logger.info("screensize changed: " + width + "x" + height);
+        logger.info("screen size changed: " + width + "x" + height);
         this.screenWidth = width;
         this.screenHeight = height;
 
         //Get the maximum width the tile can fit in the screen
-        tileWidth = (float) (screenWidth / Math.ceil(TILE_COLUMNS / 2.0));
+        tileWidth = (float) (screenWidth / Math.ceil(Config.FIELD_COLUMNS / 2.0));
 
         //Calculate the height from the width (equilateral triangle height from side)
         tileHeight = tileWidth * (float) Math.sqrt(3) / 2.0f;
 
         //Calculate the vertical offset, so the triangles are in the middle of the screen
-        offsetY = (screenHeight - (TILE_ROWS - 1) * tileHeight) / 2.0f;
+        offsetY = (screenHeight - (Config.FIELD_ROWS - 1) * tileHeight) / 2.0f;
 
         //Iterate through the tiles
-        for (int i = 0; i < TILE_ROWS; i++) {
-            for (int j = 0; j < TILE_COLUMNS; j++) {
+        for (int i = 0; i < Config.FIELD_ROWS; i++) {
+            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
                 TileView view = tileViews[i][j];
 
                 //Set the center
@@ -270,12 +272,9 @@ public class FieldView implements BaseView {
         this.fillerTileViews = fillers;
         this.tileViews = tileViews;
 
-        //Calculate the vertical offset, so the triangles are in the middle of the screen
-        offsetY = (screenHeight - (TILE_ROWS - 1) * tileHeight) / 2.0f;
-
         //Iterate through the tiles
-        for (int i = 0; i < TILE_ROWS; i++) {
-            for (int j = 0; j < TILE_COLUMNS; j++) {
+        for (int i = 0; i < Config.FIELD_ROWS; i++) {
+            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
                 TileView view = tileViews[i][j];
 
                 //Set the center
@@ -291,7 +290,7 @@ public class FieldView implements BaseView {
 
         if (slideVector.len() > 0 && !animating) {
             animating = true;
-            Tween.to(slideVector, TileViewAccessor.POS_XY, 500)
+            Tween.to(slideVector, Vector2Accessor.POS_XY, Config.SLIDE_DURATION)
                     .target(0, 0)
                     .ease(Quad.INOUT)
                     .setCallback(tweenCallback)
@@ -311,8 +310,8 @@ public class FieldView implements BaseView {
         float minDist = screenHeight;
 
         //Find the closest tile and mark it as selected
-        for (int i = 0; i < TILE_ROWS; i++) {
-            for (int j = 0; j < TILE_COLUMNS; j++) {
+        for (int i = 0; i < Config.FIELD_ROWS; i++) {
+            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
                 float dist = touchDown.dst(tileViews[i][j].getTriangleCenter());
                 if (minDist > dist) {
                     minDist = dist;
@@ -371,7 +370,7 @@ public class FieldView implements BaseView {
         //If the tile is out of it's place animate it back
         if (slideVector.len() > 0) {
             animating = true;
-            Tween.to(slideVector, TileViewAccessor.POS_XY, 500)
+            Tween.to(slideVector, Vector2Accessor.POS_XY, Config.SLIDE_DURATION)
                     .target(0, 0)
                     .ease(Quad.INOUT)
                     .setCallback(tweenCallback)

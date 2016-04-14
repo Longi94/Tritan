@@ -3,6 +3,7 @@ package com.tlongdev.hexle.controller.impl;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
+import com.tlongdev.hexle.Config;
 import com.tlongdev.hexle.controller.GameController;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.GameModel;
@@ -47,21 +48,21 @@ public class GameControllerImpl implements GameController {
         float tileWidth = fieldView.getTileWidth();
         TileView selected = fieldView.getSelectedTile();
 
-        if (Math.abs(slideDistance) < tileWidth * 2.0f / 3.0f) {
+        if (Math.abs(slideDistance) < tileWidth * (1.0f - Config.SLIDE_THRESHOLD)) {
             //Not enough distance
             fieldView.noMatch();
             return;
         }
 
-        if (Math.abs(slideDistance) % tileWidth > tileWidth / 3.0f &&
-                Math.abs(slideDistance) % tileWidth < tileWidth * 2.0f / 3.0f) {
+        if (Math.abs(slideDistance) % tileWidth > tileWidth * Config.SLIDE_THRESHOLD &&
+                Math.abs(slideDistance) % tileWidth < tileWidth * (1.0f - Config.SLIDE_THRESHOLD)) {
             //Tiles are not close enough to each other
             fieldView.noMatch();
             return;
         }
 
         int steps = (int) (slideDistance / tileWidth);
-        if (Math.abs(slideDistance) % tileWidth > tileWidth * 2.0f / 3.0f) {
+        if (Math.abs(slideDistance) % tileWidth > tileWidth * (1.0f - Config.SLIDE_THRESHOLD)) {
             if (slideDistance > 0) {
                 steps++;
             } else {
