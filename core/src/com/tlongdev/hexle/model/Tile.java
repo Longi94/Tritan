@@ -1,7 +1,5 @@
 package com.tlongdev.hexle.model;
 
-import com.badlogic.gdx.math.Vector2;
-
 /**
  * A single tile.
  *
@@ -26,8 +24,6 @@ public class Tile {
     private TileOrientation orientation;
 
     private boolean marked;
-
-    private Vector2 temporaryOffset;
 
     public int getPosX() {
         return posX;
@@ -133,14 +129,6 @@ public class Tile {
                 return leftDiagonalIndex;
         }
         return 0;
-    }
-
-    public Vector2 getTemporaryOffset() {
-        return temporaryOffset;
-    }
-
-    public void setTemporaryOffset(Vector2 temporaryOffset) {
-        this.temporaryOffset = temporaryOffset;
     }
 
     public enum TileOrientation {

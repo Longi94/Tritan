@@ -286,25 +286,21 @@ public class FieldView implements BaseView {
                 view.setFullWidth(tileWidth);
                 view.setSide(tileWidth * 0.9f);
                 view.setCenter(view.getOriginCenter());
-
-                if (view.getTile().getTemporaryOffset() != null) {
-                    if (!animating) {
-                        animating = true;
-                        slideVector.set(view.getTile().getTemporaryOffset());
-                        Tween.to(slideVector, TileViewAccessor.POS_XY, 500)
-                                .target(0, 0)
-                                .ease(Quad.INOUT)
-                                .setCallback(tweenCallback)
-                                .start(manager);
-                    }
-                    view.getTile().setTemporaryOffset(null);
-                }
             }
         }
 
-        //Notify the listener if animation has started
-        if (animating && animationListener != null) {
-            animationListener.onAnimationStarted();
+        if (slideVector.len() > 0 && !animating) {
+            animating = true;
+            Tween.to(slideVector, TileViewAccessor.POS_XY, 500)
+                    .target(0, 0)
+                    .ease(Quad.INOUT)
+                    .setCallback(tweenCallback)
+                    .start(manager);
+
+            //Notify the listener if animation has started
+            if (animationListener != null) {
+                animationListener.onAnimationStarted();
+            }
         }
     }
 
@@ -409,6 +405,10 @@ public class FieldView implements BaseView {
 
     public float getTileWidth() {
         return tileWidth;
+    }
+
+    public void setSlideVector(Vector2 slideVector) {
+        this.slideVector.set(slideVector);
     }
 
     public interface OnAnimationListener {

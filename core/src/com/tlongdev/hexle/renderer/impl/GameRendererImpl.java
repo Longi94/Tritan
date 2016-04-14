@@ -160,6 +160,11 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
         controller.notifySlideEnd();
     }
 
+    @Override
+    public void setOffset(Vector2 offset) {
+        fieldView.setSlideVector(offset);
+    }
+
     public void setController(GameController controller) {
         this.controller = controller;
     }

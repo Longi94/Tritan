@@ -7,7 +7,6 @@ import com.tlongdev.hexle.controller.GameController;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.GameModel;
 import com.tlongdev.hexle.model.SlideDirection;
-import com.tlongdev.hexle.model.Tile;
 import com.tlongdev.hexle.model.impl.GameModelImpl;
 import com.tlongdev.hexle.renderer.GameRenderer;
 import com.tlongdev.hexle.view.FieldView;
@@ -78,6 +77,15 @@ public class GameControllerImpl implements GameController {
         int rowIndex = selected.getTile().getRowIndex(slideDirection);
         tempField.shift(slideDirection, steps * 2, rowIndex);
 
+        for (int i = 0; i < GameModelImpl.TILE_ROWS; i++) {
+            for (int j = 0; j < GameModelImpl.TILE_COLUMNS; j++) {
+                if (tempField.getTiles()[i][j].getPosX() != j ||
+                        tempField.getTiles()[i][j].getPosY() != i) {
+                    throw new IllegalStateException("aSADASDASD");
+                }
+            }
+        }
+
         if (tempField.checkField()) {
 
             //The is the offset vector that will make the tile animate into its new place
@@ -89,17 +97,7 @@ public class GameControllerImpl implements GameController {
             if (length * slideDistance < 0) {
                 offset.rotateRad(MathUtils.PI);
             }
-
-            //If the tile is affected, mark it with a offset vector that will make it animate
-            //into its place
-            for (int i = 0; i < GameModelImpl.TILE_ROWS; i++) {
-                for (int j = 0; j < GameModelImpl.TILE_COLUMNS; j++) {
-                    Tile tile = tempField.getTiles()[i][j];
-                    if (tile.getRowIndex(slideDirection) == rowIndex) {
-                        tile.setTemporaryOffset(offset);
-                    }
-                }
-            }
+            renderer.setOffset(offset);
 
             //Shift successfully creates a group, apply it
             model.setField(tempField);
