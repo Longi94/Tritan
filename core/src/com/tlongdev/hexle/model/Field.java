@@ -208,12 +208,13 @@ public class Field {
     }
 
     public void shift(SlideDirection slideDirection, int steps, int rowIndex) {
-        if (Math.abs(steps) == width + 1) {
-            return;
-        }
 
         //Number of tiles in the row
         int tileCount = getRowTileCount(slideDirection, rowIndex);
+
+        if (Math.abs(steps) == tileCount + 1) {
+            return;
+        }
 
         //Create a temporary row that will store all the tiles and the filler
         Tile[] tempRow = new Tile[tileCount + 1];

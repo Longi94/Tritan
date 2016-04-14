@@ -7,7 +7,6 @@ import com.tlongdev.hexle.controller.GameController;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.GameModel;
 import com.tlongdev.hexle.model.SlideDirection;
-import com.tlongdev.hexle.model.impl.GameModelImpl;
 import com.tlongdev.hexle.renderer.GameRenderer;
 import com.tlongdev.hexle.view.FieldView;
 import com.tlongdev.hexle.view.TileView;
@@ -76,15 +75,6 @@ public class GameControllerImpl implements GameController {
         //Apply shift to field
         int rowIndex = selected.getTile().getRowIndex(slideDirection);
         tempField.shift(slideDirection, steps * 2, rowIndex);
-
-        for (int i = 0; i < GameModelImpl.TILE_ROWS; i++) {
-            for (int j = 0; j < GameModelImpl.TILE_COLUMNS; j++) {
-                if (tempField.getTiles()[i][j].getPosX() != j ||
-                        tempField.getTiles()[i][j].getPosY() != i) {
-                    throw new IllegalStateException("aSADASDASD");
-                }
-            }
-        }
 
         if (tempField.checkField()) {
 
