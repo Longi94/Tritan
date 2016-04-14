@@ -40,11 +40,13 @@ public class GameControllerImpl implements GameController {
 
     @Override
     public void startGame() {
+        logger.info("startGame");
         model.randomizeField();
     }
 
     @Override
     public void notifyUserInputFinish() {
+        logger.info("notifyUserInputFinish");
         FieldView fieldView = renderer.getFieldView();
 
         SlideDirection slideDirection = fieldView.getSlideDirection();
@@ -104,6 +106,7 @@ public class GameControllerImpl implements GameController {
 
     @Override
     public void notifyShiftAnimationFinish() {
+        logger.info("notifyShiftAnimationFinish");
         for (int i = 0; i < Config.FIELD_ROWS; i++) {
             for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
                 if (model.getField().getTiles()[i][j].isMarked()) {

@@ -415,7 +415,6 @@ public class Field {
     }
 
     public void generateNewTiles() {
-
         for (int i = 0; i < 8; i++) {
             slideIn(orientation, i);
         }
@@ -598,6 +597,10 @@ public class Field {
                     //Shift the tiles down, so there is only 1 or 0 blank tiles left in the current gap
                     System.arraycopy(tiles, i + blankCount, tiles, i, tiles.length - (i + blankCount));
                     totalShifts += blankCount;
+
+                    for (int j = i; j < tiles.length - blankCount; j++) {
+                        tiles[j].addSlideInOffset(blankCount);
+                    }
                 }
             }
         }
@@ -611,10 +614,16 @@ public class Field {
     private void randomizeEnd(Tile[] tiles) {
         //Fill up the nulls with blank tiles
         int i = tiles.length - 1;
-        while (tiles[i] == null && i >= 0) {
+        int slideInOffset = 0;
+        while (i >= 0 && tiles[i] == null) {
             tiles[i] = tileFactory.get(0, 0);
             tiles[i].setTileColor(TileColor.values()[generator.nextInt(6)]);
             i--;
+            slideInOffset++;
+        }
+
+        for (int j = 1; j <= slideInOffset; j++) {
+            tiles[tiles.length - j].addSlideInOffset(slideInOffset);
         }
     }
 }

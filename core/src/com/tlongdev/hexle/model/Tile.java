@@ -25,6 +25,8 @@ public class Tile {
 
     private boolean marked;
 
+    private int slideInOffset = 0;
+
     public int getPosX() {
         return posX;
     }
@@ -143,6 +145,18 @@ public class Tile {
                 return leftDiagonalIndex;
         }
         return 0;
+    }
+
+    public void addSlideInOffset(int offset) {
+        slideInOffset += offset;
+    }
+
+    public void resetSlideInOffset() {
+        slideInOffset = 0;
+    }
+
+    public int getSlideInOffset() {
+        return slideInOffset;
     }
 
     public enum TileOrientation {

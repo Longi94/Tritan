@@ -57,6 +57,7 @@ public class FieldView implements BaseView {
 
     //Animation stuff
     private TweenManager manager;
+    private int animatingTiles = 0;
 
     public FieldView(TweenManager manager) {
         this.manager = manager;
@@ -91,7 +92,7 @@ public class FieldView implements BaseView {
                     view.setCenter(view.getOriginCenter().cpy().add(slideVector));
                     //Render duplicates
                     renderDuplicates(view, shapeRenderer);
-                } else {
+                } else if (!animating) {
                     view.setCenter(view.getOriginCenter());
                 }
 
@@ -427,6 +428,22 @@ public class FieldView implements BaseView {
         return fillerTileViews;
     }
 
+    public void animateNewTileGeneration() {
+        for (int i = 0; i < Config.FIELD_ROWS; i++) {
+            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
+            }
+        }
+
+        //Notify the listener if animation has started
+        if (animating && animationListener != null) {
+            animationListener.onAnimationStarted();
+        }
+    }
+
+    public void setAnimating(boolean animating) {
+        this.animating = animating;
+    }
+
     public interface OnAnimationListener {
         /**
          * Called when an animation starts
@@ -443,6 +460,8 @@ public class FieldView implements BaseView {
          * Called when the shift (animation tiles to their new place) finishes
          */
         void onFinishShiftAnimationFinished();
+
+        void onFinishNewTileGenerationAnimation();
     }
 
     public interface OnSlideEndListener {
