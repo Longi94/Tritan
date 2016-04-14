@@ -3,6 +3,7 @@ package com.tlongdev.hexle.model;
 import com.tlongdev.hexle.model.Tile.TileOrientation;
 import com.tlongdev.hexle.util.Util;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,14 +34,6 @@ public class Field {
         generator = new Random();
         tiles = new Tile[height][width];
         fillerTiles = new Tile[height];
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
     }
 
     public SlideDirection getOrientation() {
@@ -80,7 +73,8 @@ public class Field {
                     int randomColor = generator.nextInt(colors.size());
                     tile.setTileColor(colors.get(randomColor));
                     colors.remove(randomColor);
-                } while (checkTile(null, tile, 0, true));
+
+                } while (checkTile(null, tile, 0, true) || getSameColorNeighbors(tile) > 1);
 
                 tiles[i][j] = tile;
             }
@@ -103,6 +97,11 @@ public class Field {
         return fillerTiles;
     }
 
+    /**
+     * Check if a field hs groups
+     *
+     * @return whether the field has groups
+     */
     public boolean checkField() {
         return true;
         /*boolean result = false;
@@ -114,6 +113,75 @@ public class Field {
             }
         }
         return result;*/
+    }
+
+    /**
+     * Get the number of neighboring tiles that have the same color of the given tile.
+     *
+     * @param tile the tile
+     * @return numbah
+     */
+    private int getSameColorNeighbors(Tile tile) {
+        int count = 0;
+
+        for (Tile neighbor : getNeighbors(tile)) {
+            if (neighbor.getTileColor() == tile.getTileColor()) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    /**
+     * Get the neighbors of the tile. Will not include null values.
+     *
+     * @param tile the tile
+     * @return the neighbors
+     */
+    private List<Tile> getNeighbors(Tile tile) {
+        List<Tile> neighbors = new ArrayList<Tile>();
+
+        //Get the neighbors of the current tile
+        Tile neighbor1 = null;
+        Tile neighbor2 = null;
+        Tile neighbor3 = null;
+
+        //The left neighbor
+        if (tile.getPosX() != 0) {
+            neighbor1 = tiles[tile.getPosY()][tile.getPosX() - 1];
+        }
+
+        //The right neighbor
+        if (tile.getPosX() != width - 1) {
+            neighbor2 = tiles[tile.getPosY()][tile.getPosX() + 1];
+        }
+
+        if (tile.getOrientation() == TileOrientation.UP) {
+            //The bottom neighbor
+            if (tile.getPosY() != 0) {
+                neighbor3 = tiles[tile.getPosY() - 1][tile.getPosX()];
+            }
+        } else {
+            //The top neighbor
+            if (tile.getPosY() != height - 1) {
+                neighbor3 = tiles[tile.getPosY() + 1][tile.getPosX()];
+            }
+        }
+
+        if (neighbor1 != null) {
+            neighbors.add(neighbor1);
+        }
+
+        if (neighbor2 != null) {
+            neighbors.add(neighbor2);
+        }
+
+        if (neighbor3 != null) {
+            neighbors.add(neighbor3);
+        }
+
+        return neighbors;
     }
 
     /**
@@ -139,49 +207,11 @@ public class Field {
             return true;
         }
 
-        //Get the neighbors of the current tile
-        Tile neighbor1 = null;
-        Tile neighbor2 = null;
-        Tile neighbor3 = null;
-
-        //The left neighbor
-        if (current.getPosX() != 0) {
-            neighbor1 = tiles[current.getPosY()][current.getPosX() - 1];
-        }
-
-        //The right neighbor
-        if (current.getPosX() != width - 1) {
-            neighbor2 = tiles[current.getPosY()][current.getPosX() + 1];
-        }
-
-        if (current.getOrientation() == TileOrientation.UP) {
-            //The bottom neighbor
-            if (current.getPosY() != 0) {
-                neighbor3 = tiles[current.getPosY() - 1][current.getPosX()];
-            }
-        } else {
-            //The top neighbor
-            if (current.getPosY() != height - 1) {
-                neighbor3 = tiles[current.getPosY() + 1][current.getPosX()];
-            }
-        }
-
-        //Recursive group discovery
-        if (neighbor1 != null && (source == null || neighbor1 != source)) {
-            if (checkTile(current, neighbor1, depth + 1, init)) {
-                result = true;
-            }
-        }
-
-        if (neighbor2 != null && (source == null || neighbor2 != source)) {
-            if (checkTile(current, neighbor2, depth + 1, init)) {
-                result = true;
-            }
-        }
-
-        if (neighbor3 != null && (source == null || neighbor3 != source)) {
-            if (checkTile(current, neighbor3, depth + 1, init)) {
-                result = true;
+        for (Tile neighbor : getNeighbors(current)) {
+            if (source == null || neighbor != source) {
+                if (checkTile(current, neighbor, depth + 1, init)) {
+                    result = true;
+                }
             }
         }
 
@@ -207,6 +237,13 @@ public class Field {
         return field;
     }
 
+    /**
+     * Shift a row
+     *
+     * @param slideDirection the direction to shift
+     * @param steps          the number of tiles to shift
+     * @param rowIndex       the index of the row to shift
+     */
     public void shift(SlideDirection slideDirection, int steps, int rowIndex) {
 
         //Number of tiles in the row
