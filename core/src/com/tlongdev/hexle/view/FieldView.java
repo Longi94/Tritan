@@ -57,19 +57,6 @@ public class FieldView implements BaseView {
 
     //Animation stuff
     private TweenManager manager;
-    private TweenCallback tweenCallback = new TweenCallback() {
-        @Override
-        public void onEvent(int type, BaseTween<?> source) {
-            animating = false;
-            selectedTile = null;
-            slideDirection = null;
-
-            //Notify the listener that the animation stopped
-            if (animationListener != null) {
-                animationListener.onAnimationFinished();
-            }
-        }
-    };
 
     public FieldView(TweenManager manager) {
         this.manager = manager;
@@ -98,19 +85,17 @@ public class FieldView implements BaseView {
             for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
                 TileView view = tileViews[i][j];
 
-                if (!view.getTile().isBlank()) {
-                    //If slideDirection is not null the a slide is currently happening
-                    if (slideDirection != null && view.getTile().getRowIndex(slideDirection) == rowIndex
-                            && (touchDown || animating)) {
-                        view.setCenter(view.getOriginCenter().cpy().add(slideVector));
-                        //Render duplicates
-                        renderDuplicates(view, shapeRenderer);
-                    } else {
-                        view.setCenter(view.getOriginCenter());
-                    }
-
-                    view.render(shapeRenderer);
+                //If slideDirection is not null the a slide is currently happening
+                if (slideDirection != null && view.getTile().getRowIndex(slideDirection) == rowIndex
+                        && (touchDown || animating)) {
+                    view.setCenter(view.getOriginCenter().cpy().add(slideVector));
+                    //Render duplicates
+                    renderDuplicates(view, shapeRenderer);
+                } else {
+                    view.setCenter(view.getOriginCenter());
                 }
+
+                view.render(shapeRenderer);
             }
         }
 
@@ -305,7 +290,7 @@ public class FieldView implements BaseView {
         touchDown = false;
         //If slide direction is null, slide has not started
         if (slideDirection != null && slideEndListener != null) {
-            slideEndListener.onSlideEnd();
+            slideEndListener.onUserInputFinish();
         }
     }
 
@@ -346,14 +331,57 @@ public class FieldView implements BaseView {
         }
     }
 
-    public void animateSlide() {
+    public void animateNoMatchSlide() {
         //If the tile is out of it's place animate it back
         if (slideVector.len() > 0) {
             animating = true;
             Tween.to(slideVector, Vector2Accessor.POS_XY, Config.SLIDE_DURATION)
                     .target(0, 0)
                     .ease(Cubic.OUT)
-                    .setCallback(tweenCallback)
+                    .setCallback(new TweenCallback() {
+                        @Override
+                        public void onEvent(int type, BaseTween<?> source) {
+                            //Animation finished
+                            animating = false;
+                            selectedTile = null;
+                            slideDirection = null;
+
+                            //Notify the listener that the animation stopped
+                            if (animationListener != null) {
+                                animationListener.onNoMatchAnimationFinished();
+                            }
+                        }
+                    })
+                    .start(manager);
+        }
+
+        //Notify the listener if animation has started
+        if (animating && animationListener != null) {
+            animationListener.onAnimationStarted();
+        }
+    }
+
+    public void animateFinishShift() {
+        //If the tile is out of it's place animate it back
+        if (slideVector.len() > 0) {
+            animating = true;
+            Tween.to(slideVector, Vector2Accessor.POS_XY, Config.SLIDE_DURATION)
+                    .target(0, 0)
+                    .ease(Cubic.OUT)
+                    .setCallback(new TweenCallback() {
+                        @Override
+                        public void onEvent(int type, BaseTween<?> source) {
+                            //Animation finished
+                            animating = false;
+                            selectedTile = null;
+                            slideDirection = null;
+
+                            //Notify the listener that the animation stopped
+                            if (animationListener != null) {
+                                animationListener.onFinishShiftAnimationFinished();
+                            }
+                        }
+                    })
                     .start(manager);
         }
 
@@ -400,12 +428,24 @@ public class FieldView implements BaseView {
     }
 
     public interface OnAnimationListener {
+        /**
+         * Called when an animation starts
+         */
         void onAnimationStarted();
 
-        void onAnimationFinished();
+        /**
+         * Called when the no match (sliding the tiles back to their original place) animation
+         * finishes.
+         */
+        void onNoMatchAnimationFinished();
+
+        /**
+         * Called when the shift (animation tiles to their new place) finishes
+         */
+        void onFinishShiftAnimationFinished();
     }
 
     public interface OnSlideEndListener {
-        void onSlideEnd();
+        void onUserInputFinish();
     }
 }

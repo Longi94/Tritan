@@ -9,4 +9,14 @@ public class BlankTile extends Tile {
     public boolean isBlank() {
         return true;
     }
+
+    @Override
+    public Tile copy() {
+        BlankTile tile = new BlankTile();
+        tile.setOrientation(getOrientation());
+        tile.setPosY(getPosY());
+        tile.setPosX(getPosX());
+        tile.updateIndices();
+        return tile;
+    }
 }

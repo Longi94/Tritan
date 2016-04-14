@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
 import com.tlongdev.hexle.Config;
 import com.tlongdev.hexle.controller.GameController;
+import com.tlongdev.hexle.factory.TileFactory;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.GameModel;
 import com.tlongdev.hexle.model.SlideDirection;
@@ -26,12 +27,15 @@ public class GameControllerImpl implements GameController {
 
     private GameModel model;
 
+    private TileFactory tileFactory;
+
     public GameControllerImpl() {
         init();
     }
 
     private void init() {
         logger = new Logger(TAG, Logger.DEBUG);
+        tileFactory = new TileFactory();
     }
 
     @Override
@@ -40,7 +44,7 @@ public class GameControllerImpl implements GameController {
     }
 
     @Override
-    public void notifySlideEnd() {
+    public void notifyUserInputFinish() {
         FieldView fieldView = renderer.getFieldView();
 
         SlideDirection slideDirection = fieldView.getSlideDirection();
@@ -50,14 +54,14 @@ public class GameControllerImpl implements GameController {
 
         if (Math.abs(slideDistance) < tileWidth * (1.0f - Config.SLIDE_THRESHOLD)) {
             //Not enough distance
-            fieldView.animateSlide();
+            fieldView.animateNoMatchSlide();
             return;
         }
 
         if (Math.abs(slideDistance) % tileWidth > tileWidth * Config.SLIDE_THRESHOLD &&
                 Math.abs(slideDistance) % tileWidth < tileWidth * (1.0f - Config.SLIDE_THRESHOLD)) {
             //Tiles are not close enough to each other
-            fieldView.animateSlide();
+            fieldView.animateNoMatchSlide();
             return;
         }
 
@@ -94,8 +98,21 @@ public class GameControllerImpl implements GameController {
             model.setField(tempField);
         } else {
             //No group
-            fieldView.animateSlide();
+            fieldView.animateNoMatchSlide();
         }
+    }
+
+    @Override
+    public void notifyShiftAnimationFinish() {
+        for (int i = 0; i < Config.FIELD_ROWS; i++) {
+            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
+                if (model.getField().getTiles()[i][j].isMarked()) {
+                    model.getField().getTiles()[i][j] = tileFactory.getBlank(j, i);
+                }
+            }
+        }
+
+        renderer.notifyNewTilesGenerated();
     }
 
     public void update(float dt) {

@@ -183,6 +183,11 @@ public class Field {
      * @return if there is a group
      */
     private boolean checkTile(Tile source, Tile current, int depth, boolean init) {
+        //Blanco
+        if (current.isBlank()) {
+            return false;
+        }
+
         //Don't even bother, they are not the same color
         if (source != null && source.getTileColor() != current.getTileColor()) {
             return false;
@@ -196,6 +201,7 @@ public class Field {
             return true;
         }
 
+        //Recursively check the neighbors
         for (Tile neighbor : getNeighbors(current)) {
             if (source == null || neighbor != source) {
                 if (checkTile(current, neighbor, depth + 1, init)) {

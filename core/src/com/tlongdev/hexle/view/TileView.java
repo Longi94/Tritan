@@ -32,6 +32,11 @@ public class TileView implements BaseView {
 
     @Override
     public void render(ShapeRenderer shapeRenderer) {
+        //Don't render anything if it's a blank
+        if (tile.isBlank()) {
+            return;
+        }
+
         switch (tile.getOrientation()) {
             case UP:
                 //Triangle faces up /\

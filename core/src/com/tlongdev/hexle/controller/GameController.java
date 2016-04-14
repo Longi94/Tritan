@@ -5,7 +5,18 @@ package com.tlongdev.hexle.controller;
  * @since 2016.04.13.
  */
 public interface GameController {
+    /**
+     * Init the game.
+     */
     void startGame();
 
-    void notifySlideEnd();
+    /**
+     * Called when a valid user input is received.
+     */
+    void notifyUserInputFinish();
+
+    /**
+     * Called when the shifting animation finished.
+     */
+    void notifyShiftAnimationFinish();
 }

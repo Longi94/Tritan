@@ -88,7 +88,7 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
             fieldView.getFillerTileViews()[i].setTile(field.getFillerTiles()[i]);
         }
 
-        fieldView.animateSlide();
+        fieldView.animateFinishShift();
     }
 
     @Override
@@ -155,13 +155,31 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
     }
 
     @Override
-    public void onAnimationFinished() {
+    public void onNoMatchAnimationFinished() {
         animating = false;
     }
 
     @Override
-    public void onSlideEnd() {
-        controller.notifySlideEnd();
+    public void onFinishShiftAnimationFinished() {
+        animating = false;
+        controller.notifyShiftAnimationFinish();
+    }
+
+    @Override
+    public void notifyNewTilesGenerated() {
+        Field field = model.getField();
+
+        for (int i = 0; i < Config.FIELD_ROWS; i++) {
+            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
+                fieldView.getTileViews()[i][j].setTile(field.getTiles()[i][j]);
+            }
+            fieldView.getFillerTileViews()[i].setTile(field.getFillerTiles()[i]);
+        }
+    }
+
+    @Override
+    public void onUserInputFinish() {
+        controller.notifyUserInputFinish();
     }
 
     @Override

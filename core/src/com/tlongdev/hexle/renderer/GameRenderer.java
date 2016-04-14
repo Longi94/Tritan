@@ -15,4 +15,6 @@ public interface GameRenderer extends Renderer {
     FieldView getFieldView();
 
     void setSlideOffset(Vector2 offset);
+
+    void notifyNewTilesGenerated();
 }
