@@ -19,4 +19,9 @@ public interface GameController {
      * Called when the shifting animation finished.
      */
     void notifyShiftAnimationFinish();
+
+    /**
+     * Called after sliding in new tiles finishes
+     */
+    void notifySlideInAnimationFinish();
 }

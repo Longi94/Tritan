@@ -120,6 +120,27 @@ public class GameControllerImpl implements GameController {
         renderer.notifyNewTilesGenerated();
     }
 
+    @Override
+    public void notifySlideInAnimationFinish() {
+        logger.info("notifySlideInAnimationFinish");
+
+        Field field = model.getField();
+
+        if (field.checkField()) {
+            for (int i = 0; i < Config.FIELD_ROWS; i++) {
+                for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
+                    if (field.getTiles()[i][j].isMarked()) {
+                        field.getTiles()[i][j] = tileFactory.getBlank(j, i);
+                    }
+                }
+            }
+
+            model.getField().generateNewTiles();
+
+            renderer.notifyNewTilesGenerated();
+        }
+    }
+
     public void update(float dt) {
         renderer.update(dt);
     }

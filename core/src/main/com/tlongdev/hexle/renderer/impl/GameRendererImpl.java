@@ -14,6 +14,7 @@ import com.tlongdev.hexle.input.HexleInputProcessor;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.GameModel;
 import com.tlongdev.hexle.model.SlideDirection;
+import com.tlongdev.hexle.model.Tile;
 import com.tlongdev.hexle.renderer.GameRenderer;
 import com.tlongdev.hexle.view.FieldView;
 import com.tlongdev.hexle.view.TileView;
@@ -193,6 +194,7 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
     public void onFinishNewTileGenerationAnimation() {
         logger.info("onFinishNewTileGenerationAnimation");
         animating = false;
+        controller.notifySlideInAnimationFinish();
     }
 
     @Override
@@ -205,9 +207,11 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
         for (int i = 0; i < Config.FIELD_ROWS; i++) {
             for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
                 TileView view = fieldView.getTileViews()[i][j];
-                view.setTile(field.getTiles()[i][j]);
+                Tile tile = field.getTiles()[i][j];
+                view.setTile(tile);
 
-                int offset = field.getTiles()[i][j].getSlideInOffset();
+                int offset = tile.getSlideInOffset();
+                tile.resetSlideInOffset();
                 if (offset > 0) {
 
                     animatingTiles++;
