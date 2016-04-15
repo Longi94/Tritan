@@ -221,10 +221,15 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
                     Vector2 slideInVector = new Vector2(1, 0);
                     slideInVector.setAngleRad(MathUtils.PI / 3.0f);
                     slideInVector.setLength(offset * fieldView.getTileWidth() / 2.0f);
-                    timeline.push(Tween.from(view.getCenter(), Vector2Accessor.POS_XY, 500)
-                            .target(view.getCenter().x + slideInVector.x,
-                                    view.getCenter().y + slideInVector.y)
+                    timeline.push(Tween.to(view.getCenter(), Vector2Accessor.POS_XY, 500)
+                            .target(view.getCenter().x,
+                                    view.getCenter().y)
                             .ease(Quad.IN));
+
+                    //If I used from(), the first frame would render at iT1s destionation position
+                    //making it glitchy
+                    view.setCenter(view.getCenter().x + slideInVector.x,
+                            view.getCenter().y + slideInVector.y);
                 }
             }
             fieldView.getFillerTileViews()[i].setTile(field.getFillerTiles()[i]);

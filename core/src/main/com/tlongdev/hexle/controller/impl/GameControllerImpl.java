@@ -19,7 +19,7 @@ import com.tlongdev.hexle.view.TileView;
  */
 public class GameControllerImpl implements GameController {
 
-    private static final String TAG = GameControllerImpl.class.getName();
+    private static final String TAG = GameControllerImpl.class.getSimpleName();
 
     private Logger logger;
 
