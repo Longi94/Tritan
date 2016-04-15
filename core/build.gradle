@@ -1,4 +1,5 @@
 apply plugin: "java"
+apply plugin: "jacoco"
 
 sourceCompatibility = 1.6
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -24,5 +25,44 @@ eclipse.project {
 test {
     testLogging {
         events "passed", "skipped", "failed"
+    }
+}
+
+jacoco {
+    toolVersion = "0.7.6.201602180812"
+    reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+task jacocoReport(type: JacocoReport, dependsOn: 'test') {
+    group = 'Reporting'
+    description = 'Generate Jacoco coverage reports after running tests.'
+
+    reports {
+        xml {
+            enabled = true
+            destination "${buildDir}/reports/jacoco/jacoco.xml"
+        }
+        html {
+            enabled = true
+            destination "${buildDir}/reports/jacoco"
+        }
+    }
+
+    classDirectories = fileTree(
+            dir: 'build/classes/main',
+            excludes: [
+                    '**/*$$*'
+            ]
+    )
+
+    sourceDirectories = files('src/main/java')
+    executionData = files('build/jacoco/test.exec')
+
+    doFirst {
+        files('build/intermediates/classes/debug').getFiles().each { file ->
+            if (file.name.contains('$$')) {
+                file.renameTo(file.path.replace('$$', '$'))
+            }
+        }
     }
 }
