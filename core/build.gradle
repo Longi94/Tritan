@@ -5,11 +5,17 @@ sourceCompatibility = 1.6
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 
+dependencies {
+    compile fileTree(dir: '../libs', include: '*.jar')
+    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+    compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+    compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+    compile "com.kotcrab.vis:vis-ui:1.0.1"
+
+    testCompile 'junit:junit:4.12'
+}
 
 eclipse.project {
     name = appName + "-core"
-}
-dependencies {
-    compile 'junit:junit:4.12'
 }
 
