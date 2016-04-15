@@ -21,3 +21,8 @@ eclipse.project {
     name = appName + "-core"
 }
 
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
