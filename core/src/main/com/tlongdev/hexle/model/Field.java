@@ -443,7 +443,7 @@ public class Field {
                 //Create a new array
                 System.arraycopy(tiles[rowIndex], 0, tempRow, 0, tileCount);
 
-                minimizeHoles(tempRow);
+                minimizeGaps(tempRow);
                 randomizeEnd(tempRow, tileFactory, generator);
 
                 //Apply changes, update indices
@@ -479,7 +479,7 @@ public class Field {
                     }
                 }
 
-                minimizeHoles(tempRow);
+                minimizeGaps(tempRow);
                 randomizeEnd(tempRow, tileFactory, generator);
 
                 x = startX;
@@ -524,7 +524,7 @@ public class Field {
                     }
                 }
 
-                minimizeHoles(tempRow);
+                minimizeGaps(tempRow);
                 randomizeEnd(tempRow, tileFactory, generator);
 
                 x = startX;
@@ -557,7 +557,7 @@ public class Field {
      *
      * @param tiles the row tho reduce
      */
-    public static void minimizeHoles(Tile[] tiles) {
+    public static void minimizeGaps(Tile[] tiles) {
         boolean hasBlank = false;
 
         int t = 0;
@@ -585,21 +585,32 @@ public class Field {
                     blankCount++;
                 }
 
-                //Holes with a length of 1 cannot be filled
-                if (blankCount != 1) {
+                if (i + blankCount == tiles.length) {
+                    i = tiles.length;
 
                     //If the number of blank tiles is odd, on tile must be left blank
                     if (blankCount % 2 == 1) {
                         blankCount--;
-                        i++;
                     }
 
-                    //Shift the tiles down, so there is only 1 or 0 blank tiles left in the current gap
-                    System.arraycopy(tiles, i + blankCount, tiles, i, tiles.length - (i + blankCount));
                     totalShifts += blankCount;
+                } else {
+                    //Holes with a length of 1 cannot be filled
+                    if (blankCount != 1) {
 
-                    for (int j = i; j < tiles.length - blankCount; j++) {
-                        tiles[j].addSlideInOffset(blankCount);
+                        //If the number of blank tiles is odd, on tile must be left blank
+                        if (blankCount % 2 == 1) {
+                            blankCount--;
+                            i++;
+                        }
+
+                        //Shift the tiles down, so there is only 1 or 0 blank tiles left in the current gap
+                        System.arraycopy(tiles, i + blankCount, tiles, i, tiles.length - (i + blankCount));
+                        totalShifts += blankCount;
+
+                        for (int j = i; j < tiles.length - blankCount; j++) {
+                            tiles[j].addSlideInOffset(blankCount);
+                        }
                     }
                 }
             }

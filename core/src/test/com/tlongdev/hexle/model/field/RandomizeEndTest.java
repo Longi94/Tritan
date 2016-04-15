@@ -26,7 +26,7 @@ public class RandomizeEndTest {
 
     private Tile[] tiles;
 
-    private TileFactory tileFactory;
+    private TileFactory factory;
 
     @Mock
     private Random generator;
@@ -35,75 +35,83 @@ public class RandomizeEndTest {
     public void setUp() throws Exception {
         tiles = new Tile[10];
 
-        tileFactory = new TileFactory();
+        factory = new TileFactory();
         for (int i = 0; i < 10; i++) {
-            tiles[i] = tileFactory.get(0, 0);
+            tiles[i] = factory.get(0, 0);
         }
 
         when(generator.nextInt(6)).thenReturn(0);
     }
 
     @Test
-    public void testEmpty() {
+    public void testEmpty() throws Exception {
         for (int i = 0; i < 10; i++) {
             tiles[i] = null;
         }
 
-        Field.randomizeEnd(tiles, tileFactory, generator);
+        Field.randomizeEnd(tiles, factory, generator);
 
         for (Tile tile: tiles) {
             assertNotNull(tile);
             assertEquals(TileColor.RED, tile.getTileColor());
+            assertEquals(10, tile.getSlideInOffset());
         }
     }
 
     @Test
-    public void testHalf() {
+    public void testHalf() throws Exception {
         for (int i = 5; i < 10; i++) {
             tiles[i] = null;
         }
 
-        Field.randomizeEnd(tiles, tileFactory, generator);
+        Field.randomizeEnd(tiles, factory, generator);
 
-        for (Tile tile: tiles) {
+        for (int i = 0; i < tiles.length; i++) {
+            Tile tile = tiles[i];
             assertNotNull(tile);
             assertEquals(TileColor.RED, tile.getTileColor());
+            assertEquals(i > 4 ? 5 : 0, tile.getSlideInOffset());
         }
     }
 
     @Test
-    public void testOneNotNull() {
+    public void testOneNotNull() throws Exception {
         for (int i = 1; i < 10; i++) {
             tiles[i] = null;
         }
 
-        Field.randomizeEnd(tiles, tileFactory, generator);
+        Field.randomizeEnd(tiles, factory, generator);
 
-        for (Tile tile: tiles) {
+        for (int i = 0; i < tiles.length; i++) {
+            Tile tile = tiles[i];
             assertNotNull(tile);
             assertEquals(TileColor.RED, tile.getTileColor());
+            assertEquals(i > 0 ? 9 : 0, tile.getSlideInOffset());
         }
     }
 
     @Test
-    public void testOneNull() {
+    public void testOneNull() throws Exception {
         tiles[9] = null;
 
-        Field.randomizeEnd(tiles, tileFactory, generator);
+        Field.randomizeEnd(tiles, factory, generator);
 
-        for (Tile tile: tiles) {
+        for (int i = 0; i < tiles.length; i++) {
+            Tile tile = tiles[i];
             assertNotNull(tile);
             assertEquals(TileColor.RED, tile.getTileColor());
+            assertEquals(i == 9 ? 1 : 0, tile.getSlideInOffset());
         }
     }
 
     @Test
-    public void testFull() {
-        Field.randomizeEnd(tiles, tileFactory, generator);
+    public void testFull() throws Exception {
+        Field.randomizeEnd(tiles, factory, generator);
 
         for (Tile tile: tiles) {
             assertNotNull(tile);
             assertEquals(TileColor.RED, tile.getTileColor());
+            assertEquals(0, tile.getSlideInOffset());
         }
     }
 }

@@ -10,12 +10,12 @@ import org.junit.Test;
 public class ModuleTest {
 
     @Test
-    public void testModulo() {
+    public void testModulo() throws Exception {
         Assert.assertEquals(3, Util.modulo(11, 8));
     }
 
     @Test
-    public void testModuloNegative() {
+    public void testModuloNegative() throws Exception {
         Assert.assertEquals(3, Util.modulo(-5, 8));
     }
 }
