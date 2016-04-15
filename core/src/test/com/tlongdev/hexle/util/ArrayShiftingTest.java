@@ -9,7 +9,7 @@ import static org.junit.Assert.assertArrayEquals;
  * @author longi
  * @since 2016.04.15.
  */
-public class ArrayShiftingTests {
+public class ArrayShiftingTest {
 
     private Integer[] array;
 

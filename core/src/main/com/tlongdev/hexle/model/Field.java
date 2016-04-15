@@ -444,7 +444,7 @@ public class Field {
                 System.arraycopy(tiles[rowIndex], 0, tempRow, 0, tileCount);
 
                 minimizeHoles(tempRow);
-                randomizeEnd(tempRow);
+                randomizeEnd(tempRow, tileFactory, generator);
 
                 //Apply changes, update indices
                 for (int i = 0; i < tileCount; i++) {
@@ -480,7 +480,7 @@ public class Field {
                 }
 
                 minimizeHoles(tempRow);
-                randomizeEnd(tempRow);
+                randomizeEnd(tempRow, tileFactory, generator);
 
                 x = startX;
                 y = startY;
@@ -525,7 +525,7 @@ public class Field {
                 }
 
                 minimizeHoles(tempRow);
-                randomizeEnd(tempRow);
+                randomizeEnd(tempRow, tileFactory, generator);
 
                 x = startX;
                 y = startY;
@@ -557,7 +557,7 @@ public class Field {
      *
      * @param tiles the row tho reduce
      */
-    private void minimizeHoles(Tile[] tiles) {
+    public static void minimizeHoles(Tile[] tiles) {
         boolean hasBlank = false;
 
         int t = 0;
@@ -611,7 +611,7 @@ public class Field {
         }
     }
 
-    private void randomizeEnd(Tile[] tiles) {
+    public static void randomizeEnd(Tile[] tiles, TileFactory tileFactory, Random generator) {
         //Fill up the nulls with blank tiles
         int i = tiles.length - 1;
         int slideInOffset = 0;
