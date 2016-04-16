@@ -1,5 +1,7 @@
 package com.tlongdev.hexle.model;
 
+import com.tlongdev.hexle.model.enumration.TileColor;
+
 /**
  * A single tile.
  *
@@ -19,7 +21,7 @@ public class Tile {
     private int leftDiagonalIndex;
     private int rightDiagonalIndex;
 
-    private TileColor tileColor;
+    private com.tlongdev.hexle.model.enumration.TileColor tileColor;
 
     private TileOrientation orientation;
 
@@ -43,7 +45,7 @@ public class Tile {
         this.posY = posY;
     }
 
-    public TileColor getTileColor() {
+    public com.tlongdev.hexle.model.enumration.TileColor getTileColor() {
         return tileColor;
     }
 
@@ -71,18 +73,18 @@ public class Tile {
         return rightDiagonalIndex;
     }
 
-    public boolean isAffectedBySlide(Tile selectedTile, SlideDirection slideDirection) {
+    public boolean isAffectedBySlide(Tile selectedTile, com.tlongdev.hexle.model.enumration.SlideDirection slideDirection) {
         if (selectedTile == null || slideDirection == null) {
             return false;
         }
         switch (slideDirection) {
-            case EAST:
+            case SIDEWAYS:
                 //Sliding sideways, tile is affected if the Y coordinate is the same
                 return horizontalRowIndex == selectedTile.getHorizontalRowIndex();
-            case NORTH_EAST:
+            case ANTI_DIAGONAL:
                 //Magic to determine whether the tile is in the same right diagonal
                 return rightDiagonalIndex == selectedTile.getRightDiagonalIndex();
-            case NORTH_WEST:
+            case MAIN_DIAGONAL:
                 //Magic to determine whether the tile is in the same left diagonal
                 return leftDiagonalIndex == selectedTile.getLeftDiagonalIndex();
         }
@@ -135,13 +137,13 @@ public class Tile {
         return tile;
     }
 
-    public int getRowIndex(SlideDirection slideDirection) {
+    public int getRowIndex(com.tlongdev.hexle.model.enumration.SlideDirection slideDirection) {
         switch (slideDirection) {
-            case EAST:
+            case SIDEWAYS:
                 return horizontalRowIndex;
-            case NORTH_EAST:
+            case ANTI_DIAGONAL:
                 return rightDiagonalIndex;
-            case NORTH_WEST:
+            case MAIN_DIAGONAL:
                 return leftDiagonalIndex;
         }
         return 0;

@@ -2,6 +2,7 @@ package com.tlongdev.hexle.model;
 
 import com.tlongdev.hexle.factory.TileFactory;
 import com.tlongdev.hexle.model.Tile.TileOrientation;
+import com.tlongdev.hexle.model.enumration.TileColor;
 import com.tlongdev.hexle.util.Util;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class Field {
 
     private int height;
 
-    private SlideDirection orientation = SlideDirection.NORTH_EAST;
+    private com.tlongdev.hexle.model.enumration.SlideDirection orientation = com.tlongdev.hexle.model.enumration.SlideDirection.ANTI_DIAGONAL;
 
     private Tile[][] tiles;
 
@@ -43,11 +44,11 @@ public class Field {
         tileFactory = new TileFactory();
     }
 
-    public SlideDirection getOrientation() {
+    public com.tlongdev.hexle.model.enumration.SlideDirection getOrientation() {
         return orientation;
     }
 
-    public void setOrientation(SlideDirection orientation) {
+    public void setOrientation(com.tlongdev.hexle.model.enumration.SlideDirection orientation) {
         this.orientation = orientation;
     }
 
@@ -56,14 +57,14 @@ public class Field {
     }
 
     public void randomize() {
-        List<TileColor> colors = new LinkedList<TileColor>();
+        List<com.tlongdev.hexle.model.enumration.TileColor> colors = new LinkedList<com.tlongdev.hexle.model.enumration.TileColor>();
         //Fill up the field with random colored tiles
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 Tile tile = tileFactory.get(j, i);
 
                 colors.clear();
-                Collections.addAll(colors, TileColor.values());
+                Collections.addAll(colors, com.tlongdev.hexle.model.enumration.TileColor.values());
 
                 //Prevent any 3+ groups
                 do {
@@ -78,7 +79,7 @@ public class Field {
 
             //Randomize filler tiles
             Tile tile = tileFactory.get(-1, i);
-            tile.setTileColor(TileColor.values()[generator.nextInt(6)]);
+            tile.setTileColor(com.tlongdev.hexle.model.enumration.TileColor.values()[generator.nextInt(6)]);
             fillerTiles[i] = tile;
         }
     }
@@ -239,7 +240,7 @@ public class Field {
      * @param steps          the number of tiles to shift
      * @param rowIndex       the index of the row to shift
      */
-    public void shift(SlideDirection slideDirection, int steps, int rowIndex) {
+    public void shift(com.tlongdev.hexle.model.enumration.SlideDirection slideDirection, int steps, int rowIndex) {
 
         //Number of tiles in the row
         int tileCount = getRowTileCount(slideDirection, rowIndex);
@@ -263,7 +264,7 @@ public class Field {
         int y;
 
         switch (slideDirection) {
-            case EAST:
+            case SIDEWAYS:
                 //Create a new array
                 System.arraycopy(tiles[rowIndex], 0, tempRow, 0, tileCount);
 
@@ -284,7 +285,7 @@ public class Field {
                 fillerTiles[rowIndex].setPosY(rowIndex);
                 fillerTiles[rowIndex].updateIndices();
                 break;
-            case NORTH_EAST:
+            case ANTI_DIAGONAL:
                 if (rowIndex < 4) {
                     y = startY = 6 - rowIndex * 2;
                     x = startX = 0;
@@ -329,7 +330,7 @@ public class Field {
                 fillerTiles[fillerIndex].updateIndices();
 
                 break;
-            case NORTH_WEST:
+            case MAIN_DIAGONAL:
                 if (rowIndex < 4) {
                     y = startY = 0;
                     x = startX = 1 + rowIndex * 2;
@@ -383,8 +384,8 @@ public class Field {
      * @param rowIndex       the index of the row
      * @return the number of tiles
      */
-    public static int getRowTileCount(SlideDirection slideDirection, int rowIndex) {
-        return slideDirection == SlideDirection.EAST ? 9 :
+    public static int getRowTileCount(com.tlongdev.hexle.model.enumration.SlideDirection slideDirection, int rowIndex) {
+        return slideDirection == com.tlongdev.hexle.model.enumration.SlideDirection.SIDEWAYS ? 9 :
                 3 + Math.min(rowIndex, 7 - rowIndex) * 4;
     }
 
@@ -395,11 +396,11 @@ public class Field {
      * @param rowIndex       the index of the row
      * @return the index of the filler
      */
-    public static int getFillerIndex(SlideDirection slideDirection, int rowIndex) {
+    public static int getFillerIndex(com.tlongdev.hexle.model.enumration.SlideDirection slideDirection, int rowIndex) {
         switch (slideDirection) {
-            case EAST:
+            case SIDEWAYS:
                 return rowIndex;
-            case NORTH_EAST:
+            case ANTI_DIAGONAL:
                 if (rowIndex < 4) {
                     return 6 - 2 * rowIndex;
                 } else {
@@ -420,7 +421,7 @@ public class Field {
         }
     }
 
-    private void slideIn(SlideDirection slideDirection, int rowIndex) {
+    private void slideIn(com.tlongdev.hexle.model.enumration.SlideDirection slideDirection, int rowIndex) {
         //Number of tiles in the row
         int tileCount = getRowTileCount(orientation, rowIndex);
 
@@ -439,7 +440,7 @@ public class Field {
         int y;
 
         switch (slideDirection) {
-            case EAST:
+            case SIDEWAYS:
                 //Create a new array
                 System.arraycopy(tiles[rowIndex], 0, tempRow, 0, tileCount);
 
@@ -460,7 +461,7 @@ public class Field {
                 fillerTiles[rowIndex].setPosY(rowIndex);
                 fillerTiles[rowIndex].updateIndices();
                 break;
-            case NORTH_EAST:
+            case ANTI_DIAGONAL:
                 if (rowIndex < 4) {
                     y = startY = 6 - rowIndex * 2;
                     x = startX = 0;
@@ -505,7 +506,7 @@ public class Field {
                 fillerTiles[fillerIndex].updateIndices();
 
                 break;
-            case NORTH_WEST:
+            case MAIN_DIAGONAL:
                 if (rowIndex < 4) {
                     y = startY = 0;
                     x = startX = 1 + rowIndex * 2;

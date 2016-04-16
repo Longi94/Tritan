@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Logger;
 import com.tlongdev.hexle.Config;
 import com.tlongdev.hexle.animation.Vector2Accessor;
 import com.tlongdev.hexle.model.Field;
-import com.tlongdev.hexle.model.SlideDirection;
+import com.tlongdev.hexle.model.enumration.SlideDirection;
 import com.tlongdev.hexle.shape.Rectangle;
 import com.tlongdev.hexle.shape.Triangle;
 
@@ -122,7 +122,7 @@ public class FieldView implements BaseView {
         float rightFillerPosY;
 
         switch (slideDirection) {
-            case EAST:
+            case SIDEWAYS:
                 //Calculate the X coordinates of the fillers
                 leftFillerPosX = 0 + slideVector.x;
                 rightFillerPosX = screenWidth + slideVector.x;
@@ -130,7 +130,7 @@ public class FieldView implements BaseView {
                 //The Y coordinates since they are in the same row
                 rightFillerPosY = leftFillerPosY = offsetY + fillerIndex * tileHeight;
                 break;
-            case NORTH_EAST:
+            case ANTI_DIAGONAL:
                 if (rowIndex < 4) {
                     leftFillerPosX = 0 + slideVector.x;
                     rightFillerPosX = tileWidth * (rowIndex + 1) + slideVector.x;
@@ -304,12 +304,12 @@ public class FieldView implements BaseView {
 
         //Calculate the direction if the slide vector and the number of tiles in the sliding row
         switch (slideDirection) {
-            case EAST:
+            case SIDEWAYS:
                 slideVector.setAngleRad(0);
                 rowWidth = tileWidth * 5.0f;
                 rowIndex = selectedTile.getTile().getPosY();
                 break;
-            case NORTH_EAST:
+            case ANTI_DIAGONAL:
                 rowIndex = selectedTile.getTile().getRightDiagonalIndex();
                 slideVector.setAngleRad(MathUtils.PI / 3.0f);
                 rowWidth = (1 + Math.min(rowIndex, 7 - rowIndex)) * 2.0f * tileWidth;

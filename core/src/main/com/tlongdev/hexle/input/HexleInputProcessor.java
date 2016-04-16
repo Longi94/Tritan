@@ -4,9 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Logger;
 import com.tlongdev.hexle.Config;
-import com.tlongdev.hexle.model.SlideDirection;
+import com.tlongdev.hexle.model.enumration.Orientation;
+import com.tlongdev.hexle.model.enumration.SlideDirection;
 
 /**
  * Input processor for the standard game.
@@ -35,8 +37,17 @@ public class HexleInputProcessor implements InputProcessor {
 
     private int fingerCount = 0;
 
+    //Accelerometer data
+    private float accelX;
+    private float accelY;
+    private float accelZ;
+    private int orientation;
+
+    private Vector3 g;
+
     public HexleInputProcessor() {
         logger = new Logger(TAG, Logger.DEBUG);
+        g = new Vector3();
     }
 
     @Override
@@ -121,14 +132,14 @@ public class HexleInputProcessor implements InputProcessor {
                 if (angle >= -MathUtils.PI / 6.0f && angle < MathUtils.PI / 6.0f ||
                         angle >= 5.0f * MathUtils.PI / 6.0f || angle < -5.0f * MathUtils.PI / 6.0f) {
                     //User dragged left/right
-                    direction = SlideDirection.EAST;
+                    direction = SlideDirection.SIDEWAYS;
                 } else if (angle >= MathUtils.PI / 6.0f && angle < MathUtils.PI / 2.0f ||
                         opposite >= MathUtils.PI / 6.0f && opposite < MathUtils.PI / 2.0f) {
                     //User dragged NE or SW
-                    direction = SlideDirection.NORTH_EAST;
+                    direction = SlideDirection.ANTI_DIAGONAL;
                 } else {
                     //User dragged NW or SE
-                    direction = SlideDirection.NORTH_WEST;
+                    direction = SlideDirection.MAIN_DIAGONAL;
                 }
                 logger.info(direction.toString() + ":" + dst);
             }
@@ -136,13 +147,13 @@ public class HexleInputProcessor implements InputProcessor {
             //Vector parallel to the slide direction
             Vector2 projectionBase = new Vector2(1, 0);
             switch (direction) {
-                case EAST:
+                case SIDEWAYS:
                     projectionBase.setAngleRad(0);
                     break;
-                case NORTH_EAST:
+                case ANTI_DIAGONAL:
                     projectionBase.setAngleRad(MathUtils.PI / 3.0f);
                     break;
-                case NORTH_WEST:
+                case MAIN_DIAGONAL:
                     projectionBase.setAngleRad(2.0f * MathUtils.PI / 3.0f);
                     break;
             }
@@ -174,11 +185,30 @@ public class HexleInputProcessor implements InputProcessor {
         this.listener = listener;
     }
 
+    public float[] updateAccelerometer() {
+        accelX = Gdx.input.getAccelerometerX();
+        accelY = Gdx.input.getAccelerometerY();
+        accelZ = Gdx.input.getAccelerometerZ();
+        orientation = Gdx.input.getRotation();
+
+        g.set(-accelX, accelY, accelZ);
+        g.nor();
+
+        float inclination = (float) Math.acos(g.z);
+
+        float rotation = MathUtils.atan2(g.y, g.x);
+
+        // TODO: 2016.04.16. return to draw for now
+        return new float[]{rotation, inclination};
+    }
+
     public interface HexleInputListener {
         void touchDown(int x, int y);
 
         void touchUp(int x, int y);
 
         void touchDragged(SlideDirection direction, float dst);
+
+        void onOrientationChanged(Orientation orientation);
     }
 }

@@ -8,7 +8,7 @@ import com.tlongdev.hexle.controller.GameController;
 import com.tlongdev.hexle.factory.TileFactory;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.GameModel;
-import com.tlongdev.hexle.model.SlideDirection;
+import com.tlongdev.hexle.model.enumration.SlideDirection;
 import com.tlongdev.hexle.renderer.GameRenderer;
 import com.tlongdev.hexle.view.FieldView;
 import com.tlongdev.hexle.view.TileView;
