@@ -659,4 +659,52 @@ public class MinimizeGapsTest {
             assertNull(result4[result4.length - i - 1]);
         }
     }
+
+    @Test
+    public void testOneRemainingEnd() throws Exception {
+        //Insert blanks
+        for (int i = 0; i < 15; i++) {
+            if (i < result1.length - 1) {
+                result1[i] = factory.getBlank(0, 0);
+            }
+            if (i < result2.length - 1) {
+                result2[i] = factory.getBlank(0, 0);
+            }
+            if (i < result3.length - 1) {
+                result3[i] = factory.getBlank(0, 0);
+            }
+            result4[i] = factory.getBlank(0, 0);
+        }
+
+        //The operation
+        Field.minimizeGaps(result1);
+        Field.minimizeGaps(result2);
+        Field.minimizeGaps(result3);
+        Field.minimizeGaps(result4);
+
+        assertTrue(result1[0].isBlank());
+        assertTrue(result2[0].isBlank());
+        assertTrue(result3[0].isBlank());
+        assertTrue(result4[0].isBlank());
+
+        assertFalse(result1[1].isBlank());
+        assertFalse(result2[1].isBlank());
+        assertFalse(result3[1].isBlank());
+        assertFalse(result4[1].isBlank());
+
+
+        //Insert blanks
+        for (int i = 2; i < 16; i++) {
+            if (i < result1.length) {
+                assertNull(result1[i]);
+            }
+            if (i < result2.length) {
+                assertNull(result2[i]);
+            }
+            if (i < result3.length) {
+                assertNull(result3[i]);
+            }
+            assertNull(result4[i]);
+        }
+    }
 }

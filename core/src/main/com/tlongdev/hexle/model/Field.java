@@ -559,6 +559,9 @@ public class Field {
      * @param tiles the row tho reduce
      */
     public static void minimizeGaps(Tile[] tiles) {
+
+        Tile[] backup = tiles.clone();
+
         boolean hasBlank = false;
 
         int t = 0;
@@ -617,9 +620,17 @@ public class Field {
             }
         }
 
-        //Nullify the end of the row
-        for (int i = 1; i <= totalShifts; i++) {
-            tiles[tiles.length - i] = null;
+        try {
+            //Nullify the end of the row
+            for (int i = 1; i <= totalShifts; i++) {
+                tiles[tiles.length - i] = null;
+            }
+        } catch (Exception e) {
+            String s = "";
+            for (Tile tile : backup) {
+                s += tile.toString();
+            }
+            throw new RuntimeException(s, e);
         }
     }
 
