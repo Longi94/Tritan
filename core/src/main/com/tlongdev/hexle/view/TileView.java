@@ -32,11 +32,8 @@ public class TileView implements BaseView {
 
     @Override
     public void render(ShapeRenderer shapeRenderer) {
-        //Don't render anything if it's a blank
-        if (tile.isBlank()) {
-            return;
-        }
 
+        //Still needs to update position, even if it's blank
         switch (tile.getOrientation()) {
             case UP:
                 //Triangle faces up /\
@@ -62,26 +59,33 @@ public class TileView implements BaseView {
                 break;
         }
 
+        //Don't render anything if it's a blank
+        if (tile.isBlank()) {
+            return;
+        }
+
         //Set the color
-        switch (tile.getTileColor()) {
-            case RED:
-                triangle.setColor(Color.RED);
-                break;
-            case GREEN:
-                triangle.setColor(Color.GREEN);
-                break;
-            case BLUE:
-                triangle.setColor(Color.BLUE);
-                break;
-            case CYAN:
-                triangle.setColor(Color.CYAN);
-                break;
-            case MAGENTA:
-                triangle.setColor(Color.MAGENTA);
-                break;
-            case YELLOW:
-                triangle.setColor(Color.YELLOW);
-                break;
+        if (tile.getTileColor() != null) {
+            switch (tile.getTileColor()) {
+                case RED:
+                    triangle.setColor(Color.RED);
+                    break;
+                case GREEN:
+                    triangle.setColor(Color.GREEN);
+                    break;
+                case BLUE:
+                    triangle.setColor(Color.BLUE);
+                    break;
+                case CYAN:
+                    triangle.setColor(Color.CYAN);
+                    break;
+                case MAGENTA:
+                    triangle.setColor(Color.MAGENTA);
+                    break;
+                case YELLOW:
+                    triangle.setColor(Color.YELLOW);
+                    break;
+            }
         }
 
         triangle.render(shapeRenderer);
