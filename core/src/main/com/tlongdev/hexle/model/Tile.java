@@ -164,4 +164,10 @@ public class Tile {
     public enum TileOrientation {
         UP, DOWN
     }
+
+    @Override
+    public String toString() {
+        // TODO: 2016.04.19. remove me
+        return "N";
+    }
 }

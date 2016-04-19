@@ -564,12 +564,11 @@ public class Field {
 
         boolean hasBlank = false;
 
-        int t = 0;
-        while (!hasBlank && t < tiles.length) {
-            if (tiles[t].isBlank()) {
+        for (Tile tile : tiles) {
+            if (tile.isBlank()) {
                 hasBlank = true;
+                break;
             }
-            t++;
         }
 
         //Do nothing if the row has no gaps
@@ -577,45 +576,41 @@ public class Field {
             return;
         }
 
+        //This will contain the total number null tiles at the end of the array
         int totalShifts = 0;
-        for (int i = 0; i < tiles.length; i++) {
+
+        //This will be reduced by the amount of nulls so we don't unnecessarily iterate to those
+        int remainingLength = tiles.length;
+        for (int i = 0; i < remainingLength; i++) {
 
             //Find a gap
             if (tiles[i].isBlank()) {
                 int blankCount = 0;
 
                 //Count the number of blanks and nulls
-                for (int j = i; j < tiles.length && tiles[j].isBlank(); j++) {
+                for (int j = i; j < remainingLength && tiles[j].isBlank(); j++) {
                     blankCount++;
                 }
 
-                if (i + blankCount == tiles.length) {
-                    i = tiles.length;
+                //Holes with the size of 1 cannote be filled
+                if (blankCount == 1) {
+                    continue;
+                }
 
-                    //If the number of blank tiles is odd, on tile must be left blank
-                    if (blankCount % 2 == 1) {
-                        blankCount--;
-                    }
+                //If the number of blank tiles is odd, on tile must be left blank
+                if (blankCount % 2 == 1) {
+                    blankCount--;
+                    i++;
+                }
 
-                    totalShifts += blankCount;
-                } else {
-                    //Holes with a length of 1 cannot be filled
-                    if (blankCount != 1) {
+                remainingLength -= blankCount;
+                totalShifts += blankCount;
 
-                        //If the number of blank tiles is odd, on tile must be left blank
-                        if (blankCount % 2 == 1) {
-                            blankCount--;
-                            i++;
-                        }
+                //Shift the tiles down, so there is only 1 or 0 blank tiles left in the current gap
+                System.arraycopy(tiles, i + blankCount, tiles, i, remainingLength - i);
 
-                        //Shift the tiles down, so there is only 1 or 0 blank tiles left in the current gap
-                        System.arraycopy(tiles, i + blankCount, tiles, i, tiles.length - (i + blankCount));
-                        totalShifts += blankCount;
-
-                        for (int j = i; j < tiles.length - blankCount; j++) {
-                            tiles[j].addSlideInOffset(blankCount);
-                        }
-                    }
+                for (int j = i; j < remainingLength; j++) {
+                    tiles[j].addSlideInOffset(blankCount);
                 }
             }
         }

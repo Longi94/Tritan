@@ -19,4 +19,10 @@ public class BlankTile extends Tile {
         tile.updateIndices();
         return tile;
     }
+
+    @Override
+    public String toString() {
+        // TODO: 2016.04.19. remove me
+        return "B";
+    }
 }
