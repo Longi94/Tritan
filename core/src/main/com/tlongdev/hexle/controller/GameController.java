@@ -24,4 +24,6 @@ public interface GameController {
      * Called after sliding in new tiles finishes
      */
     void notifySlideInAnimationFinish();
+
+    void notifyOrientationChanged(boolean animating);
 }

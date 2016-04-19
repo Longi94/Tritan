@@ -136,7 +136,15 @@ public class GameControllerImpl implements GameController {
             }
 
             model.getField().generateNewTiles();
+            renderer.notifyNewTilesGenerated();
+        }
+    }
 
+    @Override
+    public void notifyOrientationChanged(boolean animating) {
+        if (!animating) {
+            // TODO: 2016.04.19. this is called way too often
+            model.getField().generateNewTiles();
             renderer.notifyNewTilesGenerated();
         }
     }

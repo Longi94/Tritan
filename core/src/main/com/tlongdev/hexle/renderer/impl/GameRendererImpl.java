@@ -171,8 +171,10 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
 
     @Override
     public void onOrientationChanged(Orientation orientation) {
+        logger.info("onOrientationChanged");
         model.getField().setOrientation(orientation);
         fieldView.setOrientation(orientation);
+        controller.notifyOrientationChanged(animating);
     }
 
     @Override
