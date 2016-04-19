@@ -1,5 +1,7 @@
 package com.tlongdev.hexle.util;
 
+import org.jetbrains.annotations.Contract;
+
 /**
  * @author longi
  * @since 2016.04.14.
@@ -37,7 +39,17 @@ public class Util {
      * @param b b in a mod b
      * @return the modulo
      */
+    @Contract(pure = true)
     public static int modulo(int a, int b) {
         return (a % b + b) % b;
+    }
+
+    public static <T> void reversArrayExceptLast(T[] array) {
+        for(int i = 0; i < (array.length - 1) / 2; i++)
+        {
+            T temp = array[i];
+            array[i] = array[array.length - i - 2];
+            array[array.length - i - 2] = temp;
+        }
     }
 }
