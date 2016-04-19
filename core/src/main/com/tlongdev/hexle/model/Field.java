@@ -66,6 +66,7 @@ public class Field {
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 Tile tile = tileFactory.get(j, i);
+                tiles[i][j] = tile;
 
                 colors.clear();
                 Collections.addAll(colors, TileColor.values());
@@ -76,9 +77,7 @@ public class Field {
                     tile.setTileColor(colors.get(randomColor));
                     colors.remove(randomColor);
 
-                } while (checkTile(null, tile, 0, true) || getSameColorNeighbors(tile) > 1);
-
-                tiles[i][j] = tile;
+                } while (checkField(false));
             }
 
             //Randomize filler tiles
@@ -96,12 +95,13 @@ public class Field {
      * Check if a field hs groups
      *
      * @return whether the field has groups
+     * @param markIfTrue only mark tiles if set to true
      */
-    public boolean checkField() {
+    public boolean checkField(boolean markIfTrue) {
         boolean result = false;
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                if (checkTile(null, tiles[i][j], 0, false)) {
+                if (tiles[i][j] != null && checkTile(tiles[i][j], markIfTrue)) {
                     result = true;
                 }
             }
@@ -110,30 +110,12 @@ public class Field {
     }
 
     /**
-     * Get the number of neighboring tiles that have the same color of the given tile.
+     * Get the neighboring tiles that have the same color of the given tile.
      *
      * @param tile the tile
      * @return numbah
      */
-    private int getSameColorNeighbors(Tile tile) {
-        int count = 0;
-
-        for (Tile neighbor : getNeighbors(tile)) {
-            if (neighbor.getTileColor() == tile.getTileColor()) {
-                count++;
-            }
-        }
-
-        return count;
-    }
-
-    /**
-     * Get the neighbors of the tile. Will not include null values.
-     *
-     * @param tile the tile
-     * @return the neighbors
-     */
-    private List<Tile> getNeighbors(Tile tile) {
+    private List<Tile> getSameColorNeighbors(Tile tile) {
         List<Tile> neighbors = new ArrayList<Tile>();
 
         //Get the neighbors of the current tile
@@ -163,15 +145,15 @@ public class Field {
             }
         }
 
-        if (neighbor1 != null) {
+        if (neighbor1 != null && tile.getTileColor() == neighbor1.getTileColor()) {
             neighbors.add(neighbor1);
         }
 
-        if (neighbor2 != null) {
+        if (neighbor2 != null && tile.getTileColor() == neighbor2.getTileColor()) {
             neighbors.add(neighbor2);
         }
 
-        if (neighbor3 != null) {
+        if (neighbor3 != null && tile.getTileColor() == neighbor3.getTileColor()) {
             neighbors.add(neighbor3);
         }
 
@@ -179,47 +161,32 @@ public class Field {
     }
 
     /**
-     * Check if there are 3 or more tiles of the same color together.
+     * Check if the tile has 2 ore more tiles of the same color
      *
-     * @param source  the tile the call came from
-     * @param current the current tile
-     * @param depth   recursion depth
-     * @param init    if true, it won't go deeper than 3
+     * @param tile       the current tile
+     * @param markIfTrue only mark tiles if set to true
      * @return if there is a group
      */
-    private boolean checkTile(Tile source, Tile current, int depth, boolean init) {
+    private boolean checkTile(Tile tile, boolean markIfTrue) {
         //Blanco
-        if (current.isBlank()) {
+        if (tile.isBlank()) {
             return false;
         }
 
-        //Don't even bother, they are not the same color
-        if (source != null && source.getTileColor() != current.getTileColor()) {
-            return false;
-        }
+        //The same color neighbors
+        List<Tile> colorNeighbors = getSameColorNeighbors(tile);
 
-        //If we reached a depth of  return true;
-        boolean result = depth >= 2;
+        if (tile.isMarked() || colorNeighbors.size() >= 2) {
+            if (markIfTrue) {
+                tile.setMarked(true);
 
-        //init: check when randomizing the field
-        if (init && result) {
-            return true;
-        }
-
-        //Recursively check the neighbors
-        for (Tile neighbor : getNeighbors(current)) {
-            if (source == null || neighbor != source) {
-                if (checkTile(current, neighbor, depth + 1, init)) {
-                    result = true;
+                for (Tile neighbor : colorNeighbors) {
+                    neighbor.setMarked(true);
                 }
             }
+            return true;
         }
-
-        if (result && !init) {
-            current.setMarked(true);
-        }
-
-        return result;
+        return false;
     }
 
     /**

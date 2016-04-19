@@ -83,7 +83,7 @@ public class GameControllerImpl implements GameController {
         int rowIndex = selected.getTile().getRowIndex(slideDirection);
         tempField.shift(slideDirection, steps * 2, rowIndex);
 
-        if (tempField.checkField()) {
+        if (tempField.checkField(true)) {
 
             //The is the offset vector that will make the tile animate into its new place
             Vector2 offset = selected.getCenter().cpy().sub(selected.getOriginCenter());
@@ -126,7 +126,7 @@ public class GameControllerImpl implements GameController {
 
         Field field = model.getField();
 
-        if (field.checkField()) {
+        if (field.checkField(true)) {
             for (int i = 0; i < Config.FIELD_ROWS; i++) {
                 for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
                     if (field.getTiles()[i][j].isMarked()) {
