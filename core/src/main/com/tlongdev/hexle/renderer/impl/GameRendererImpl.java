@@ -14,8 +14,8 @@ import com.tlongdev.hexle.input.HexleInputProcessor;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.GameModel;
 import com.tlongdev.hexle.model.Tile;
-import com.tlongdev.hexle.model.enumration.Orientation;
-import com.tlongdev.hexle.model.enumration.SlideDirection;
+import com.tlongdev.hexle.model.enumeration.Orientation;
+import com.tlongdev.hexle.model.enumeration.SlideDirection;
 import com.tlongdev.hexle.renderer.GameRenderer;
 import com.tlongdev.hexle.view.FieldView;
 import com.tlongdev.hexle.view.TileView;
@@ -171,7 +171,8 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
 
     @Override
     public void onOrientationChanged(Orientation orientation) {
-
+        model.getField().setOrientation(orientation);
+        fieldView.setOrientation(orientation);
     }
 
     @Override

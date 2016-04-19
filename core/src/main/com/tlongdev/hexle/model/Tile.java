@@ -1,6 +1,7 @@
 package com.tlongdev.hexle.model;
 
-import com.tlongdev.hexle.model.enumration.TileColor;
+import com.tlongdev.hexle.model.enumeration.SlideDirection;
+import com.tlongdev.hexle.model.enumeration.TileColor;
 
 /**
  * A single tile.
@@ -21,7 +22,7 @@ public class Tile {
     private int leftDiagonalIndex;
     private int rightDiagonalIndex;
 
-    private com.tlongdev.hexle.model.enumration.TileColor tileColor;
+    private TileColor tileColor;
 
     private TileOrientation orientation;
 
@@ -45,7 +46,7 @@ public class Tile {
         this.posY = posY;
     }
 
-    public com.tlongdev.hexle.model.enumration.TileColor getTileColor() {
+    public TileColor getTileColor() {
         return tileColor;
     }
 
@@ -73,7 +74,7 @@ public class Tile {
         return rightDiagonalIndex;
     }
 
-    public boolean isAffectedBySlide(Tile selectedTile, com.tlongdev.hexle.model.enumration.SlideDirection slideDirection) {
+    public boolean isAffectedBySlide(Tile selectedTile, SlideDirection slideDirection) {
         if (selectedTile == null || slideDirection == null) {
             return false;
         }
@@ -137,7 +138,7 @@ public class Tile {
         return tile;
     }
 
-    public int getRowIndex(com.tlongdev.hexle.model.enumration.SlideDirection slideDirection) {
+    public int getRowIndex(SlideDirection slideDirection) {
         switch (slideDirection) {
             case SIDEWAYS:
                 return horizontalRowIndex;

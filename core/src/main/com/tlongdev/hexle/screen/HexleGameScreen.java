@@ -88,10 +88,11 @@ public class HexleGameScreen implements Screen {
     @Override
     public void render(float delta) {
 
+        float[] values = inputProcessor.updateAccelerometer();
+
         // TODO: 2016.04.16. Remove accel data drawing
         if (lastTextUpdate < System.currentTimeMillis() - TEXT_UPDATE_FREQUENCY) {
             lastTextUpdate = System.currentTimeMillis();
-            float[] values = inputProcessor.updateAccelerometer();
             rad = values[0];
             inclination = values[1];
             accelX = Gdx.input.getAccelerometerX();

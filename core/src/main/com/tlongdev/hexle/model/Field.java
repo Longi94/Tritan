@@ -3,8 +3,9 @@ package com.tlongdev.hexle.model;
 import com.tlongdev.hexle.Consts;
 import com.tlongdev.hexle.factory.TileFactory;
 import com.tlongdev.hexle.model.Tile.TileOrientation;
-import com.tlongdev.hexle.model.enumration.SlideDirection;
-import com.tlongdev.hexle.model.enumration.TileColor;
+import com.tlongdev.hexle.model.enumeration.Orientation;
+import com.tlongdev.hexle.model.enumeration.SlideDirection;
+import com.tlongdev.hexle.model.enumeration.TileColor;
 import com.tlongdev.hexle.util.Util;
 
 import org.jetbrains.annotations.Contract;
@@ -29,7 +30,7 @@ public class Field {
 
     private int height;
 
-    private SlideDirection orientation = SlideDirection.ANTI_DIAGONAL;
+    private Orientation orientation;
 
     private Tile[][] tiles;
 
@@ -48,11 +49,11 @@ public class Field {
         tileFactory = new TileFactory();
     }
 
-    public SlideDirection getOrientation() {
+    public Orientation getOrientation() {
         return orientation;
     }
 
-    public void setOrientation(SlideDirection orientation) {
+    public void setOrientation(Orientation orientation) {
         this.orientation = orientation;
     }
 
@@ -267,7 +268,7 @@ public class Field {
 
     public void generateNewTiles() {
         for (int i = 0; i < 8; i++) {
-            slideIn(orientation, i);
+            slideIn(SlideDirection.ANTI_DIAGONAL, i);
         }
     }
 

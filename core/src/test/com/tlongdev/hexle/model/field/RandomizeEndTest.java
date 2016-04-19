@@ -3,7 +3,7 @@ package com.tlongdev.hexle.model.field;
 import com.tlongdev.hexle.factory.TileFactory;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.Tile;
-import com.tlongdev.hexle.model.enumration.TileColor;
+import com.tlongdev.hexle.model.enumeration.TileColor;
 
 import org.junit.Before;
 import org.junit.Test;

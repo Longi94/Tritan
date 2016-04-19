@@ -22,6 +22,7 @@ public class Util {
             return array;
         }
 
+        // TODO: 2016.04.19. Don't create new array?
         T[] newArray = array.clone();
         for (int i = 0; i < array.length; i++) {
             newArray[modulo((i + n), newArray.length)] = array[i];
@@ -45,8 +46,7 @@ public class Util {
     }
 
     public static <T> void reversArrayExceptLast(T[] array) {
-        for(int i = 0; i < (array.length - 1) / 2; i++)
-        {
+        for (int i = 0; i < (array.length - 1) / 2; i++) {
             T temp = array[i];
             array[i] = array[array.length - i - 2];
             array[array.length - i - 2] = temp;

@@ -7,8 +7,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Logger;
 import com.tlongdev.hexle.Consts;
-import com.tlongdev.hexle.model.enumration.Orientation;
-import com.tlongdev.hexle.model.enumration.SlideDirection;
+import com.tlongdev.hexle.model.enumeration.Orientation;
+import com.tlongdev.hexle.model.enumeration.SlideDirection;
 
 /**
  * Input processor for the standard game.
@@ -41,13 +41,16 @@ public class HexleInputProcessor implements InputProcessor {
     private float accelX;
     private float accelY;
     private float accelZ;
-    private int orientation;
+    private int deviceOrientation;
 
     private Vector3 g;
+
+    private Orientation orientation;
 
     public HexleInputProcessor() {
         logger = new Logger(TAG, Logger.DEBUG);
         g = new Vector3();
+        orientation = Orientation.NONE;
     }
 
     @Override
@@ -189,14 +192,42 @@ public class HexleInputProcessor implements InputProcessor {
         accelX = Gdx.input.getAccelerometerX();
         accelY = Gdx.input.getAccelerometerY();
         accelZ = Gdx.input.getAccelerometerZ();
-        orientation = Gdx.input.getRotation();
+        deviceOrientation = Gdx.input.getRotation();
 
-        g.set(-accelX, accelY, accelZ);
+        g.set(accelX, accelY, accelZ);
         g.nor();
 
         float inclination = (float) Math.acos(g.z);
 
         float rotation = MathUtils.atan2(g.y, g.x);
+
+        Orientation currentOrientation;
+
+        // TODO: 2016.04.19. Add epsilon to avoid thrashing
+        if (inclination < Consts.INCLINATION_LIMIT) {
+            currentOrientation = Orientation.NONE;
+        } else if (rotation < -5.0f * MathUtils.PI / 6.0f || rotation >= 5.0f * MathUtils.PI / 6.0f) {
+            currentOrientation = Orientation.WEST;
+        } else if (rotation < -3.0f * MathUtils.PI / 6.0f) {
+            currentOrientation = Orientation.SOUTH_WEST;
+        } else if (rotation < -1.0f * MathUtils.PI / 6.0f) {
+            currentOrientation = Orientation.SOUTH_EAST;
+        } else if (rotation < MathUtils.PI / 6.0f) {
+            currentOrientation = Orientation.EAST;
+        } else if (rotation < 3.0f * MathUtils.PI / 6.0f) {
+            currentOrientation = Orientation.NORTH_EAST;
+        } else {
+            currentOrientation = Orientation.NORTH_WEST;
+        }
+
+        if (orientation != currentOrientation) {
+            logger.info(currentOrientation.toString());
+            orientation = currentOrientation;
+
+            if (listener != null) {
+                listener.onOrientationChanged(orientation);
+            }
+        }
 
         // TODO: 2016.04.16. return to draw for now
         return new float[]{rotation, inclination};

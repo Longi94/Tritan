@@ -8,7 +8,8 @@ import com.badlogic.gdx.utils.Logger;
 import com.tlongdev.hexle.Consts;
 import com.tlongdev.hexle.animation.Vector2Accessor;
 import com.tlongdev.hexle.model.Field;
-import com.tlongdev.hexle.model.enumration.SlideDirection;
+import com.tlongdev.hexle.model.enumeration.Orientation;
+import com.tlongdev.hexle.model.enumeration.SlideDirection;
 import com.tlongdev.hexle.shape.Rectangle;
 import com.tlongdev.hexle.shape.Triangle;
 
@@ -57,7 +58,8 @@ public class FieldView implements BaseView {
 
     //Animation stuff
     private TweenManager manager;
-    private int animatingTiles = 0;
+
+    private OrientationIndicator orientationIndicator;
 
     public FieldView(TweenManager manager) {
         this.manager = manager;
@@ -77,6 +79,12 @@ public class FieldView implements BaseView {
             }
             fillerTileViews[i] = new TileView();
         }
+
+        orientationIndicator = new OrientationIndicator();
+        orientationIndicator.setCenter(
+                50.0f, 50.0f
+        );
+        orientationIndicator.setRadius(50.0f);
     }
 
     @Override
@@ -103,6 +111,7 @@ public class FieldView implements BaseView {
         //Render fillers
         renderFillers(shapeRenderer);
         renderBorders(shapeRenderer);
+        renderOrientationIndicator(shapeRenderer);
     }
 
     /**
@@ -236,6 +245,10 @@ public class FieldView implements BaseView {
             triangle.setC(screenWidth, rectangleHeight + 2.0f * i * tileHeight - tileHeight);
             triangle.render(shapeRenderer);
         }
+    }
+
+    private void renderOrientationIndicator(ShapeRenderer shapeRenderer) {
+        orientationIndicator.render(shapeRenderer);
     }
 
     public void setDimensions(int width, int height) {
@@ -442,6 +455,10 @@ public class FieldView implements BaseView {
 
     public void setAnimating(boolean animating) {
         this.animating = animating;
+    }
+
+    public void setOrientation(Orientation orientation) {
+        orientationIndicator.setOrientation(orientation);
     }
 
     public interface OnAnimationListener {

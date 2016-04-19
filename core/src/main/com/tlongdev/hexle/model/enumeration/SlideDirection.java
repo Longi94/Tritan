@@ -1,4 +1,4 @@
-package com.tlongdev.hexle.model.enumration;
+package com.tlongdev.hexle.model.enumeration;
 
 /**
  * @author longi
