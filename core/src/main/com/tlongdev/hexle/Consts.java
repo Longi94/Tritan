@@ -4,7 +4,7 @@ package com.tlongdev.hexle;
  * @author longi
  * @since 2016.04.14.
  */
-public class Config {
+public class Consts {
 
     public static final int FIELD_ROWS = 8;
     public static final int FIELD_COLUMNS = 9;
@@ -17,4 +17,6 @@ public class Config {
      * The minimum distance in pixels needed for the drag to trigger.
      */
     public static final float MIN_DRAG_DISTANCE = 10.0f;
+
+    public static final float MAGIC_SLIDE_CONSTANT = 35.0f;
 }

@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
-import com.tlongdev.hexle.Config;
+import com.tlongdev.hexle.Consts;
 import com.tlongdev.hexle.animation.Vector2Accessor;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.enumration.SlideDirection;
@@ -68,11 +68,11 @@ public class FieldView implements BaseView {
         slideVector = new Vector2();
         logger = new Logger(TAG, Logger.DEBUG);
 
-        tileViews = new TileView[Config.FIELD_ROWS][Config.FIELD_COLUMNS];
-        fillerTileViews = new TileView[Config.FIELD_COLUMNS];
+        tileViews = new TileView[Consts.FIELD_ROWS][Consts.FIELD_COLUMNS];
+        fillerTileViews = new TileView[Consts.FIELD_COLUMNS];
 
-        for (int i = 0; i < Config.FIELD_ROWS; i++) {
-            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
+        for (int i = 0; i < Consts.FIELD_ROWS; i++) {
+            for (int j = 0; j < Consts.FIELD_COLUMNS; j++) {
                 tileViews[i][j] = new TileView();
             }
             fillerTileViews[i] = new TileView();
@@ -82,8 +82,8 @@ public class FieldView implements BaseView {
     @Override
     public void render(ShapeRenderer shapeRenderer) {
         //Iterate through the tiles
-        for (int i = 0; i < Config.FIELD_ROWS; i++) {
-            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
+        for (int i = 0; i < Consts.FIELD_ROWS; i++) {
+            for (int j = 0; j < Consts.FIELD_COLUMNS; j++) {
                 TileView view = tileViews[i][j];
 
                 //If slideDirection is not null the a slide is currently happening
@@ -136,7 +136,7 @@ public class FieldView implements BaseView {
                     rightFillerPosX = tileWidth * (rowIndex + 1) + slideVector.x;
 
                     leftFillerPosY = offsetY + fillerIndex * tileHeight + slideVector.y;
-                    rightFillerPosY = offsetY + Config.FIELD_ROWS * tileHeight + slideVector.y;
+                    rightFillerPosY = offsetY + Consts.FIELD_ROWS * tileHeight + slideVector.y;
                 } else {
                     leftFillerPosX = tileWidth * (rowIndex - 3) + slideVector.x;
                     rightFillerPosX = screenWidth + slideVector.x;
@@ -157,7 +157,7 @@ public class FieldView implements BaseView {
                     rightFillerPosX = screenWidth + slideVector.x;
 
                     rightFillerPosY = offsetY + fillerIndex * tileHeight + slideVector.y;
-                    leftFillerPosY = offsetY + Config.FIELD_ROWS * tileHeight + slideVector.y;
+                    leftFillerPosY = offsetY + Consts.FIELD_ROWS * tileHeight + slideVector.y;
                 }
                 break;
         }
@@ -244,17 +244,17 @@ public class FieldView implements BaseView {
         this.screenHeight = height;
 
         //Get the maximum width the tile can fit in the screen
-        tileWidth = (float) (screenWidth / Math.ceil(Config.FIELD_COLUMNS / 2.0));
+        tileWidth = (float) (screenWidth / Math.ceil(Consts.FIELD_COLUMNS / 2.0));
 
         //Calculate the height from the width (equilateral triangle height from side)
         tileHeight = tileWidth * (float) Math.sqrt(3) / 2.0f;
 
         //Calculate the vertical offset, so the triangles are in the middle of the screen
-        offsetY = (screenHeight - (Config.FIELD_ROWS - 1) * tileHeight) / 2.0f;
+        offsetY = (screenHeight - (Consts.FIELD_ROWS - 1) * tileHeight) / 2.0f;
 
         //Iterate through the tiles
-        for (int i = 0; i < Config.FIELD_ROWS; i++) {
-            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
+        for (int i = 0; i < Consts.FIELD_ROWS; i++) {
+            for (int j = 0; j < Consts.FIELD_COLUMNS; j++) {
                 TileView view = tileViews[i][j];
 
                 //Set the center
@@ -276,8 +276,8 @@ public class FieldView implements BaseView {
         float minDist = screenHeight;
 
         //Find the closest tile and mark it as selected
-        for (int i = 0; i < Config.FIELD_ROWS; i++) {
-            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
+        for (int i = 0; i < Consts.FIELD_ROWS; i++) {
+            for (int j = 0; j < Consts.FIELD_COLUMNS; j++) {
                 float dist = touchDown.dst(tileViews[i][j].getTriangleCenter());
                 if (minDist > dist) {
                     minDist = dist;
@@ -336,7 +336,7 @@ public class FieldView implements BaseView {
         //If the tile is out of it's place animate it back
         if (slideVector.len() > 0) {
             animating = true;
-            Tween.to(slideVector, Vector2Accessor.POS_XY, Config.SLIDE_DURATION)
+            Tween.to(slideVector, Vector2Accessor.POS_XY, Consts.SLIDE_DURATION)
                     .target(0, 0)
                     .ease(Cubic.OUT)
                     .setCallback(new TweenCallback() {
@@ -366,7 +366,7 @@ public class FieldView implements BaseView {
         //If the tile is out of it's place animate it back
         if (slideVector.len() > 0) {
             animating = true;
-            Tween.to(slideVector, Vector2Accessor.POS_XY, Config.SLIDE_DURATION)
+            Tween.to(slideVector, Vector2Accessor.POS_XY, Consts.SLIDE_DURATION)
                     .target(0, 0)
                     .ease(Cubic.OUT)
                     .setCallback(new TweenCallback() {
@@ -429,8 +429,8 @@ public class FieldView implements BaseView {
     }
 
     public void animateNewTileGeneration() {
-        for (int i = 0; i < Config.FIELD_ROWS; i++) {
-            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
+        for (int i = 0; i < Consts.FIELD_ROWS; i++) {
+            for (int j = 0; j < Consts.FIELD_COLUMNS; j++) {
             }
         }
 

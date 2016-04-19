@@ -1,6 +1,6 @@
 package com.tlongdev.hexle.model.impl;
 
-import com.tlongdev.hexle.Config;
+import com.tlongdev.hexle.Consts;
 import com.tlongdev.hexle.model.Field;
 import com.tlongdev.hexle.model.GameModel;
 import com.tlongdev.hexle.renderer.GameRenderer;
@@ -20,7 +20,7 @@ public class GameModelImpl implements GameModel {
     }
 
     private void init() {
-        field = new Field(Config.FIELD_COLUMNS, Config.FIELD_ROWS);
+        field = new Field(Consts.FIELD_COLUMNS, Consts.FIELD_ROWS);
     }
 
     @Override

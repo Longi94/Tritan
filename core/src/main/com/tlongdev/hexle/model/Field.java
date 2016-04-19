@@ -1,6 +1,6 @@
 package com.tlongdev.hexle.model;
 
-import com.tlongdev.hexle.Config;
+import com.tlongdev.hexle.Consts;
 import com.tlongdev.hexle.factory.TileFactory;
 import com.tlongdev.hexle.model.Tile.TileOrientation;
 import com.tlongdev.hexle.model.enumration.SlideDirection;
@@ -498,7 +498,7 @@ public class Field {
                 if (rowIndex < 4) {
                     return 1 + rowIndex * 2;
                 } else {
-                    return Config.FIELD_COLUMNS - 1;
+                    return Consts.FIELD_COLUMNS - 1;
                 }
             default:
                 return 0;

@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Logger;
-import com.tlongdev.hexle.Config;
+import com.tlongdev.hexle.Consts;
 import com.tlongdev.hexle.animation.TileViewAccessor;
 import com.tlongdev.hexle.animation.Vector2Accessor;
 import com.tlongdev.hexle.controller.GameController;
@@ -54,8 +54,6 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
 
     private boolean noInput = false;
 
-    private int animatingTiles;
-
     public GameRendererImpl() {
         init();
     }
@@ -102,8 +100,8 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
         logger.info("notifyModelChanged");
         Field field = model.getField();
 
-        for (int i = 0; i < Config.FIELD_ROWS; i++) {
-            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
+        for (int i = 0; i < Consts.FIELD_ROWS; i++) {
+            for (int j = 0; j < Consts.FIELD_COLUMNS; j++) {
                 fieldView.getTileViews()[i][j].setTile(field.getTiles()[i][j]);
             }
             fieldView.getFillerTileViews()[i].setTile(field.getFillerTiles()[i]);
@@ -210,8 +208,8 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
 
         Timeline timeline = Timeline.createParallel();
 
-        for (int i = 0; i < Config.FIELD_ROWS; i++) {
-            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
+        for (int i = 0; i < Consts.FIELD_ROWS; i++) {
+            for (int j = 0; j < Consts.FIELD_COLUMNS; j++) {
                 TileView view = fieldView.getTileViews()[i][j];
                 Tile tile = field.getTiles()[i][j];
                 view.setTile(tile);
@@ -219,15 +217,16 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
                 int offset = tile.getSlideInOffset();
                 tile.resetSlideInOffset();
                 if (offset > 0) {
-
-                    animatingTiles++;
                     fieldView.setAnimating(true);
                     animating = true;
 
                     Vector2 slideInVector = new Vector2(1, 0);
                     slideInVector.setAngleRad(MathUtils.PI / 3.0f);
                     slideInVector.setLength(offset * fieldView.getTileWidth() / 2.0f);
-                    timeline.push(Tween.to(view.getCenter(), Vector2Accessor.POS_XY, 500)
+                    //Magic
+                    float time = (float) Math.sqrt(offset * fieldView.getTileWidth() / 2.0f)
+                            * Consts.MAGIC_SLIDE_CONSTANT;
+                    timeline.push(Tween.to(view.getCenter(), Vector2Accessor.POS_XY, time)
                             .target(view.getCenter().x,
                                     view.getCenter().y)
                             .ease(Quad.IN));

@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Logger;
-import com.tlongdev.hexle.Config;
+import com.tlongdev.hexle.Consts;
 import com.tlongdev.hexle.model.enumration.Orientation;
 import com.tlongdev.hexle.model.enumration.SlideDirection;
 
@@ -126,7 +126,7 @@ public class HexleInputProcessor implements InputProcessor {
             float dst = start.dst(dragged);
 
             //Check if the distance if long enough
-            if (dst > Config.MIN_DRAG_DISTANCE) {
+            if (dst > Consts.MIN_DRAG_DISTANCE) {
 
                 //Magic angles
                 if (angle >= -MathUtils.PI / 6.0f && angle < MathUtils.PI / 6.0f ||

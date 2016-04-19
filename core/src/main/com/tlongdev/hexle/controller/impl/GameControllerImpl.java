@@ -3,7 +3,7 @@ package com.tlongdev.hexle.controller.impl;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
-import com.tlongdev.hexle.Config;
+import com.tlongdev.hexle.Consts;
 import com.tlongdev.hexle.controller.GameController;
 import com.tlongdev.hexle.factory.TileFactory;
 import com.tlongdev.hexle.model.Field;
@@ -54,21 +54,21 @@ public class GameControllerImpl implements GameController {
         float tileWidth = fieldView.getTileWidth();
         TileView selected = fieldView.getSelectedTile();
 
-        if (Math.abs(slideDistance) < tileWidth * (1.0f - Config.SLIDE_THRESHOLD)) {
+        if (Math.abs(slideDistance) < tileWidth * (1.0f - Consts.SLIDE_THRESHOLD)) {
             //Not enough distance
             fieldView.animateNoMatchSlide();
             return;
         }
 
-        if (Math.abs(slideDistance) % tileWidth > tileWidth * Config.SLIDE_THRESHOLD &&
-                Math.abs(slideDistance) % tileWidth < tileWidth * (1.0f - Config.SLIDE_THRESHOLD)) {
+        if (Math.abs(slideDistance) % tileWidth > tileWidth * Consts.SLIDE_THRESHOLD &&
+                Math.abs(slideDistance) % tileWidth < tileWidth * (1.0f - Consts.SLIDE_THRESHOLD)) {
             //Tiles are not close enough to each other
             fieldView.animateNoMatchSlide();
             return;
         }
 
         int steps = (int) (slideDistance / tileWidth);
-        if (Math.abs(slideDistance) % tileWidth > tileWidth * (1.0f - Config.SLIDE_THRESHOLD)) {
+        if (Math.abs(slideDistance) % tileWidth > tileWidth * (1.0f - Consts.SLIDE_THRESHOLD)) {
             if (slideDistance > 0) {
                 steps++;
             } else {
@@ -107,8 +107,8 @@ public class GameControllerImpl implements GameController {
     @Override
     public void notifyShiftAnimationFinish() {
         logger.info("notifyShiftAnimationFinish");
-        for (int i = 0; i < Config.FIELD_ROWS; i++) {
-            for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
+        for (int i = 0; i < Consts.FIELD_ROWS; i++) {
+            for (int j = 0; j < Consts.FIELD_COLUMNS; j++) {
                 if (model.getField().getTiles()[i][j].isMarked()) {
                     model.getField().getTiles()[i][j] = tileFactory.getBlank(j, i);
                 }
@@ -127,8 +127,8 @@ public class GameControllerImpl implements GameController {
         Field field = model.getField();
 
         if (field.checkField(true)) {
-            for (int i = 0; i < Config.FIELD_ROWS; i++) {
-                for (int j = 0; j < Config.FIELD_COLUMNS; j++) {
+            for (int i = 0; i < Consts.FIELD_ROWS; i++) {
+                for (int j = 0; j < Consts.FIELD_COLUMNS; j++) {
                     if (field.getTiles()[i][j].isMarked()) {
                         field.getTiles()[i][j] = tileFactory.getBlank(j, i);
                     }
