@@ -51,10 +51,15 @@ public class RandomizeEndTest {
 
         Field.randomizeEnd(tiles, factory, generator);
 
-        for (Tile tile: tiles) {
+        for (int i = 0; i < tiles.length; i++) {
+            Tile tile = tiles[i];
             assertNotNull(tile);
             assertEquals(TileColor.RED, tile.getTileColor());
-            assertEquals(10, tile.getSlideInOffset());
+            if (i != tiles.length -1) {
+                assertEquals(10, tile.getSlideInOffset());
+            } else{
+                assertEquals(0, tile.getSlideInOffset());
+            }
         }
     }
 
@@ -70,7 +75,11 @@ public class RandomizeEndTest {
             Tile tile = tiles[i];
             assertNotNull(tile);
             assertEquals(TileColor.RED, tile.getTileColor());
-            assertEquals(i > 4 ? 5 : 0, tile.getSlideInOffset());
+            if (i != tiles.length -1) {
+                assertEquals(i > 4 ? 5 : 0, tile.getSlideInOffset());
+            } else{
+                assertEquals(0, tile.getSlideInOffset());
+            }
         }
     }
 
@@ -86,7 +95,11 @@ public class RandomizeEndTest {
             Tile tile = tiles[i];
             assertNotNull(tile);
             assertEquals(TileColor.RED, tile.getTileColor());
-            assertEquals(i > 0 ? 9 : 0, tile.getSlideInOffset());
+            if (i != tiles.length -1) {
+                assertEquals(i > 0 ? 9 : 0, tile.getSlideInOffset());
+            } else{
+                assertEquals(0, tile.getSlideInOffset());
+            }
         }
     }
 
@@ -100,7 +113,11 @@ public class RandomizeEndTest {
             Tile tile = tiles[i];
             assertNotNull(tile);
             assertEquals(TileColor.RED, tile.getTileColor());
-            assertEquals(i == 9 ? 1 : 0, tile.getSlideInOffset());
+            if (i != tiles.length -1) {
+                assertEquals(i == 9 ? 1 : 0, tile.getSlideInOffset());
+            } else{
+                assertEquals(0, tile.getSlideInOffset());
+            }
         }
     }
 
