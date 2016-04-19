@@ -1,9 +1,13 @@
 package com.tlongdev.hexle.model;
 
+import com.tlongdev.hexle.Config;
 import com.tlongdev.hexle.factory.TileFactory;
 import com.tlongdev.hexle.model.Tile.TileOrientation;
+import com.tlongdev.hexle.model.enumration.SlideDirection;
 import com.tlongdev.hexle.model.enumration.TileColor;
 import com.tlongdev.hexle.util.Util;
+
+import org.jetbrains.annotations.Contract;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +29,7 @@ public class Field {
 
     private int height;
 
-    private com.tlongdev.hexle.model.enumration.SlideDirection orientation = com.tlongdev.hexle.model.enumration.SlideDirection.ANTI_DIAGONAL;
+    private SlideDirection orientation = SlideDirection.ANTI_DIAGONAL;
 
     private Tile[][] tiles;
 
@@ -44,11 +48,11 @@ public class Field {
         tileFactory = new TileFactory();
     }
 
-    public com.tlongdev.hexle.model.enumration.SlideDirection getOrientation() {
+    public SlideDirection getOrientation() {
         return orientation;
     }
 
-    public void setOrientation(com.tlongdev.hexle.model.enumration.SlideDirection orientation) {
+    public void setOrientation(SlideDirection orientation) {
         this.orientation = orientation;
     }
 
@@ -57,14 +61,14 @@ public class Field {
     }
 
     public void randomize() {
-        List<com.tlongdev.hexle.model.enumration.TileColor> colors = new LinkedList<com.tlongdev.hexle.model.enumration.TileColor>();
+        List<TileColor> colors = new LinkedList<TileColor>();
         //Fill up the field with random colored tiles
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 Tile tile = tileFactory.get(j, i);
 
                 colors.clear();
-                Collections.addAll(colors, com.tlongdev.hexle.model.enumration.TileColor.values());
+                Collections.addAll(colors, TileColor.values());
 
                 //Prevent any 3+ groups
                 do {
@@ -79,7 +83,7 @@ public class Field {
 
             //Randomize filler tiles
             Tile tile = tileFactory.get(-1, i);
-            tile.setTileColor(com.tlongdev.hexle.model.enumration.TileColor.values()[generator.nextInt(6)]);
+            tile.setTileColor(TileColor.values()[generator.nextInt(6)]);
             fillerTiles[i] = tile;
         }
     }
@@ -240,8 +244,7 @@ public class Field {
      * @param steps          the number of tiles to shift
      * @param rowIndex       the index of the row to shift
      */
-    public void shift(com.tlongdev.hexle.model.enumration.SlideDirection slideDirection, int steps, int rowIndex) {
-
+    public void shift(SlideDirection slideDirection, int steps, int rowIndex) {
         //Number of tiles in the row
         int tileCount = getRowTileCount(slideDirection, rowIndex);
 
@@ -250,131 +253,10 @@ public class Field {
         }
 
         //Create a temporary row that will store all the tiles and the filler
-        Tile[] tempRow = new Tile[tileCount + 1];
+        Tile[] tempRow = getRow(slideDirection, rowIndex);
 
-        //Position of the filler
-        int fillerIndex = getFillerIndex(slideDirection, rowIndex);
-
-        //Add the filler to the end of the new array
-        tempRow[tileCount] = fillerTiles[fillerIndex];
-
-        int startX;
-        int startY;
-        int x;
-        int y;
-
-        switch (slideDirection) {
-            case SIDEWAYS:
-                //Create a new array
-                System.arraycopy(tiles[rowIndex], 0, tempRow, 0, tileCount);
-
-                //Shift the array
-                tempRow = Util.shiftArray(tempRow, steps);
-
-                //Apply changes, update indices
-                for (int i = 0; i < tileCount; i++) {
-                    tiles[rowIndex][i] = tempRow[i];
-                    tiles[rowIndex][i].setPosX(i);
-                    tiles[rowIndex][i].setPosY(rowIndex);
-                    tiles[rowIndex][i].updateIndices();
-                }
-
-                //Apply filler (it's the last in the array)
-                fillerTiles[rowIndex] = tempRow[tileCount];
-                fillerTiles[rowIndex].setPosX(-1);
-                fillerTiles[rowIndex].setPosY(rowIndex);
-                fillerTiles[rowIndex].updateIndices();
-                break;
-            case ANTI_DIAGONAL:
-                if (rowIndex < 4) {
-                    y = startY = 6 - rowIndex * 2;
-                    x = startX = 0;
-                } else {
-                    y = startY = 0;
-                    x = startX = 2 * rowIndex - 7;
-                }
-
-                //Create a new array
-                for (int i = 0; i < tileCount; i++) {
-                    tempRow[i] = tiles[y][x];
-                    if (tempRow[i].getOrientation() == TileOrientation.UP) {
-                        x++;
-                    } else {
-                        y++;
-                    }
-                }
-
-                //Shift the array
-                tempRow = Util.shiftArray(tempRow, steps);
-
-                x = startX;
-                y = startY;
-
-                //Create a new array
-                for (int i = 0; i < tileCount; i++) {
-                    tiles[y][x] = tempRow[i];
-                    tiles[y][x].setPosY(y);
-                    tiles[y][x].setPosX(x);
-                    tiles[y][x].updateIndices();
-                    if (tiles[y][x].getOrientation() == TileOrientation.UP) {
-                        x++;
-                    } else {
-                        y++;
-                    }
-                }
-
-                //Apply filler (it's the last in the array)
-                fillerTiles[fillerIndex] = tempRow[tileCount];
-                fillerTiles[fillerIndex].setPosX(-1);
-                fillerTiles[fillerIndex].setPosY(fillerIndex);
-                fillerTiles[fillerIndex].updateIndices();
-
-                break;
-            case MAIN_DIAGONAL:
-                if (rowIndex < 4) {
-                    y = startY = 0;
-                    x = startX = 1 + rowIndex * 2;
-                } else {
-                    y = startY = 2 * rowIndex - 8;
-                    x = startX = width - 1;
-                }
-
-                //Create a new array
-                for (int i = 0; i < tileCount; i++) {
-                    tempRow[i] = tiles[y][x];
-                    if (tempRow[i].getOrientation() == TileOrientation.UP) {
-                        x--;
-                    } else {
-                        y++;
-                    }
-                }
-
-                //Shift the array
-                tempRow = Util.shiftArray(tempRow, steps);
-
-                x = startX;
-                y = startY;
-
-                //Create a new array
-                for (int i = 0; i < tileCount; i++) {
-                    tiles[y][x] = tempRow[i];
-                    tiles[y][x].setPosY(y);
-                    tiles[y][x].setPosX(x);
-                    tiles[y][x].updateIndices();
-                    if (tiles[y][x].getOrientation() == TileOrientation.UP) {
-                        x--;
-                    } else {
-                        y++;
-                    }
-                }
-
-                //Apply filler (it's the last in the array)
-                fillerTiles[fillerIndex] = tempRow[tileCount];
-                fillerTiles[fillerIndex].setPosX(-1);
-                fillerTiles[fillerIndex].setPosY(fillerIndex);
-                fillerTiles[fillerIndex].updateIndices();
-                break;
-        }
+        //Shift and replace
+        replaceRow(slideDirection, rowIndex, Util.shiftArray(tempRow, steps));
     }
 
     /**
@@ -384,8 +266,8 @@ public class Field {
      * @param rowIndex       the index of the row
      * @return the number of tiles
      */
-    public static int getRowTileCount(com.tlongdev.hexle.model.enumration.SlideDirection slideDirection, int rowIndex) {
-        return slideDirection == com.tlongdev.hexle.model.enumration.SlideDirection.SIDEWAYS ? 9 :
+    public static int getRowTileCount(SlideDirection slideDirection, int rowIndex) {
+        return slideDirection == SlideDirection.SIDEWAYS ? 9 :
                 3 + Math.min(rowIndex, 7 - rowIndex) * 4;
     }
 
@@ -396,7 +278,8 @@ public class Field {
      * @param rowIndex       the index of the row
      * @return the index of the filler
      */
-    public static int getFillerIndex(com.tlongdev.hexle.model.enumration.SlideDirection slideDirection, int rowIndex) {
+    @Contract(pure = true)
+    public static int getFillerIndex(SlideDirection slideDirection, int rowIndex) {
         switch (slideDirection) {
             case SIDEWAYS:
                 return rowIndex;
@@ -421,136 +304,18 @@ public class Field {
         }
     }
 
-    private void slideIn(com.tlongdev.hexle.model.enumration.SlideDirection slideDirection, int rowIndex) {
-        //Number of tiles in the row
-        int tileCount = getRowTileCount(orientation, rowIndex);
-
+    private void slideIn(SlideDirection slideDirection, int rowIndex) {
         //Create a temporary row that will store all the tiles and the filler
-        Tile[] tempRow = new Tile[tileCount + 1];
+        Tile[] tempRow = getRow(slideDirection, rowIndex);
 
-        //Position of the filler
-        int fillerIndex = getFillerIndex(slideDirection, rowIndex);
+        //Shrink holes
+        minimizeGaps(tempRow);
 
-        //Add the filler to the end of the new array
-        tempRow[tileCount] = fillerTiles[fillerIndex];
+        //Generate new tiles
+        randomizeEnd(tempRow, tileFactory, generator);
 
-        int startX;
-        int startY;
-        int x;
-        int y;
-
-        switch (slideDirection) {
-            case SIDEWAYS:
-                //Create a new array
-                System.arraycopy(tiles[rowIndex], 0, tempRow, 0, tileCount);
-
-                minimizeGaps(tempRow);
-                randomizeEnd(tempRow, tileFactory, generator);
-
-                //Apply changes, update indices
-                for (int i = 0; i < tileCount; i++) {
-                    tiles[rowIndex][i] = tempRow[i];
-                    tiles[rowIndex][i].setPosX(i);
-                    tiles[rowIndex][i].setPosY(rowIndex);
-                    tiles[rowIndex][i].updateIndices();
-                }
-
-                //Apply filler (it's the last in the array)
-                fillerTiles[rowIndex] = tempRow[tileCount];
-                fillerTiles[rowIndex].setPosX(-1);
-                fillerTiles[rowIndex].setPosY(rowIndex);
-                fillerTiles[rowIndex].updateIndices();
-                break;
-            case ANTI_DIAGONAL:
-                if (rowIndex < 4) {
-                    y = startY = 6 - rowIndex * 2;
-                    x = startX = 0;
-                } else {
-                    y = startY = 0;
-                    x = startX = 2 * rowIndex - 7;
-                }
-
-                //Create a new array
-                for (int i = 0; i < tileCount; i++) {
-                    tempRow[i] = tiles[y][x];
-                    if (tempRow[i].getOrientation() == TileOrientation.UP) {
-                        x++;
-                    } else {
-                        y++;
-                    }
-                }
-
-                minimizeGaps(tempRow);
-                randomizeEnd(tempRow, tileFactory, generator);
-
-                x = startX;
-                y = startY;
-
-                //Create a new array
-                for (int i = 0; i < tileCount; i++) {
-                    tiles[y][x] = tempRow[i];
-                    tiles[y][x].setPosY(y);
-                    tiles[y][x].setPosX(x);
-                    tiles[y][x].updateIndices();
-                    if (tiles[y][x].getOrientation() == TileOrientation.UP) {
-                        x++;
-                    } else {
-                        y++;
-                    }
-                }
-
-                //Apply filler (it's the last in the array)
-                fillerTiles[fillerIndex] = tempRow[tileCount];
-                fillerTiles[fillerIndex].setPosX(-1);
-                fillerTiles[fillerIndex].setPosY(fillerIndex);
-                fillerTiles[fillerIndex].updateIndices();
-
-                break;
-            case MAIN_DIAGONAL:
-                if (rowIndex < 4) {
-                    y = startY = 0;
-                    x = startX = 1 + rowIndex * 2;
-                } else {
-                    y = startY = 2 * rowIndex - 8;
-                    x = startX = width - 1;
-                }
-
-                //Create a new array
-                for (int i = 0; i < tileCount; i++) {
-                    tempRow[i] = tiles[y][x];
-                    if (tempRow[i].getOrientation() == TileOrientation.UP) {
-                        x--;
-                    } else {
-                        y++;
-                    }
-                }
-
-                minimizeGaps(tempRow);
-                randomizeEnd(tempRow, tileFactory, generator);
-
-                x = startX;
-                y = startY;
-
-                //Create a new array
-                for (int i = 0; i < tileCount; i++) {
-                    tiles[y][x] = tempRow[i];
-                    tiles[y][x].setPosY(y);
-                    tiles[y][x].setPosX(x);
-                    tiles[y][x].updateIndices();
-                    if (tiles[y][x].getOrientation() == TileOrientation.UP) {
-                        x--;
-                    } else {
-                        y++;
-                    }
-                }
-
-                //Apply filler (it's the last in the array)
-                fillerTiles[fillerIndex] = tempRow[tileCount];
-                fillerTiles[fillerIndex].setPosX(-1);
-                fillerTiles[fillerIndex].setPosY(fillerIndex);
-                fillerTiles[fillerIndex].updateIndices();
-                break;
-        }
+        //Insert new tiles
+        replaceRow(slideDirection, rowIndex, tempRow);
     }
 
     /**
@@ -559,9 +324,6 @@ public class Field {
      * @param tiles the row tho reduce
      */
     public static void minimizeGaps(Tile[] tiles) {
-
-        Tile[] backup = tiles.clone();
-
         boolean hasBlank = false;
 
         for (Tile tile : tiles) {
@@ -615,17 +377,9 @@ public class Field {
             }
         }
 
-        try {
-            //Nullify the end of the row
-            for (int i = 1; i <= totalShifts; i++) {
-                tiles[tiles.length - i] = null;
-            }
-        } catch (Exception e) {
-            String s = "";
-            for (Tile tile : backup) {
-                s += tile.toString();
-            }
-            throw new RuntimeException(s, e);
+        //Nullify the end of the row
+        for (int i = 1; i <= totalShifts; i++) {
+            tiles[tiles.length - i] = null;
         }
     }
 
@@ -642,6 +396,164 @@ public class Field {
 
         for (int j = 1; j <= slideInOffset; j++) {
             tiles[tiles.length - j].addSlideInOffset(slideInOffset);
+        }
+    }
+
+    private Tile[] getRow(SlideDirection direction, int rowIndex) {
+
+        //Number of tiles in the row
+        int tileCount = getRowTileCount(direction, rowIndex);
+
+        //Create a temporary row that will store all the tiles and the filler
+        Tile[] temp = new Tile[tileCount + 1];
+
+        //Position of the filler
+        int fillerIndex = getFillerIndex(direction, rowIndex);
+
+        //Add the filler to the end of the new array
+        temp[tileCount] = fillerTiles[fillerIndex];
+
+        int x = getRowStartX(direction, rowIndex);
+        int y = getRowStartY(direction, rowIndex);
+
+        switch (direction) {
+            case SIDEWAYS:
+                //Create a new array
+                System.arraycopy(tiles[rowIndex], 0, temp, 0, tileCount);
+                break;
+            case ANTI_DIAGONAL:
+                //Create a new array
+                for (int i = 0; i < tileCount; i++) {
+                    temp[i] = tiles[y][x];
+                    if (temp[i].getOrientation() == TileOrientation.UP) {
+                        x++;
+                    } else {
+                        y++;
+                    }
+                }
+                break;
+            case MAIN_DIAGONAL:
+                //Create a new array
+                for (int i = 0; i < tileCount; i++) {
+                    temp[i] = tiles[y][x];
+                    if (temp[i].getOrientation() == TileOrientation.UP) {
+                        x--;
+                    } else {
+                        y++;
+                    }
+                }
+                break;
+        }
+
+        return temp;
+    }
+
+    private void replaceRow(SlideDirection direction, int rowIndex, Tile[] newRow) {
+        //Number of tiles in the row
+        int tileCount = getRowTileCount(direction, rowIndex);
+
+        //Position of the filler
+        int fillerIndex = getFillerIndex(direction, rowIndex);
+
+        int x = getRowStartX(direction, rowIndex);
+        int y = getRowStartY(direction, rowIndex);
+
+        switch (direction) {
+            case SIDEWAYS:
+                //Apply changes, update indices
+                for (int i = 0; i < tileCount; i++) {
+                    tiles[rowIndex][i] = newRow[i];
+                    tiles[rowIndex][i].setPosX(i);
+                    tiles[rowIndex][i].setPosY(rowIndex);
+                    tiles[rowIndex][i].updateIndices();
+                }
+
+                //Apply filler (it's the last in the array)
+                fillerTiles[rowIndex] = newRow[tileCount];
+                fillerTiles[rowIndex].setPosX(-1);
+                fillerTiles[rowIndex].setPosY(rowIndex);
+                fillerTiles[rowIndex].updateIndices();
+                break;
+            case ANTI_DIAGONAL:
+                //Create a new array
+                for (int i = 0; i < tileCount; i++) {
+                    tiles[y][x] = newRow[i];
+                    tiles[y][x].setPosY(y);
+                    tiles[y][x].setPosX(x);
+                    tiles[y][x].updateIndices();
+                    if (tiles[y][x].getOrientation() == TileOrientation.UP) {
+                        x++;
+                    } else {
+                        y++;
+                    }
+                }
+
+                //Apply filler (it's the last in the array)
+                fillerTiles[fillerIndex] = newRow[tileCount];
+                fillerTiles[fillerIndex].setPosX(-1);
+                fillerTiles[fillerIndex].setPosY(fillerIndex);
+                fillerTiles[fillerIndex].updateIndices();
+                break;
+            case MAIN_DIAGONAL:
+                //Create a new array
+                for (int i = 0; i < tileCount; i++) {
+                    tiles[y][x] = newRow[i];
+                    tiles[y][x].setPosY(y);
+                    tiles[y][x].setPosX(x);
+                    tiles[y][x].updateIndices();
+                    if (tiles[y][x].getOrientation() == TileOrientation.UP) {
+                        x--;
+                    } else {
+                        y++;
+                    }
+                }
+
+                //Apply filler (it's the last in the array)
+                fillerTiles[fillerIndex] = newRow[tileCount];
+                fillerTiles[fillerIndex].setPosX(-1);
+                fillerTiles[fillerIndex].setPosY(fillerIndex);
+                fillerTiles[fillerIndex].updateIndices();
+                break;
+        }
+    }
+
+    @Contract(pure = true)
+    private static int getRowStartX(SlideDirection direction, int rowIndex) {
+        switch (direction) {
+            case ANTI_DIAGONAL:
+                if (rowIndex < 4) {
+                    return 0;
+                } else {
+                    return 2 * rowIndex - 7;
+                }
+            case MAIN_DIAGONAL:
+                if (rowIndex < 4) {
+                    return 1 + rowIndex * 2;
+                } else {
+                    return Config.FIELD_COLUMNS - 1;
+                }
+            default:
+                return 0;
+        }
+    }
+
+    @Contract(pure = true)
+    private static int getRowStartY(SlideDirection direction, int rowIndex) {
+        switch (direction) {
+            case ANTI_DIAGONAL:
+                if (rowIndex < 4) {
+                    return 6 - rowIndex * 2;
+                } else {
+                    return 0;
+                }
+            case MAIN_DIAGONAL:
+                if (rowIndex < 4) {
+                    return 0;
+                } else {
+                    return 2 * rowIndex - 8;
+                }
+            default:
+                return 0;
         }
     }
 }
