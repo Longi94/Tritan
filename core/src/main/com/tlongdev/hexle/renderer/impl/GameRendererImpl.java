@@ -232,13 +232,14 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
                                     view.getCenter().y)
                             .ease(Quad.IN));
 
-                    //If I used from(), the first frame would render at iT1s destionation position
+                    //If I used from(), the first frame would render at iT1s destination position
                     //making it glitchy
                     view.setCenter(view.getCenter().x + slideInVector.x,
                             view.getCenter().y + slideInVector.y);
                 }
             }
             fieldView.getFillerTileViews()[i].setTile(field.getFillerTiles()[i]);
+            fieldView.getFillerTileViews()[i].getTile().resetSlideInOffset();
         }
 
         if (animating) {

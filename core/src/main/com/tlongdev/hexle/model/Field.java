@@ -361,7 +361,8 @@ public class Field {
             slideInOffset++;
         }
 
-        for (int j = 1; j <= slideInOffset; j++) {
+        //The list tile doesn't get a slide offset
+        for (int j = 2; j <= slideInOffset; j++) {
             tiles[tiles.length - j].addSlideInOffset(slideInOffset);
         }
     }
