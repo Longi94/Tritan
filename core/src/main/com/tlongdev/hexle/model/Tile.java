@@ -162,6 +162,10 @@ public class Tile {
         return slideInOffset;
     }
 
+    public void negateSlideInOffset() {
+        slideInOffset = -slideInOffset;
+    }
+
     public enum TileOrientation {
         UP, DOWN
     }

@@ -30,7 +30,7 @@ public class Field {
 
     private int height;
 
-    private Orientation orientation;
+    private Orientation orientation = Orientation.NONE;
 
     private Tile[][] tiles;
 
@@ -95,8 +95,8 @@ public class Field {
     /**
      * Check if a field hs groups
      *
-     * @return whether the field has groups
      * @param markIfTrue only mark tiles if set to true
+     * @return whether the field has groups
      */
     public boolean checkField(boolean markIfTrue) {
         boolean result = false;
@@ -202,6 +202,7 @@ public class Field {
             }
             field.getFillerTiles()[i] = fillerTiles[i].copy();
         }
+        field.setOrientation(orientation);
         return field;
     }
 
@@ -267,14 +268,17 @@ public class Field {
     }
 
     public void generateNewTiles() {
+        if (orientation == Orientation.NONE) {
+            return;
+        }
         for (int i = 0; i < 8; i++) {
-            slideIn(SlideDirection.ANTI_DIAGONAL, i);
+            slideIn(orientation, i);
         }
     }
 
-    private void slideIn(SlideDirection slideDirection, int rowIndex) {
+    private void slideIn(Orientation orientation, int rowIndex) {
         //Create a temporary row that will store all the tiles and the filler
-        Tile[] tempRow = getRow(slideDirection, rowIndex);
+        Tile[] tempRow = getRow(orientation, rowIndex);
 
         //Shrink holes
         minimizeGaps(tempRow);
@@ -283,7 +287,7 @@ public class Field {
         randomizeEnd(tempRow, tileFactory, generator);
 
         //Insert new tiles
-        replaceRow(slideDirection, rowIndex, tempRow);
+        replaceRow(orientation, rowIndex, tempRow);
     }
 
     /**
@@ -417,6 +421,35 @@ public class Field {
         return temp;
     }
 
+    private Tile[] getRow(Orientation orientation, int rowIndex) {
+        Tile[] row;
+        switch (orientation) {
+            case EAST:
+                row = getRow(SlideDirection.SIDEWAYS, rowIndex);
+                return row;
+            case WEST:
+                row = getRow(SlideDirection.SIDEWAYS, rowIndex);
+                Util.reversArrayExceptLast(row);
+                return row;
+            case NORTH_EAST:
+                row = getRow(SlideDirection.ANTI_DIAGONAL, rowIndex);
+                return row;
+            case NORTH_WEST:
+                row = getRow(SlideDirection.MAIN_DIAGONAL, rowIndex);
+                return row;
+            case SOUTH_EAST:
+                row = getRow(SlideDirection.MAIN_DIAGONAL, rowIndex);
+                Util.reversArrayExceptLast(row);
+                return row;
+            case SOUTH_WEST:
+                row = getRow(SlideDirection.ANTI_DIAGONAL, rowIndex);
+                Util.reversArrayExceptLast(row);
+                return row;
+            default:
+                throw new IllegalArgumentException(orientation.toString() + " not allowed");
+        }
+    }
+
     private void replaceRow(SlideDirection direction, int rowIndex, Tile[] newRow) {
         //Number of tiles in the row
         int tileCount = getRowTileCount(direction, rowIndex);
@@ -483,6 +516,34 @@ public class Field {
                 fillerTiles[fillerIndex].setPosY(fillerIndex);
                 fillerTiles[fillerIndex].updateIndices();
                 break;
+        }
+    }
+
+    private void replaceRow(Orientation orientation, int rowIndex, Tile[] newRow) {
+        switch (orientation) {
+            case EAST:
+                replaceRow(SlideDirection.SIDEWAYS, rowIndex, newRow);
+                break;
+            case WEST:
+                Util.reversArrayExceptLast(newRow);
+                replaceRow(SlideDirection.SIDEWAYS, rowIndex, newRow);
+                break;
+            case NORTH_EAST:
+                replaceRow(SlideDirection.ANTI_DIAGONAL, rowIndex, newRow);
+                break;
+            case NORTH_WEST:
+                replaceRow(SlideDirection.MAIN_DIAGONAL, rowIndex, newRow);
+                break;
+            case SOUTH_EAST:
+                Util.reversArrayExceptLast(newRow);
+                replaceRow(SlideDirection.MAIN_DIAGONAL, rowIndex, newRow);
+                break;
+            case SOUTH_WEST:
+                Util.reversArrayExceptLast(newRow);
+                replaceRow(SlideDirection.ANTI_DIAGONAL, rowIndex, newRow);
+                break;
+            default:
+                throw new IllegalArgumentException(orientation.toString() + " not allowed");
         }
     }
 

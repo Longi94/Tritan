@@ -222,7 +222,28 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
                     animating = true;
 
                     Vector2 slideInVector = new Vector2(1, 0);
-                    slideInVector.setAngleRad(MathUtils.PI / 3.0f);
+
+                    switch (model.getField().getOrientation()) {
+                        case WEST:
+                            slideInVector.setAngleRad(MathUtils.PI);
+                            break;
+                        case NORTH_EAST:
+                            slideInVector.setAngleRad(MathUtils.PI / 3.0f);
+                            break;
+                        case NORTH_WEST:
+                            slideInVector.setAngleRad(2.0f * MathUtils.PI / 3.0f);
+                            break;
+                        case SOUTH_EAST:
+                            slideInVector.setAngleRad(-MathUtils.PI / 3.0f);
+                            break;
+                        case SOUTH_WEST:
+                            slideInVector.setAngleRad(-2.0f * MathUtils.PI / 3.0f);
+                            break;
+                        default:
+                            slideInVector.setAngleRad(0);
+                            break;
+                    }
+
                     slideInVector.setLength(offset * fieldView.getTileWidth() / 2.0f);
                     //Magic
                     float time = (float) Math.sqrt(offset * fieldView.getTileWidth() / 2.0f)
