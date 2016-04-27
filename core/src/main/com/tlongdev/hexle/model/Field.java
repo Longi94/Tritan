@@ -267,27 +267,33 @@ public class Field {
         }
     }
 
-    public void generateNewTiles() {
+    public boolean generateNewTiles() {
         if (orientation == Orientation.NONE) {
-            return;
+            return false;
         }
+
+        boolean newTiles = false;
+
         for (int i = 0; i < 8; i++) {
-            slideIn(orientation, i);
+            newTiles = slideIn(orientation, i) || newTiles;
         }
+
+        return newTiles;
     }
 
-    private void slideIn(Orientation orientation, int rowIndex) {
+    private boolean slideIn(Orientation orientation, int rowIndex) {
         //Create a temporary row that will store all the tiles and the filler
         Tile[] tempRow = getRow(orientation, rowIndex);
 
         //Shrink holes
         minimizeGaps(tempRow);
 
-        //Generate new tiles
-        randomizeEnd(tempRow, tileFactory, generator);
+        int newTiles = randomizeEnd(tempRow, tileFactory, generator);
 
         //Insert new tiles
         replaceRow(orientation, rowIndex, tempRow);
+
+        return newTiles > 0;
     }
 
     /**
@@ -355,7 +361,7 @@ public class Field {
         }
     }
 
-    public static void randomizeEnd(Tile[] tiles, TileFactory tileFactory, Random generator) {
+    public static int randomizeEnd(Tile[] tiles, TileFactory tileFactory, Random generator) {
         //Fill up the nulls with blank tiles
         int i = tiles.length - 1;
         int slideInOffset = 0;
@@ -370,6 +376,8 @@ public class Field {
         for (int j = 2; j <= slideInOffset; j++) {
             tiles[tiles.length - j].addSlideInOffset(slideInOffset);
         }
+
+        return slideInOffset;
     }
 
     private Tile[] getRow(SlideDirection direction, int rowIndex) {

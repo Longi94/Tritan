@@ -107,17 +107,21 @@ public class GameControllerImpl implements GameController {
     @Override
     public void notifyShiftAnimationFinish() {
         logger.info("notifyShiftAnimationFinish");
+        boolean changed = false;
         for (int i = 0; i < Consts.FIELD_ROWS; i++) {
             for (int j = 0; j < Consts.FIELD_COLUMNS; j++) {
                 if (model.getField().getTiles()[i][j].isMarked()) {
+                    changed = true;
                     model.getField().getTiles()[i][j] = tileFactory.getBlank(j, i);
                 }
             }
         }
 
-        model.getField().generateNewTiles();
-
-        renderer.notifyNewTilesGenerated();
+        if (model.getField().generateNewTiles()) {
+            renderer.notifyNewTilesGenerated();
+        } else if (changed) {
+            renderer.notifyModelChanged();
+        }
     }
 
     @Override
@@ -127,16 +131,22 @@ public class GameControllerImpl implements GameController {
         Field field = model.getField();
 
         if (field.checkField(true)) {
+            boolean changed = false;
+
             for (int i = 0; i < Consts.FIELD_ROWS; i++) {
                 for (int j = 0; j < Consts.FIELD_COLUMNS; j++) {
                     if (field.getTiles()[i][j].isMarked()) {
+                        changed = true;
                         field.getTiles()[i][j] = tileFactory.getBlank(j, i);
                     }
                 }
             }
 
-            model.getField().generateNewTiles();
-            renderer.notifyNewTilesGenerated();
+            if (model.getField().generateNewTiles()) {
+                renderer.notifyNewTilesGenerated();
+            } else if (changed) {
+                renderer.notifyModelChanged();
+            }
         }
     }
 
@@ -144,8 +154,9 @@ public class GameControllerImpl implements GameController {
     public void notifyOrientationChanged(boolean animating) {
         if (!animating) {
             // TODO: 2016.04.19. this is called way too often
-            model.getField().generateNewTiles();
-            renderer.notifyNewTilesGenerated();
+            if (model.getField().generateNewTiles()) {
+                renderer.notifyNewTilesGenerated();
+            }
         }
     }
 
