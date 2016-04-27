@@ -400,8 +400,12 @@ public class FieldView implements BaseView {
         }
 
         //Notify the listener if animation has started
-        if (animating && animationListener != null) {
-            animationListener.onAnimationStarted();
+        if (animationListener != null) {
+            if (animating) {
+                animationListener.onAnimationStarted();
+            } else {
+                animationListener.onFinishShiftAnimationFinished();
+            }
         }
     }
 
