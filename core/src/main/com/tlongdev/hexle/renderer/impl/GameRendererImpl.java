@@ -140,7 +140,7 @@ public class GameRendererImpl implements GameRenderer, Disposable, FieldView.OnA
 
     @Override
     public void touchUp(int x, int y) {
-        logger.info("touchDown");
+        logger.info("touchUp");
         //Only forward input if animation is not happening
         if (!animating) {
             //Don't forward input if dragging started while animating

@@ -37,12 +37,6 @@ public class HexleInputProcessor implements InputProcessor {
 
     private int fingerCount = 0;
 
-    //Accelerometer data
-    private float accelX;
-    private float accelY;
-    private float accelZ;
-    private int deviceOrientation;
-
     private Vector3 g;
 
     private Orientation orientation;
@@ -188,14 +182,11 @@ public class HexleInputProcessor implements InputProcessor {
         this.listener = listener;
     }
 
-    public float[] updateAccelerometer() {
-        accelX = Gdx.input.getAccelerometerX();
-        accelY = Gdx.input.getAccelerometerY();
-        accelZ = Gdx.input.getAccelerometerZ();
-        deviceOrientation = Gdx.input.getRotation();
-
-        g.set(accelX, accelY, accelZ);
-        g.nor();
+    public void updateAccelerometer() {
+        g.set(Gdx.input.getAccelerometerX(),
+                Gdx.input.getAccelerometerY(),
+                Gdx.input.getAccelerometerZ())
+                .nor();
 
         float inclination = (float) Math.acos(g.z);
 
@@ -228,9 +219,6 @@ public class HexleInputProcessor implements InputProcessor {
                 listener.onOrientationChanged(orientation);
             }
         }
-
-        // TODO: 2016.04.16. return to draw for now
-        return new float[]{rotation, inclination};
     }
 
     public interface HexleInputListener {

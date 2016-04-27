@@ -34,14 +34,7 @@ public class HexleGameScreen implements Screen {
     private BitmapFont arial12;
     private SpriteBatch batch;
 
-    private long lastTextUpdate = 0;
-    private float accelX;
-    private float accelY;
-    private float accelZ;
-    private int orientation;
-    private float rad;
     private HexleInputProcessor inputProcessor;
-    private float inclination;
 
     public HexleGameScreen() {
         logger = new Logger(TAG, Logger.DEBUG);
@@ -88,21 +81,10 @@ public class HexleGameScreen implements Screen {
     @Override
     public void render(float delta) {
 
-        float[] values = inputProcessor.updateAccelerometer();
-
-        // TODO: 2016.04.16. Remove accel data drawing
-        if (lastTextUpdate < System.currentTimeMillis() - TEXT_UPDATE_FREQUENCY) {
-            lastTextUpdate = System.currentTimeMillis();
-            rad = values[0];
-            inclination = values[1];
-            accelX = Gdx.input.getAccelerometerX();
-            accelY = Gdx.input.getAccelerometerY();
-            accelZ = Gdx.input.getAccelerometerZ();
-            orientation = Gdx.input.getRotation();
-        }
-
         //Do not update is paused
         if (!paused) {
+            inputProcessor.updateAccelerometer();
+
             //Update game world by the time that has passed since last rendered frame.
             controller.update(Gdx.graphics.getDeltaTime() * 1000.0f);
         }
@@ -115,14 +97,6 @@ public class HexleGameScreen implements Screen {
 
         //Render game world to screen
         renderer.render();
-
-        batch.begin();
-        arial12.draw(batch, "Accelerometer\nX: " + accelX + "\nY: " + accelY +
-                "\nZ: " + accelZ, 0, Gdx.graphics.getHeight());
-        arial12.draw(batch, "Radian\n" + rad , 250, Gdx.graphics.getHeight());
-        arial12.draw(batch, "Inclination\n" + inclination , 500, Gdx.graphics.getHeight());
-        arial12.draw(batch, "Orientation\n" + orientation, 750, Gdx.graphics.getHeight());
-        batch.end();
     }
 
     @Override
