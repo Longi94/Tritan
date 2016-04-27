@@ -379,7 +379,10 @@ public class FieldView implements BaseView {
         //If the tile is out of it's place animate it back
         if (slideVector.len() > 0) {
             animating = true;
-            Tween.to(slideVector, Vector2Accessor.POS_XY, Consts.SLIDE_DURATION)
+
+            float time = (float) Math.sqrt(slideVector.len() * tileWidth / 2.0f)
+                    * Consts.MAGIC_SLIDE_CONSTANT2;
+            Tween.to(slideVector, Vector2Accessor.POS_XY, time)
                     .target(0, 0)
                     .ease(Cubic.OUT)
                     .setCallback(new TweenCallback() {

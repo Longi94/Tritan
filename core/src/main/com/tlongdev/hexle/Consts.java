@@ -21,6 +21,7 @@ public class Consts {
     public static final float MIN_DRAG_DISTANCE = 10.0f;
 
     public static final float MAGIC_SLIDE_CONSTANT = 35.0f;
+    public static final float MAGIC_SLIDE_CONSTANT2 = 10.0f;
 
     public static final float INCLINATION_LIMIT = MathUtils.PI / 12.0f;
 }
