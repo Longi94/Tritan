@@ -1,0 +1,20 @@
+language: android
+android:
+  components:
+    - tools
+    - build-tools-23.0.2
+    - android-23
+
+before_install:
+  - chmod +x gradlew
+  - pip install --user codecov
+
+script:
+  - ./gradlew :core:jacocoReport --stacktrace
+
+after_success:
+  - codecov
+
+notifications:
+  email:
+    on_failure: change
