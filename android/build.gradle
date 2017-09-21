@@ -16,12 +16,21 @@ android {
 
         instrumentTest.setRoot('tests')
     }
+    packagingOptions {
+        exclude 'META-INF/robovm/ios/robovm.xml'
+    }
     defaultConfig {
-        applicationId "com.tlongdev.hexle"
-        minSdkVersion 8
+        applicationId "in.dragonbra"
+        minSdkVersion 9
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
 }
 
@@ -42,14 +51,15 @@ dependencies {
     natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a"
     natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
     natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64"
+    compile "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
     compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi"
     natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
     natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
     natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
     natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
+    compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
 }
-
 
 // called every time gradle gets executed, takes the native dependencies of
 // the natives configuration, and extracts them to the proper libs/ folders
@@ -97,5 +107,5 @@ task run(type: Exec) {
     }
 
     def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.tlongdev.hexle/com.tlongdev.hexle.AndroidLauncher'
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'in.dragonbra/in.dragonbra.AndroidLauncher'
 }
